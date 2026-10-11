@@ -1,8 +1,9 @@
-import type { AllSettings } from "@/lib/settings/schema";
+import type { AllSettings, SettingsScope } from "@/lib/settings/schema";
 import type { AvDepotInput } from "./av-depot";
 
 export interface CalculatorInfo {
-  id: string;
+  /** Also the settings scope of the calculator. */
+  id: Exclude<SettingsScope, "shared">;
   href: string;
   title: string;
   description: string;
@@ -30,6 +31,8 @@ export function toAvDepotInput(settings: AllSettings): AvDepotInput {
     etfReturnRate: shared.expectedReturn,
     exemptionOrder: shared.exemptionOrder,
     childBirthYears: shared.childBirthYears,
+    payoutReturnRate: shared.retirementReturn,
+    payoutUntilAge: shared.payoutUntilAge,
     ...settings["av-depot"],
   };
 }

@@ -174,3 +174,90 @@ export function Card({
     </section>
   );
 }
+
+function FieldLabel({
+  label,
+  shared,
+  changed,
+}: {
+  label: string;
+  shared?: boolean;
+  changed?: boolean;
+}) {
+  return (
+    <span className="flex flex-wrap items-center gap-2 text-sm font-medium text-ink">
+      {label}
+      {shared && <SharedBadge />}
+      {changed && <ChangedBadge />}
+    </span>
+  );
+}
+
+export function ToggleField({
+  label,
+  checked,
+  onChange,
+  hint,
+  shared,
+  changed,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  hint?: React.ReactNode;
+  shared?: boolean;
+  changed?: boolean;
+}) {
+  return (
+    <div>
+      <label className="flex items-start gap-2">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+          className="mt-0.5 size-4 shrink-0 accent-(--accent)"
+        />
+        <FieldLabel label={label} shared={shared} changed={changed} />
+      </label>
+      {hint && <p className="mt-1 text-xs text-ink-2">{hint}</p>}
+    </div>
+  );
+}
+
+export function SelectField<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  hint,
+  shared,
+  changed,
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+  hint?: React.ReactNode;
+  shared?: boolean;
+  changed?: boolean;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1 block">
+        <FieldLabel label={label} shared={shared} changed={changed} />
+      </span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        className="w-full rounded-md border border-axis bg-surface px-3 py-2 text-sm text-ink"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {hint && <span className="mt-1 block text-xs text-ink-2">{hint}</span>}
+    </label>
+  );
+}

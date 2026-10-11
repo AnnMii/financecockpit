@@ -8,6 +8,20 @@
       "when": 1791718009699,
       "tag": "0000_organic_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791722243512,
+      "tag": "0001_profiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791722259541,
+      "tag": "0002_drop_settings",
+      "breakpoints": true
     }
   ]
 }

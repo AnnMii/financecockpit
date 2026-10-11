@@ -15,12 +15,14 @@ import {
 type Overrides = Partial<Record<SettingsScope, Record<string, unknown>>>;
 
 interface DraftControls {
-  /** Number of values that differ from the saved settings. */
+  /** Number of values that differ from the saved profiles. */
   changedCount: number;
-  /** Writes the local values to the account. */
+  /** Writes the local values into the profiles in use. */
   save: () => void;
-  /** Drops the local values and returns to the saved settings. */
+  /** Drops the local values and returns to the saved profiles. */
   reset: () => void;
+  /** Drops the local values of one scope, e.g. after switching its profile. */
+  resetScope: (scope: SettingsScope) => void;
 }
 
 const DraftContext = createContext<DraftControls | null>(null);
@@ -30,10 +32,10 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 /**
  * Lets the fields inside work on a local copy of the settings. Changes apply
  * immediately to everything below, but reach the account only through `save`;
- * a reload or `reset` brings the saved settings back.
+ * a reload or `reset` brings the saved profiles back.
  */
 export function DraftSettings({ children }: { children: React.ReactNode }) {
-  const { settings: saved, update: saveToAccount } = useSettings();
+  const { settings: saved, update: saveToProfile } = useSettings();
   const [overrides, setOverrides] = useState<Overrides>({});
 
   const editor = useMemo<SettingsEditor>(() => {
@@ -69,17 +71,22 @@ export function DraftSettings({ children }: { children: React.ReactNode }) {
     for (const scope of SETTINGS_SCOPES) {
       const changes = overrides[scope];
       if (changes && Object.keys(changes).length > 0) {
-        saveToAccount(scope, changes as Partial<AllSettings[typeof scope]>);
+        saveToProfile(scope, changes as Partial<AllSettings[typeof scope]>);
       }
     }
     setOverrides({});
-  }, [overrides, saveToAccount]);
+  }, [overrides, saveToProfile]);
 
   const reset = useCallback(() => setOverrides({}), []);
+  const resetScope = useCallback(
+    (scope: SettingsScope) =>
+      setOverrides((previous) => ({ ...previous, [scope]: {} })),
+    [],
+  );
 
   const controls = useMemo(
-    () => ({ changedCount, save, reset }),
-    [changedCount, save, reset],
+    () => ({ changedCount, save, reset, resetScope }),
+    [changedCount, save, reset, resetScope],
   );
 
   return (
@@ -89,12 +96,17 @@ export function DraftSettings({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** The draft around the caller, or null on pages that save directly. */
+export function useDraft(): DraftControls | null {
+  return useContext(DraftContext);
+}
+
 /**
  * Floating panel in the bottom right corner with the buttons to save or
  * discard the local changes. Only shown while there are any.
  */
 export function DraftBar() {
-  const draft = useContext(DraftContext);
+  const draft = useDraft();
   if (!draft) throw new Error("DraftBar must be used inside DraftSettings");
   const { changedCount, save, reset } = draft;
   if (changedCount === 0) return null;
@@ -118,7 +130,7 @@ export function DraftBar() {
           onClick={save}
           className="rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent"
         >
-          In Einstellungen speichern
+          Im Profil speichern
         </button>
         <button
           type="button"

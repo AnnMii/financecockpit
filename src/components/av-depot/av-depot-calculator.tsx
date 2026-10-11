@@ -2,11 +2,11 @@
 
 import { DraftBar, DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
+import { CalculatorProfiles } from "@/components/profile-picker";
 import {
-  AvDepotField,
   ChildrenField,
-  SharedField,
-  TaxSavingsModeField,
+  NumberSetting,
+  SelectSetting,
   yearlySavingsHint,
 } from "@/components/setting-fields";
 import { AvDepotResults } from "./av-depot-results";
@@ -34,25 +34,27 @@ function AvDepotWorkspace() {
 
   return (
     <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-      <div>
+      <div className="space-y-4">
+        <CalculatorProfiles scope="av-depot" />
         <Card className="space-y-7">
           <Section title="Persönliche Daten">
-            <SharedField name="age" slider={sliders.age} />
-            <SharedField name="retirementAge" hint="Zwischen 65 und 70 Jahren." />
+            <NumberSetting scope="shared" name="age" slider={sliders.age} />
+            <NumberSetting scope="shared" name="retirementAge" hint="Zwischen 65 und 70 Jahren." />
           </Section>
 
           <Section title="Einkommen">
-            <SharedField name="zveSavingsPhase" slider={sliders.income} />
-            <SharedField name="zveRetirement" slider={sliders.income} />
+            <NumberSetting scope="shared" name="zveSavingsPhase" slider={sliders.income} />
+            <NumberSetting scope="shared" name="zveRetirement" slider={sliders.income} />
           </Section>
 
           <Section title="Ansparphase">
-            <SharedField
+            <NumberSetting
+              scope="shared"
               name="savingsRateMonthly"
               slider={sliders.savingsRateMonthly}
               hint={`${yearlySavingsHint(input.savingsRate / 12)}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`}
             />
-            <SharedField name="expectedReturn" />
+            <NumberSetting scope="shared" name="expectedReturn" />
           </Section>
 
           <Section title="Kinder">
@@ -60,16 +62,20 @@ function AvDepotWorkspace() {
           </Section>
 
           <Section title="Auszahlphase">
-            <AvDepotField name="oneTimePayout" slider={sliders.oneTimePayout} />
-            <AvDepotField name="payoutUntilAge" />
-            <AvDepotField name="payoutReturnRate" />
+            <NumberSetting scope="av-depot" name="oneTimePayout" slider={sliders.oneTimePayout} />
+            <NumberSetting
+              scope="shared"
+              name="payoutUntilAge"
+              hint="Im Altersvorsorgedepot mindestens bis 85."
+            />
+            <NumberSetting scope="shared" name="retirementReturn" />
           </Section>
 
           <Section title="Erweitert">
-            <AvDepotField name="avDepotCosts" />
-            <TaxSavingsModeField />
-            <SharedField name="exemptionOrder" />
-            <AvDepotField name="baseRate" />
+            <NumberSetting scope="av-depot" name="avDepotCosts" />
+            <SelectSetting scope="av-depot" name="taxSavingsMode" />
+            <NumberSetting scope="shared" name="exemptionOrder" />
+            <NumberSetting scope="av-depot" name="baseRate" />
           </Section>
         </Card>
       </div>

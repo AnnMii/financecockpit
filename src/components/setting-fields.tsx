@@ -1,162 +1,120 @@
 "use client";
 
 import { formatEuro } from "@/lib/format";
+import { numberText, selectText, toggleText } from "@/lib/settings/labels";
 import {
-  type AvDepotSettings,
+  type AllSettings,
   MAX_CHILDREN,
-  type SharedSettings,
-  TAX_SAVINGS_MODES,
-  type TaxSavingsMode,
-  avDepotFields,
+  type NumberFieldName,
+  type NumberFieldSpec,
+  type SelectFieldName,
+  type SettingsScope,
+  type ToggleFieldName,
   childBirthYearSpec,
-  sharedFields,
+  numberFields,
+  selectFields,
 } from "@/lib/settings/schema";
 import {
   ChangedBadge,
   NumberField,
+  SelectField,
   SharedBadge,
   type SliderSpec,
+  ToggleField,
 } from "./fields";
 import { useSettingsEditor } from "./settings-provider";
 
-interface FieldText {
-  label: string;
-  unit?: string;
-  hint?: string;
-}
+/**
+ * Input fields bound to one setting. They read and write through the settings
+ * editor, so inside a calculator they work on the local draft. Fields of the
+ * "shared" scope are marked as shared between calculators.
+ */
 
-const sharedText: Record<keyof typeof sharedFields, FieldText> = {
-  age: { label: "Alter", unit: "Jahre" },
-  retirementAge: { label: "Renteneintritt mit", unit: "Jahren" },
-  savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
-  expectedReturn: {
-    label: "Erwartete Rendite MSCI World",
-    unit: "% p. a.",
-    hint: "Nach Fondskosten (TER), vor Steuern.",
-  },
-  zveSavingsPhase: {
-    label: "Einkommen in der Ansparphase",
-    unit: "€ / Jahr",
-    hint: "Zu versteuerndes Einkommen pro Jahr.",
-  },
-  zveRetirement: {
-    label: "Einkommen im Ruhestand",
-    unit: "€ / Jahr",
-    hint: "Zu versteuerndes Einkommen pro Jahr, ohne die Auszahlungen.",
-  },
-  exemptionOrder: {
-    label: "Sparerpauschbetrag",
-    unit: "€ / Jahr",
-    hint: "Der Teil, der für diese Geldanlage noch frei ist.",
-  },
-};
-
-const avDepotText: Record<keyof typeof avDepotFields, FieldText> = {
-  avDepotCosts: {
-    label: "Kosten des AV-Depots",
-    unit: "% p. a.",
-    hint: "Zusätzlich zu den Fondskosten, z. B. Depotgebühr.",
-  },
-  baseRate: {
-    label: "Basiszins",
-    unit: "%",
-    hint: "Für die Vorabpauschale im normalen Depot.",
-  },
-  oneTimePayout: {
-    label: "Einmalauszahlung bei Renteneintritt",
-    unit: "%",
-    hint: "Bis zu 30 % des Kapitals, brutto.",
-  },
-  payoutReturnRate: {
-    label: "Rendite in der Auszahlphase",
-    unit: "% p. a.",
-  },
-  payoutUntilAge: { label: "Auszahlung bis Alter", unit: "Jahre" },
-};
-
-const taxSavingsModeText: Record<TaxSavingsMode, string> = {
-  avDepot: "Ins AV-Depot einzahlen",
-  secondaryDepot: "In einem separaten Depot anlegen",
-  consume: "Konsumieren",
-};
-
-export function SharedField({
+export function NumberSetting<S extends SettingsScope>({
+  scope,
   name,
+  label,
+  unit,
   hint,
   slider,
 }: {
-  name: keyof typeof sharedFields;
+  scope: S;
+  name: NumberFieldName<S>;
+  /** Overrides for calculators that call a shared value differently. */
+  label?: string;
+  unit?: string;
   hint?: React.ReactNode;
   slider?: SliderSpec;
 }) {
   const { settings, update, isChanged } = useSettingsEditor();
-  const text = sharedText[name];
+  const text = numberText[scope][name];
+  const spec = (numberFields[scope] as Record<string, NumberFieldSpec>)[name];
   return (
     <NumberField
-      label={text.label}
-      unit={text.unit}
+      label={label ?? text.label}
+      unit={unit ?? text.unit}
       hint={hint ?? text.hint}
-      spec={sharedFields[name]}
-      value={settings.shared[name]}
+      spec={spec}
+      value={(settings[scope] as Record<string, number>)[name]}
       onChange={(value) =>
-        update("shared", { [name]: value } as Partial<SharedSettings>)
+        update(scope, { [name]: value } as Partial<AllSettings[S]>)
       }
-      shared
-      changed={isChanged("shared", name)}
+      shared={scope === "shared"}
+      changed={isChanged(scope, name)}
       slider={slider}
     />
   );
 }
 
-export function AvDepotField({
+export function ToggleSetting<S extends SettingsScope>({
+  scope,
   name,
-  slider,
 }: {
-  name: keyof typeof avDepotFields;
-  slider?: SliderSpec;
+  scope: S;
+  name: ToggleFieldName<S>;
 }) {
   const { settings, update, isChanged } = useSettingsEditor();
-  const text = avDepotText[name];
+  const text = toggleText[scope][name];
   return (
-    <NumberField
+    <ToggleField
       label={text.label}
-      unit={text.unit}
       hint={text.hint}
-      spec={avDepotFields[name]}
-      value={settings["av-depot"][name]}
-      onChange={(value) =>
-        update("av-depot", { [name]: value } as Partial<AvDepotSettings>)
+      checked={(settings[scope] as Record<string, boolean>)[name]}
+      onChange={(checked) =>
+        update(scope, { [name]: checked } as Partial<AllSettings[S]>)
       }
-      changed={isChanged("av-depot", name)}
-      slider={slider}
+      shared={scope === "shared"}
+      changed={isChanged(scope, name)}
     />
   );
 }
 
-export function TaxSavingsModeField() {
+export function SelectSetting<S extends SettingsScope>({
+  scope,
+  name,
+}: {
+  scope: S;
+  name: SelectFieldName<S>;
+}) {
   const { settings, update, isChanged } = useSettingsEditor();
+  const text = selectText[scope][name] as {
+    label: string;
+    hint?: string;
+    options: Record<string, string>;
+  };
+  const values = (selectFields[scope] as Record<string, readonly string[]>)[name];
   return (
-    <label className="block">
-      <span className="mb-1 flex items-center gap-2 text-sm font-medium text-ink">
-        Verwendung der Steuerersparnis
-        {isChanged("av-depot", "taxSavingsMode") && <ChangedBadge />}
-      </span>
-      <select
-        value={settings["av-depot"].taxSavingsMode}
-        onChange={(event) =>
-          update("av-depot", {
-            taxSavingsMode: event.target.value as TaxSavingsMode,
-          })
-        }
-        className="w-full rounded-md border border-axis bg-surface px-3 py-2 text-sm text-ink"
-      >
-        {TAX_SAVINGS_MODES.map((mode) => (
-          <option key={mode} value={mode}>
-            {taxSavingsModeText[mode]}
-          </option>
-        ))}
-      </select>
-    </label>
+    <SelectField
+      label={text.label}
+      hint={text.hint}
+      value={(settings[scope] as Record<string, string>)[name]}
+      options={values.map((value) => ({ value, label: text.options[value] }))}
+      onChange={(value) =>
+        update(scope, { [name]: value } as Partial<AllSettings[S]>)
+      }
+      shared={scope === "shared"}
+      changed={isChanged(scope, name)}
+    />
   );
 }
 

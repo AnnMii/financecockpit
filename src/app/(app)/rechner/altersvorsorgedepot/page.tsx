@@ -10,7 +10,7 @@ export default function AvDepotPage() {
       <p className="mb-6 mt-1 max-w-3xl text-sm text-ink-2">
         Vergleicht das staatlich geförderte Altersvorsorgedepot mit einem
         normalen ETF-Sparplan bei gleichen Einzahlungen. Änderungen gelten nur
-        hier, bis du sie in deine Einstellungen speicherst.
+        hier, bis du sie im Profil speicherst.
       </p>
       <AvDepotCalculator />
     </>

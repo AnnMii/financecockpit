@@ -130,6 +130,11 @@ export function validateAvDepotInput(input: AvDepotInput): string[] {
   if (input.age >= input.retirementAge) {
     errors.push("Das Alter muss unter dem Renteneintrittsalter liegen.");
   }
+  if (input.payoutUntilAge < 85) {
+    errors.push(
+      "Im Altersvorsorgedepot muss die Auszahlung mindestens bis zum Alter 85 laufen.",
+    );
+  }
   if (input.payoutUntilAge <= input.retirementAge) {
     errors.push("Die Auszahlung muss nach dem Renteneintritt enden.");
   }
