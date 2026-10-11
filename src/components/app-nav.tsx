@@ -40,6 +40,9 @@ export function AppNav() {
       className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
     >
       <NavLink href="/">{t.nav.cockpit}</NavLink>
+      <GroupLabel>{t.nav.planning}</GroupLabel>
+      <NavLink href="/plan">{t.nav.plan}</NavLink>
+      <NavLink href="/verlauf">{t.nav.history}</NavLink>
       <GroupLabel>{t.nav.calculators}</GroupLabel>
       {calculators.map((calculator) => (
         <NavLink key={calculator.id} href={calculator.href}>

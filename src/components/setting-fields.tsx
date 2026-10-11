@@ -37,6 +37,7 @@ export function NumberSetting<S extends SettingsScope>({
   unit,
   hint,
   slider,
+  info,
 }: {
   scope: S;
   name: NumberFieldName<S>;
@@ -45,6 +46,8 @@ export function NumberSetting<S extends SettingsScope>({
   unit?: string;
   hint?: React.ReactNode;
   slider?: SliderSpec;
+  /** Extra element after the label, e.g. an <InfoPopover>. */
+  info?: React.ReactNode;
 }) {
   const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
@@ -63,6 +66,7 @@ export function NumberSetting<S extends SettingsScope>({
       shared={scope === "shared"}
       changed={isChanged(scope, name)}
       slider={slider}
+      info={info}
     />
   );
 }

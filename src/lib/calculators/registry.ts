@@ -1,12 +1,17 @@
 import type { AllSettings, SettingsScope } from "@/lib/settings/schema";
-import type { AvDepotInput } from "./av-depot";
+import type { PlanInput, Pots } from "@/lib/plan/plan";
+import {
+  AV_DEPOT_START_YEAR,
+  type AvDepotInput,
+  MIN_OWN_CONTRIBUTION,
+} from "./av-depot";
 import type { PensionGapInput } from "./pension-gap";
 import type { SavingsInput } from "./savings";
 import type { WithdrawalPlanInput } from "./withdrawal-plan";
 
 export interface CalculatorInfo {
   /** Also the settings scope of the calculator. */
-  id: Exclude<SettingsScope, "shared">;
+  id: Exclude<SettingsScope, "shared" | "plan">;
   href: string;
 }
 
@@ -65,7 +70,9 @@ export function toSavingsInput(settings: AllSettings): SavingsInput {
     saveInterval: savings.saveInterval,
     yearlyInterest: shared.expectedReturn,
     interestInterval: savings.interestInterval,
-    durationYears: savings.durationYears,
+    durationYears: savings.untilRetirement
+      ? shared.retirementAge - shared.age
+      : savings.durationYears,
     endValue: savings.endValue,
     considerTax: savings.considerTax,
     capitalGainsTax: shared.capitalGainsTax,
@@ -88,5 +95,51 @@ export function toWithdrawalPlanInput(
     interestRate: settings.shared.retirementReturn,
     interval: plan.interval,
     capitalConsumption: plan.capitalConsumption,
+  };
+}
+
+/**
+ * The Gesamtplan for the given settings. `values` are the current balances
+ * of the pots (from the latest recorded snapshot).
+ */
+export function toPlanInput(settings: AllSettings, values: Pots): PlanInput {
+  const { shared, plan } = settings;
+  const total = shared.savingsRateMonthly;
+  let av = (total * plan.avDepotShare) / 100;
+  const cash = (total * plan.cashShare) / 100;
+  let depot = total - av - cash;
+
+  // Below its minimum contribution there is no AV-Depot; the money goes to the depot.
+  const hasAvDepot = av * 12 >= MIN_OWN_CONTRIBUTION;
+  if (!hasAvDepot && depot >= 0) {
+    depot += av;
+    av = 0;
+  }
+
+  return {
+    age: shared.age,
+    retirementAge: shared.retirementAge,
+    payoutUntilAge: shared.payoutUntilAge,
+    inflationRate: shared.inflationRate,
+    expectedReturn: shared.expectedReturn,
+    retirementReturn: shared.retirementReturn,
+    cashReturn: plan.cashReturn,
+    capitalGainsTax: shared.capitalGainsTax,
+    depotVolatility: plan.depotVolatility,
+    cashVolatility: plan.cashVolatility,
+    pension: settings["pension-gap"],
+    rates: { av, depot, cash },
+    values,
+    avDepot: hasAvDepot
+      ? {
+          ...toAvDepotInput(settings),
+          savingsRate: av * 12,
+          // Fixed, so a frozen plan does not change with the calendar.
+          currentYear: Math.max(AV_DEPOT_START_YEAR, new Date().getFullYear()),
+        }
+      : null,
+    confidenceTarget: plan.confidenceTarget,
+    lowerGuardrail: plan.lowerGuardrail,
+    upperGuardrail: plan.upperGuardrail,
   };
 }

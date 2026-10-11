@@ -106,9 +106,9 @@ Sparrechner-Karte: 15.689 € nach 7 Jahren. Beide Karten gehen von denselben
 AV-Depot, Rest in einen ETF-Sparplan)? Das wäre ein eigener globaler Wert je
 Verwendung.
 
-**Geplant:** Der Gesamtplan aus `PLANNED_FEATURES.md` (Feature 2) setzt die
-Sparrate einmal an und teilt sie auf Töpfe auf; damit entfällt die
-Doppelzählung.
+**Stand:** Der Gesamtplan (`/plan`) setzt die Sparrate einmal an und teilt sie
+auf Töpfe auf. Die einzelnen Rechner und ihre Karten im Cockpit rechnen
+weiterhin jeweils mit der vollen Sparrate.
 
 ---
 
@@ -131,7 +131,9 @@ und dessen Sparraten steigen leicht.
 
 ## 6. Vereinfachungen im Gesamtbild „Ruhestand" des Cockpits
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [x] **Erledigt:** Dieses Gesamtbild ist entfallen. Der Gesamtplan ersetzt es
+      und rechnet durchgehend in heutiger Kaufkraft. Der Rest dieses Punktes
+      beschreibt den alten Stand.
 
 **Was gilt:** Verbleibende Lücke = Rentenlücke − Netto-Rente aus dem AV-Depot.
 
@@ -251,3 +253,61 @@ Zinssatz im Sparrechner, Entnahmebetrag im Entnahmeplan)?
       Finanzfluss-Original").
 - [ ] **Sicherung** `data/financecockpit.backup-2026-10-11.db` löschen, sobald
       nach dem Neustart alles stimmt.
+
+---
+
+## 12. Gesamtplan: Annahmen und Vorgaben zum Prüfen
+
+- [ ] **Geprüft und für mich in Ordnung**
+
+**Was gilt:** Der Gesamtplan wurde mit Vorgaben umgesetzt, die du nicht einzeln
+bestätigt hast (Liste in `PLANNED_FEATURES.md`, Feature 2, „So umgesetzt").
+
+**Beispiel mit den Standardwerten** (150 € Sparrate ganz ins AV-Depot, Alter
+35, Wunschrente 2.200 €): Der Plan zeigt rund 5 % Wahrscheinlichkeit und eine
+nötige Sparrate von rund 700 €. Der Rentenlücke-Rechner zeigt für dieselben
+Werte ohne Inflation 237,50 €. Der Unterschied kommt aus drei Dingen: Der Plan
+zieht 2 % Inflation ab, verlangt 85 % Sicherheit statt des erwarteten Verlaufs
+und rechnet die AV-Depot-Rente in heutiger Kaufkraft.
+
+**So prüfst du es:** Auf `/plan` das Sicherheitsniveau auf 50 % und die
+Schwankung auf 0 stellen (Leitplanken z. B. 1 % und 99 %): Die nötige Sparrate
+fällt dann auf den Wert der Rechnung ohne Unsicherheit.
+
+**Zu entscheiden:**
+
+- Passen 85 % / 75 % / 95 % und 15 % Schwankung zu dir?
+- Ist 2.200 € Wunschrente in **heutigen** Euro gemeint? Der Plan liest es so.
+- Reichen drei feste Töpfe?
+
+## 13. Gesamtplan: Alter jährlich mitführen
+
+- [ ] **Zur Kenntnis genommen**
+
+**Was gilt:** Der Plan rechnet ab dem Alter in den globalen Werten. Die App
+zählt es nicht selbst hoch.
+
+**Beispiel:** Frierst du 2026 mit Alter 35 ein und erfasst 2027 einen
+Ist-Stand, ohne das Alter auf 36 zu ändern, rechnet die neue Prognose mit
+einem Jahr zu viel bis zur Rente und sieht zu günstig aus. Der Punkt im
+eingefrorenen Korridor sitzt trotzdem richtig, weil er aus den Stichtagen
+berechnet wird.
+
+**Zu entscheiden:** Soll statt des Alters das Geburtsjahr gespeichert werden,
+damit das Alter automatisch stimmt? Das beträfe alle Rechner.
+
+## 14. Gesamtplan: Kaufkraft beim Vergleich
+
+- [ ] **Zur Kenntnis genommen**
+
+**Was gilt:** Der eingefrorene Korridor steht in der Kaufkraft seines
+Stichtags, die aktuelle Prognose in heutiger Kaufkraft. Ist-Stände werden mit
+der eingetragenen Inflation (sonst der Annahme des Plans) auf die Kaufkraft des
+eingefrorenen Plans umgerechnet.
+
+**Beispiel:** Stand 12.320 € ein Jahr nach dem Einfrieren, ohne eingetragene
+Inflation: Im Vergleich erscheinen 12.320 € / 1,02 = 12.078 €.
+
+**Folge:** Im Diagramm liegen eingefrorener Korridor und aktuelle Prognose
+nicht in exakt derselben Kaufkraft übereinander; über wenige Jahre ist der
+Unterschied klein, über lange Zeit wächst er.

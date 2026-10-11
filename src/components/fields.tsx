@@ -1,11 +1,23 @@
 "use client";
 
-import { useId, useState } from "react";
+import { createContext, useContext, useId, useState } from "react";
 import type { NumberFieldSpec } from "@/lib/settings/schema";
 import { useLocale } from "./locale-provider";
 
+const HideSharedBadges = createContext(false);
+
+/**
+ * Leaves out the "shared" badges of the fields inside, for pages where every
+ * field is a shared one.
+ */
+export function WithoutSharedBadges({ children }: { children: React.ReactNode }) {
+  return <HideSharedBadges value={true}>{children}</HideSharedBadges>;
+}
+
 export function SharedBadge() {
   const { t } = useLocale();
+  const hidden = useContext(HideSharedBadges);
+  if (hidden) return null;
   return (
     <span
       title={t.common.sharedTitle}
@@ -55,6 +67,8 @@ interface NumberFieldProps {
   changed?: boolean;
   /** Adds a slider below the input; it may cover less than the full range. */
   slider?: SliderSpec;
+  /** Extra element after the label, e.g. an <InfoPopover>. */
+  info?: React.ReactNode;
 }
 
 /**
@@ -72,6 +86,7 @@ export function NumberField({
   shared,
   changed,
   slider,
+  info,
 }: NumberFieldProps) {
   const id = useId();
   const { locale, t, f } = useLocale();
@@ -90,12 +105,13 @@ export function NumberField({
 
   return (
     <div>
-      <div className="mb-1 flex items-center gap-2">
+      <div className="relative mb-1 flex items-center gap-2">
         <label htmlFor={id} className="text-sm font-medium text-ink">
           {label}
         </label>
         {shared && <SharedBadge />}
         {changed && <ChangedBadge />}
+        {info}
       </div>
       <div
         className={`flex items-center rounded-md border bg-surface focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent ${

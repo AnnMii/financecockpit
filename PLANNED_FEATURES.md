@@ -221,8 +221,31 @@ Anmeldung, dann Statistik, dann Dokumentation.
 
 ## 2. Vermögensplan einfrieren und über die Zeit verfolgen
 
-**Status:** geplant, nicht begonnen (Stand 11.10.2026). Umsetzung erst auf
-ausdrückliches Startsignal.
+**Status:** Phasen 1 bis 3 umgesetzt (11.10.2026), siehe README, Abschnitt
+„Gesamtplan und Verlauf". Offen ist Phase 4 (CSV-Import, Erinnerung per
+Nachricht). Der folgende Text ist der ursprüngliche Plan; wie die offenen
+Entscheidungen ausgefallen sind, steht direkt darunter.
+
+### So umgesetzt (Abweichungen und getroffene Vorgaben)
+
+- **Töpfe:** drei feste (Altersvorsorgedepot, ETF-Depot, Tagesgeld), keine frei
+  benennbaren. Die Sparrate wird per Anteil aufgeteilt.
+- **Rentenansprüche und Wunschrente** bleiben im Rentenlücke-Rechner; der Plan
+  liest das dort aktive Profil.
+- **Rendite** bleibt nominal eingegeben; der Plan zieht die Inflationsrate
+  immer ab und rechnet nur in heutiger Kaufkraft. Eine nominale Ansicht gibt
+  es nicht.
+- **Schwankung:** Vorgabe 15 % (Depot) und 1 % (Tagesgeld), einstellbar.
+- **Profile:** Der Gesamtplan hat Profile wie die Rechner.
+- **Verschlüsselung (Feature 1)** kam nicht vorher; Planversionen und
+  Ist-Stände liegen im Klartext in `plan_records`.
+- **Nötige Sparrate** verändert nur den Anteil des ETF-Depots.
+- **Die Rente aus dem AV-Depot** wird im Verhältnis zu dessen Kapital
+  hochgerechnet statt je Verlauf neu versteuert.
+- **Das frühere „Ruhestand im Gesamtbild"** im Cockpit ist entfallen; es
+  rechnete nominal und widersprach dem Gesamtplan.
+- **Erinnerung:** nur ein Hinweis im Cockpit, wenn der letzte Stand älter als
+  ein Jahr ist.
 
 ### Anliegen
 

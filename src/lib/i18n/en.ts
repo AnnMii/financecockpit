@@ -13,6 +13,9 @@ export const en: Dictionary = {
   nav: {
     main: "Main navigation",
     cockpit: "Cockpit",
+    plan: "Overall plan",
+    history: "History",
+    planning: "Planning",
     calculators: "Calculators",
     account: "Account",
     settings: "Settings",
@@ -167,6 +170,7 @@ export const en: Dictionary = {
   },
 
   scopes: {
+    plan: "Overall plan",
     shared: "Shared values",
     "av-depot": "Altersvorsorgedepot",
     "pension-gap": "Pension gap",
@@ -175,6 +179,36 @@ export const en: Dictionary = {
   },
 
   numbers: {
+    plan: {
+      avDepotShare: {
+        label: "Share Altersvorsorgedepot",
+        unit: "%",
+        hint: "Of the savings rate; what is left after the savings account goes to the ETF account.",
+      },
+      cashShare: { label: "Share savings account", unit: "%" },
+      cashReturn: { label: "Interest savings account", unit: "% p.a." },
+      depotVolatility: {
+        label: "Fluctuation ETF account",
+        unit: "% p.a.",
+        hint: "About 15% for a global equity ETF.",
+      },
+      cashVolatility: { label: "Fluctuation savings account", unit: "% p.a." },
+      confidenceTarget: {
+        label: "Confidence level",
+        unit: "%",
+        hint: "The desired pension should be reached in this many of 100 possible courses.",
+      },
+      lowerGuardrail: {
+        label: "Lower guardrail",
+        unit: "%",
+        hint: "If the probability falls below: save more.",
+      },
+      upperGuardrail: {
+        label: "Upper guardrail",
+        unit: "%",
+        hint: "If it rises above: you may reduce.",
+      },
+    },
     shared: {
       age: { label: "Age", unit: "years" },
       retirementAge: { label: "Retirement at age", unit: "years" },
@@ -282,6 +316,7 @@ export const en: Dictionary = {
   },
 
   toggles: {
+    plan: {},
     shared: {
       considerInflation: {
         label: "Account for inflation",
@@ -291,6 +326,7 @@ export const en: Dictionary = {
     "av-depot": {},
     "pension-gap": {},
     savings: {
+      untilRetirement: { label: "Duration until retirement" },
       considerTax: { label: "Include taxes" },
       considerPartialExemption: {
         label: "Apply the partial exemption for funds",
@@ -305,6 +341,7 @@ export const en: Dictionary = {
   },
 
   selects: {
+    plan: {},
     shared: {},
     "av-depot": {
       taxSavingsMode: {
@@ -388,12 +425,185 @@ export const en: Dictionary = {
     amountPositive: "The withdrawal amount must be greater than 0.",
     needsInterest:
       "Without using up the capital a positive interest rate is needed: only the interest is withdrawn.",
+    planSharesOver100:
+      "The shares for AV-Depot and savings account must not add up to more than 100%.",
+    planGuardrailOrder:
+      "The lower guardrail must be below, the upper one above the confidence level.",
+  },
+
+  plan: {
+    pageTitle: "Overall plan",
+    intro:
+      "One plan across all pots: is your savings rate enough to reach the desired pension with the confidence you want? All amounts in today's purchasing power.",
+    historyTitle: "History",
+    historyIntro:
+      "Once a year, record what is actually in your pots and check it against a frozen plan.",
+    pots: { av: "Altersvorsorgedepot", depot: "ETF account", cash: "Savings account" },
+    sections: {
+      split: "Split of the savings rate",
+      returns: "Returns and inflation",
+      volatility: "Fluctuation",
+      confidence: "Confidence",
+      time: "Period",
+    },
+    splitSummary: (av, depot, cash) =>
+      `Per month: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
+    sourcesNote:
+      "Pension entitlements and the desired pension come from the pension gap calculator, the details of the AV-Depot from its calculator, today's balances from the history.",
+    status: {
+      increase: "Save more",
+      onTrack: "On plan – change nothing",
+      room: "Room to spare",
+    },
+    statusNote: {
+      increase: (amount) =>
+        `Raise the savings rate by ${amount} per month to reach your confidence level.`,
+      onTrack: "The probability lies between your guardrails.",
+      room: (amount) =>
+        `You could save ${amount} less per month and stay at your confidence level.`,
+    },
+    probability: "Probability of reaching the desired pension",
+    guardrails: (lower, target, upper) =>
+      `Guardrails ${lower} and ${upper}, target ${target}`,
+    currentRate: "Your savings rate",
+    requiredRate: "Required savings rate",
+    requiredRateNote: (target) => `for ${target} confidence`,
+    alternativesTitle: "Other ways back on track",
+    lowerPension: (amount) => `Lower the desired pension by ${amount} per month`,
+    retireLater: (years) => `Retire ${years} later`,
+    retireLaterNotEnough:
+      "Retiring later alone is not enough, not even five years.",
+    corridorTitle: "Wealth until retirement",
+    corridorSubtitle:
+      "In today's purchasing power. The band shows the middle 80% of possible courses, the line the middle one.",
+    corridorAria: "Line chart: possible range of wealth by age until retirement",
+    forecast: "Current forecast",
+    range: "Range",
+    snapshots: "Actual balances",
+    snapshotOn: (date) => `Balance of ${date}`,
+    frozen: (label) => `Frozen: ${label}`,
+    wealthAtRetirement: "Wealth at retirement",
+    pensionPerMonth: "Pension per month",
+    pessimistic: "Pessimistic",
+    expected: "Middle course",
+    optimistic: "Optimistic",
+    freezeTitle: "Freeze the plan",
+    freezeIntro:
+      "Freezes all assumptions and this corridor as of today. Later you check your actual balances against it; the frozen plan never changes again.",
+    freezeLabel: "Name",
+    freezeDefaultLabel: (year) => `Plan ${year}`,
+    freezeButton: "Freeze",
+    versionsTitle: "Frozen plans",
+    noVersions: "No plan frozen yet.",
+    compareWith: "Compare with",
+    noComparison: "No comparison",
+    delete: "Delete",
+    saveFailed: "That did not work. Please try again.",
+    noSnapshot:
+      "No actual balance recorded yet – the plan starts at €0 in all pots.",
+    staleSnapshot: (date) =>
+      `Last actual balance of ${date}. Time for the yearly check.`,
+    balancesFrom: (date) => `Balances of ${date}.`,
+    recordSnapshot: "Record balance",
+    openPlan: "Open plan",
+    openHistory: "Open history",
+    thenNow: {
+      title: "Planned then and seen from today",
+      then: "Then",
+      now: "Today",
+      wealth: "Wealth at retirement (middle course)",
+      pension: "Pension per month (middle course)",
+      probability: "Probability",
+      requiredRate: "Required savings rate",
+    },
+    history: {
+      formTitle: "Record actual balance",
+      date: "Date",
+      valuesTitle: "Value of each pot on the date",
+      contributionsTitle: "Paid in since the last balance",
+      inflation: "Inflation since the last balance",
+      inflationHint: "Optional, in % per year. Empty: the plan's assumption applies.",
+      note: "Note",
+      save: "Save balance",
+      listTitle: "Recorded balances",
+      empty: "No balances recorded yet.",
+      total: "Total",
+      contributions: "Paid in",
+      analysisTitle: "Deviation from the frozen plan",
+      analysisEmpty: "This needs a frozen plan and a later actual balance.",
+      analysisFor: (snapshot, plan) =>
+        `Balance of ${snapshot} against “${plan}”, in its purchasing power.`,
+      planned: "Planned for this date",
+      actual: "Actual",
+      deviation: "Deviation",
+      contributionEffect: "of which contributions",
+      marketEffect: "of which market and other",
+      actualReturn: "Return earned per year",
+      assumedReturn: "Return assumed per year",
+      position: {
+        below: "Below the corridor",
+        inside: "Inside the corridor",
+        above: "Above the corridor",
+      },
+      assumptionsTitle: "Effect of changed assumptions",
+      assumptionsNote: (frozen, current) =>
+        `Required savings rate from today's balance: ${frozen} with the assumptions of then, ${current} with today's.`,
+      rateChartTitle: "Required and actual savings rate by date",
+      rateChartAria:
+        "Column chart: required savings rate by date with the actual savings rate as a line",
+      requiredSeries: "Required savings rate",
+      actualSeries: "Actual savings rate",
+    },
+    assumptions: [
+      "All amounts in today's purchasing power; the inflation rate is always deducted, regardless of the switch in the settings.",
+      "The corridor comes from 2,000 random courses of the return with constant fluctuation; AV-Depot and ETF account move together. Extreme events beyond this assumption are not covered.",
+      "Savings rates rise with inflation; the contributions to the AV-Depot stay nominally the same and follow its calculator.",
+      "The required savings rate only changes the share of the ETF account; AV-Depot and savings account stay as set.",
+      "From retirement on, the fixed return in retirement applies and the capital is used up by the end of the payout.",
+      "The corridor is a model, not a guarantee. Not tax or investment advice.",
+    ],
+  },
+
+  life: {
+    button: "Show life expectancy in Germany",
+    title: "How old do people in Germany become?",
+    intro: (age) =>
+      `For people who have reached age ${age} (your retirement). The curves show what share of them dies at which age.`,
+    male: "Men",
+    female: "Women",
+    expectedAge: "Expected age",
+    mostCommonAge: "Most common age at death",
+    sigma: "Scatter σ",
+    band: (sigmas) => `±${sigmas}σ range (share)`,
+    olderThan: (age) => `live beyond ${age}`,
+    payoutMarker: (age) => `Payout until ${age}`,
+    chartAria: (men, women) =>
+      `Chart: share of people who die at a given age. Men die most often at ${men}, women at ${women}; after that the curve drops steeply.`,
+    shareAxis: "Share dying in this year of age",
+    outliveLegend: (age, men, women) =>
+      `Area: live beyond ${age} (men ${men}, women ${women})`,
+    hover: (age, men, women) =>
+      `${men} of men and ${women} of women live beyond ${age}.`,
+    hoverHint: "Move over the chart to read off how many live beyond an age.",
+    planning: (age, men, women) =>
+      `For your plan: with “payout until ${age}”, ${men} of men and ${women} of women reach this age – their money would be used up while they are still alive.`,
+    sigmaTitle: "What does the 3σ range mean – and why does it say little here?",
+    sigmaText:
+      "σ (sigma) is the standard deviation: it measures how far the individual ages at death scatter around the mean. In a symmetric bell curve (normal distribution) 68.3% of the values lie within ±1σ of the mean, 95.4% within ±2σ and 99.7% within ±3σ.",
+    sigmaCaveat:
+      "The age at death is not distributed symmetrically, though: the curve rises slowly, peaks only above the mean and then drops steeply. Every σ step is equally wide but holds very different numbers of people – hardly anyone dies in the outermost stretch up to +3σ, and downwards the range ends at the age already reached. The shares in the table are therefore counted from the life table. For planning, the rows “live beyond …” say more than the σ ranges.",
+    source: "Source",
+    sourceText: (period, published) =>
+      `Federal Statistical Office of Germany (Destatis), statistical report “Sterbetafeln ${period}”, published on ${published}.`,
+    ownCalculation: "Expected age, scatter and shares are our own calculation from it.",
+    periodNote:
+      "The table describes today's mortality; if life expectancy keeps rising, younger people will on average live longer than shown here.",
   },
 
   settingsPage: {
     title: "Settings",
     intro:
-      "The calculators share these values. Changes are saved automatically to the selected profile.",
+      "The calculators share these values. Changes only apply once you save them at the bottom right.",
     profileLabel: "Profile of the shared values",
     personal: "Personal data",
     saving: "Saving and investing",
@@ -561,6 +771,8 @@ export const en: Dictionary = {
     duration: "Duration",
     savingRate: (perInterval) => `Savings rate ${perInterval}`,
     durationMonths: (months) => `That is ${months} months.`,
+    durationUntilRetirement: (duration, retirementAge, age) =>
+      `Duration: ${duration} (retirement at ${retirementAge} − age ${age}).`,
     chartTitle: "Capital per year",
     chartSubtitle: "Deposits including starting capital and the interest earned on them",
     afterTax: " after taxes",

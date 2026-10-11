@@ -32,8 +32,14 @@ function Workspace() {
   const text = t.savings;
   const { input, errors, result } = useSavings();
   const { settings } = useSettingsEditor();
-  const { output, considerTax, considerPartialExemption, saveInterval } =
-    settings.savings;
+  const {
+    output,
+    untilRetirement,
+    considerTax,
+    considerPartialExemption,
+    saveInterval,
+  } = settings.savings;
+  const { age, retirementAge } = settings.shared;
   const perYear = t.common.perYearEquals(
     f.euro(settings.shared.savingsRateMonthly * 12),
   );
@@ -71,7 +77,24 @@ function Workspace() {
             )}
             <SelectSetting scope="savings" name="saveInterval" />
             {output !== "duration" && (
-              <NumberSetting scope="savings" name="durationYears" />
+              <>
+                <ToggleSetting scope="savings" name="untilRetirement" />
+                {untilRetirement ? (
+                  <>
+                    <NumberSetting scope="shared" name="age" />
+                    <NumberSetting scope="shared" name="retirementAge" />
+                    <p className="text-xs text-ink-2">
+                      {text.durationUntilRetirement(
+                        f.years(Math.max(0, retirementAge - age)),
+                        retirementAge,
+                        age,
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <NumberSetting scope="savings" name="durationYears" />
+                )}
+              </>
             )}
             {output !== "endValue" && (
               <NumberSetting scope="savings" name="endValue" />

@@ -25,4 +25,7 @@ export type CalculationError =
   | "interestAboveMinus100"
   | "capitalPositive"
   | "amountPositive"
-  | "needsInterest";
+  | "needsInterest"
+  // Gesamtplan
+  | "planSharesOver100"
+  | "planGuardrailOrder";

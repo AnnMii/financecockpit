@@ -8,11 +8,16 @@ import {
   SavingsChart,
   WithdrawalChart,
 } from "@/components/charts/calculator-charts";
-import { ShareBar } from "@/components/charts/share-bar";
 import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
+import { usePlan, usePlanRecords } from "@/components/plan/plan-records";
+import {
+  PlanCorridor,
+  PlanStatus,
+  formatDate,
+  useToday,
+} from "@/components/plan/plan-views";
 import { ProfilePicker } from "@/components/profile-picker";
-import { useSettings } from "@/components/settings-provider";
 import {
   usePensionGap,
   useSavings,
@@ -21,7 +26,6 @@ import {
 import { perIntervalText } from "@/components/withdrawal-plan/withdrawal-plan-calculator";
 import type { CalculationError } from "@/lib/calculators/errors";
 import { type CalculatorInfo, calculators } from "@/lib/calculators/registry";
-import { calculateRetirementOverview } from "@/lib/calculators/retirement-overview";
 
 interface Figure {
   label: string;
@@ -82,105 +86,91 @@ function CalculatorCard({
   );
 }
 
+/** The Gesamtplan at a glance: status, corridor and a reminder to record balances. */
+function PlanSection() {
+  const { locale, t } = useLocale();
+  const text = t.plan;
+  const today = useToday();
+  const { input, errors, result, snapshot } = usePlan();
+  const { versions, snapshots } = usePlanRecords();
+  const version = versions.at(-1);
+  const oneYearAgo = `${Number(today.slice(0, 4)) - 1}${today.slice(4)}`;
+
+  return (
+    <section aria-labelledby="plan-heading" className="space-y-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <h2 id="plan-heading" className="text-base font-semibold">
+          {text.pageTitle}
+        </h2>
+        <p className="flex gap-4 text-sm font-medium">
+          <Link href="/plan" className="text-accent">
+            {text.openPlan}
+          </Link>
+          <Link href="/verlauf" className="text-accent">
+            {text.openHistory}
+          </Link>
+        </p>
+      </div>
+
+      {(!snapshot || snapshot.date < oneYearAgo) && (
+        <p className="rounded-xl border border-line bg-surface p-4 text-sm text-ink-2">
+          {snapshot
+            ? text.staleSnapshot(formatDate(locale, snapshot.date))
+            : text.noSnapshot}{" "}
+          <Link href="/verlauf" className="font-medium text-accent">
+            {text.recordSnapshot}
+          </Link>
+        </p>
+      )}
+
+      {result ? (
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+          <PlanStatus input={input} result={result} />
+          <Card>
+            <h3 className="text-base font-semibold">{text.corridorTitle}</h3>
+            <p className="mb-4 text-sm text-ink-2">{text.corridorSubtitle}</p>
+            <PlanCorridor
+              result={result}
+              version={version}
+              snapshots={snapshots}
+              height={240}
+            />
+          </Card>
+        </div>
+      ) : (
+        <Card>
+          <p className="text-sm text-ink-2">
+            {t.dashboard.notCalculable} {t.calcErrors[errors[0]]}
+          </p>
+        </Card>
+      )}
+    </section>
+  );
+}
+
 export function Dashboard() {
   const { t, f } = useLocale();
   const text = t.dashboard;
-  const { settings } = useSettings();
   const avDepot = useAvDepot();
   const pensionGap = usePensionGap();
   const savings = useSavings();
   const withdrawal = useWithdrawalPlan();
-
-  const avMonthlyNet = avDepot.result?.av.payout.monthlyNet ?? 0;
-  const overview = pensionGap.result
-    ? calculateRetirementOverview(pensionGap.input, avMonthlyNet)
-    : null;
 
   return (
     <div className="space-y-6">
       <Card>
         <h2 className="text-base font-semibold">{t.profiles.heading}</h2>
         <p className="mb-4 text-sm text-ink-2">{text.profilesHint}</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <ProfilePicker scope="shared" />
+          <ProfilePicker scope="plan" />
           {calculators.map((calculator) => (
             <ProfilePicker key={calculator.id} scope={calculator.id} />
           ))}
         </div>
       </Card>
 
-      <section aria-labelledby="retirement-heading" className="space-y-5">
-        <h2 id="retirement-heading" className="text-base font-semibold">
-          {text.retirementHeading}
-        </h2>
-        {overview ? (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-            <Card>
-              <p className="text-sm text-ink-2">{text.remainingGap}</p>
-              <p className="mt-1 text-5xl font-semibold">
-                {f.euro(overview.remainingGap)}
-              </p>
-              <p className="mt-2 text-xs text-ink-2">
-                {overview.remainingGap === 0 ? text.gapCovered : text.gapAfter}
-              </p>
-            </Card>
-            <Card>
-              <ShareBar
-                ariaLabel={text.shareBarLabel}
-                formatValue={f.euro}
-                shares={[
-                  {
-                    label: text.netPension,
-                    value: Math.min(overview.netPension, overview.desiredPension),
-                    color: "var(--series-1)",
-                  },
-                  {
-                    label: text.avDepot,
-                    value: overview.avDepotPension,
-                    color: "var(--series-2)",
-                  },
-                  { label: text.remaining, value: overview.remainingGap },
-                ]}
-              />
-              <dl className="mt-4 grid gap-4 border-t border-line pt-4 text-sm sm:grid-cols-3">
-                <div>
-                  <dt className="text-xs text-ink-2">{text.desiredPension}</dt>
-                  <dd className="font-semibold tabular-nums">
-                    {f.euro(overview.desiredPension)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-ink-2">{text.capitalForGap}</dt>
-                  <dd className="font-semibold tabular-nums">
-                    {f.euro(overview.closing.capital)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs text-ink-2">{text.extraSavingsRate}</dt>
-                  <dd className="font-semibold tabular-nums">
-                    {f.euroCents(overview.closing.savingsRate)}
-                  </dd>
-                </div>
-              </dl>
-              <p className="mt-3 text-xs text-ink-2">
-                {avDepot.result
-                  ? text.noteWithAvDepot(
-                      f.euro(settings.shared.savingsRateMonthly),
-                      avDepot.input.payoutUntilAge,
-                    )
-                  : text.noteWithoutAvDepot}{" "}
-                {text.nominal}
-              </p>
-            </Card>
-          </div>
-        ) : (
-          <Card>
-            <p className="text-sm text-ink-2">
-              {text.notCalculable} {t.calcErrors[pensionGap.errors[0]]}
-            </p>
-          </Card>
-        )}
-      </section>
+      <PlanSection />
 
       <section aria-labelledby="calculators-heading" className="space-y-5">
         <h2 id="calculators-heading" className="text-base font-semibold">

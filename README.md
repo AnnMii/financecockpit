@@ -4,8 +4,11 @@ Persönliches Finanzcockpit: mehrere Rechner, die sich Werte wie Alter, Sparrate
 und erwartete Rendite teilen, und ein Cockpit, das ihre Ergebnisse zusammenführt.
 Alle Werte liegen in Profilen und werden pro Benutzerkonto gespeichert.
 
-| Rechner | Seite |
+| Bereich | Seite |
 | --- | --- |
+| Cockpit | `/` |
+| Gesamtplan | `/plan` |
+| Verlauf (Ist-Stände) | `/verlauf` |
 | Altersvorsorgedepot | `/rechner/altersvorsorgedepot` |
 | Rentenlücke | `/rechner/rentenluecke` |
 | Sparrechner | `/rechner/sparrechner` |
@@ -48,6 +51,7 @@ src/
     calculators/       Rechenlogik ohne UI, mit Tests
     settings/          Felder, Wertebereiche und Standardwerte der Einstellungen
     i18n/              Wörterbücher (Deutsch, Englisch) und Sprachwahl
+    plan/              Gesamtplan: Simulation, Leitplanken, Verlauf
 drizzle/               SQL-Migrationen (werden beim Start angewendet)
 test/upstream/         Vergleichstests gegen das Finanzfluss-Original
 test/fixtures/         Aufgezeichnete Ergebnisse der Finanzfluss-Seite
@@ -101,13 +105,48 @@ Rechnern und in den Einstellungen.
 
 ### Cockpit
 
-Die Startseite zeigt für die gewählte Profil-Kombination die Kernzahlen und das
-Diagramm jedes Rechners (dieselben Diagramm-Komponenten wie auf den
-Rechner-Seiten, `src/components/charts/calculator-charts.tsx`) und ein
-Gesamtbild zum Ruhestand: Wunschrente gegenüber Nettorente
-(Rentenlücke-Rechner) plus Netto-Rente aus dem Altersvorsorgedepot, die
-verbleibende Lücke sowie Kapital und zusätzliche Sparrate, die sie schließen
-(`src/lib/calculators/retirement-overview.ts`).
+Die Startseite zeigt für die gewählte Profil-Kombination oben den Gesamtplan
+(Status, Korridor) und darunter die Kernzahlen und das Diagramm jedes Rechners
+(dieselben Diagramm-Komponenten wie auf den Rechner-Seiten,
+`src/components/charts/calculator-charts.tsx`).
+
+### Gesamtplan und Verlauf
+
+Der Gesamtplan (`/plan`, Rechenkern in `src/lib/plan/`) beantwortet „spare ich
+genug?" über drei Töpfe: Altersvorsorgedepot, ETF-Depot, Tagesgeld. Die globale
+Sparrate wird einmal angesetzt und per Anteil aufgeteilt. Alle Beträge sind in
+heutiger Kaufkraft.
+
+- **Korridor:** 2.000 zufällige Verläufe der Rendite (fester Startwert, also
+  reproduzierbar) ergeben den Bereich der mittleren 80 % und den mittleren
+  Verlauf.
+- **Sicherheitsniveau und Leitplanken:** einstellbar (Vorgabe 85 %, 75 %,
+  95 %). Liegt die Wahrscheinlichkeit, die Wunschrente zu erreichen, unter der
+  unteren Leitplanke, lautet der Status „Mehr sparen" mit Betrag; über der
+  oberen „Spielraum"; dazwischen „Im Plan".
+- **Nötige Sparrate:** die Sparrate, mit der das Sicherheitsniveau erreicht
+  wird. Sie verändert nur den Anteil des ETF-Depots.
+- **Woher die Werte kommen:** Rentenansprüche und Wunschrente aus dem aktiven
+  Profil des Rentenlücke-Rechners, Details des AV-Depots aus dessen Profil,
+  die heutigen Stände aus dem letzten Ist-Stand.
+
+Verfolgen über die Zeit (`/verlauf`):
+
+1. **Plan festschreiben** (auf der Plan-Seite): friert Annahmen und Korridor
+   zum Stichtag ein. Die Planversion ändert sich nie mehr.
+2. **Ist-Stand erfassen** (jährlich): Wert je Topf, Einzahlungen seit dem
+   letzten Stand, optional die tatsächliche Inflation.
+3. **Vergleich:** Ist-Stände erscheinen als Punkte im eingefrorenen Korridor.
+   Die Abweichung wird in Einzahlungen und Markt zerlegt; die Wirkung
+   geänderter Annahmen auf die nötige Sparrate steht getrennt daneben.
+4. **Verlauf der nötigen Sparrate:** je Stichtag gespeichert und als Diagramm.
+
+Wichtig: Das Alter in den globalen Werten muss jährlich mitgeführt werden; der
+Plan rechnet ab dem dort eingetragenen Alter. Planversionen und Ist-Stände
+liegen in der Tabelle `plan_records`.
+
+Grenzen des Modells stehen auf der Plan-Seite unter „Annahmen" und im
+Kopfkommentar von `src/lib/plan/plan.ts`.
 
 ### Sprachen
 

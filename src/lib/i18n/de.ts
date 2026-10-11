@@ -61,6 +61,7 @@ const calculators: Record<CalculatorInfo["id"], CalculatorTexts> = {
 };
 
 const scopes: ScopeLabels = {
+  plan: "Gesamtplan",
   shared: "Globale Werte",
   "av-depot": "Altersvorsorgedepot",
   "pension-gap": "Rentenlücke",
@@ -69,6 +70,36 @@ const scopes: ScopeLabels = {
 };
 
 const numbers: NumberTexts = {
+  plan: {
+    avDepotShare: {
+      label: "Anteil Altersvorsorgedepot",
+      unit: "%",
+      hint: "Von der Sparrate; der Rest nach Tagesgeld fließt ins ETF-Depot.",
+    },
+    cashShare: { label: "Anteil Tagesgeld", unit: "%" },
+    cashReturn: { label: "Zins Tagesgeld", unit: "% p. a." },
+    depotVolatility: {
+      label: "Schwankung Depot",
+      unit: "% p. a.",
+      hint: "Rund 15 % für einen weltweiten Aktien-ETF.",
+    },
+    cashVolatility: { label: "Schwankung Tagesgeld", unit: "% p. a." },
+    confidenceTarget: {
+      label: "Sicherheitsniveau",
+      unit: "%",
+      hint: "In so vielen von 100 möglichen Verläufen soll die Wunschrente erreicht werden.",
+    },
+    lowerGuardrail: {
+      label: "Untere Leitplanke",
+      unit: "%",
+      hint: "Sinkt die Wahrscheinlichkeit darunter: mehr sparen.",
+    },
+    upperGuardrail: {
+      label: "Obere Leitplanke",
+      unit: "%",
+      hint: "Steigt sie darüber: Du darfst reduzieren.",
+    },
+  },
   shared: {
     age: { label: "Alter", unit: "Jahre" },
     retirementAge: { label: "Renteneintritt mit", unit: "Jahren" },
@@ -176,6 +207,7 @@ const numbers: NumberTexts = {
 };
 
 const toggles: ToggleTexts = {
+  plan: {},
   shared: {
     considerInflation: {
       label: "Inflation berücksichtigen",
@@ -185,6 +217,7 @@ const toggles: ToggleTexts = {
   "av-depot": {},
   "pension-gap": {},
   savings: {
+    untilRetirement: { label: "Laufzeit bis Renteneintritt" },
     considerTax: { label: "Steuern mitberechnen" },
     considerPartialExemption: {
       label: "Teilfreistellung bei Fonds berücksichtigen",
@@ -199,6 +232,7 @@ const toggles: ToggleTexts = {
 };
 
 const selects: SelectTexts = {
+  plan: {},
   shared: {},
   "av-depot": {
     taxSavingsMode: {
@@ -286,6 +320,10 @@ const calcErrors: Record<CalculationError, string> = {
   amountPositive: "Der Entnahmebetrag muss größer als 0 sein.",
   needsInterest:
     "Ohne Kapitalverzehr braucht es einen positiven Zinssatz: Entnommen werden nur die Zinsen.",
+  planSharesOver100:
+    "Die Anteile für AV-Depot und Tagesgeld dürfen zusammen höchstens 100 % ergeben.",
+  planGuardrailOrder:
+    "Die untere Leitplanke muss unter, die obere über dem Sicherheitsniveau liegen.",
 };
 
 const profileErrors: Record<ProfileError, string> = {
@@ -316,6 +354,9 @@ export const de = {
   nav: {
     main: "Hauptnavigation",
     cockpit: "Cockpit",
+    plan: "Gesamtplan",
+    history: "Verlauf",
+    planning: "Planung",
     calculators: "Rechner",
     account: "Konto",
     settings: "Einstellungen",
@@ -425,10 +466,184 @@ export const de = {
   selects,
   calcErrors,
 
+  plan: {
+    pageTitle: "Gesamtplan",
+    intro:
+      "Ein Plan über alle Töpfe: Reicht deine Sparrate, um die Wunschrente mit der gewünschten Sicherheit zu erreichen? Alle Beträge in heutiger Kaufkraft.",
+    historyTitle: "Verlauf",
+    historyIntro:
+      "Erfasse einmal im Jahr, was tatsächlich in deinen Töpfen liegt, und prüfe es gegen einen eingefrorenen Plan.",
+    pots: { av: "Altersvorsorgedepot", depot: "ETF-Depot", cash: "Tagesgeld" },
+    sections: {
+      split: "Aufteilung der Sparrate",
+      returns: "Renditen und Inflation",
+      volatility: "Schwankung",
+      confidence: "Sicherheit",
+      time: "Zeitraum",
+    },
+    splitSummary: (av: string, depot: string, cash: string) =>
+      `Pro Monat: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
+    sourcesNote:
+      "Rentenansprüche und Wunschrente kommen aus dem Rentenlücke-Rechner, die Details des AV-Depots aus dessen Rechner, die heutigen Stände aus dem Verlauf.",
+    status: {
+      increase: "Mehr sparen",
+      onTrack: "Im Plan – nichts ändern",
+      room: "Spielraum",
+    },
+    statusNote: {
+      increase: (amount: string) =>
+        `Erhöhe die Sparrate um ${amount} pro Monat, um dein Sicherheitsniveau zu erreichen.`,
+      onTrack: "Die Wahrscheinlichkeit liegt zwischen deinen Leitplanken.",
+      room: (amount: string) =>
+        `Du könntest ${amount} pro Monat weniger sparen und bliebest auf deinem Sicherheitsniveau.`,
+    },
+    probability: "Wahrscheinlichkeit, die Wunschrente zu erreichen",
+    guardrails: (lower: string, target: string, upper: string) =>
+      `Leitplanken ${lower} und ${upper}, Ziel ${target}`,
+    currentRate: "Deine Sparrate",
+    requiredRate: "Nötige Sparrate",
+    requiredRateNote: (target: string) => `für ${target} Sicherheit`,
+    alternativesTitle: "Andere Wege zurück auf Kurs",
+    lowerPension: (amount: string) =>
+      `Wunschrente um ${amount} pro Monat senken`,
+    retireLater: (years: string) => `${years} später in Rente gehen`,
+    retireLaterNotEnough:
+      "Später in Rente gehen reicht allein nicht, auch nicht fünf Jahre.",
+    corridorTitle: "Vermögen bis zum Renteneintritt",
+    corridorSubtitle:
+      "In heutiger Kaufkraft. Der Bereich zeigt die mittleren 80 % der möglichen Verläufe, die Linie den mittleren.",
+    corridorAria:
+      "Liniendiagramm: möglicher Bereich des Vermögens je Alter bis zum Renteneintritt",
+    forecast: "Aktuelle Prognose",
+    range: "Bereich",
+    snapshots: "Ist-Stände",
+    snapshotOn: (date: string) => `Stand vom ${date}`,
+    frozen: (label: string) => `Eingefroren: ${label}`,
+    wealthAtRetirement: "Vermögen bei Renteneintritt",
+    pensionPerMonth: "Rente pro Monat",
+    pessimistic: "Pessimistisch",
+    expected: "Mittlerer Verlauf",
+    optimistic: "Optimistisch",
+    freezeTitle: "Plan festschreiben",
+    freezeIntro:
+      "Friert alle Annahmen und diesen Korridor zum heutigen Tag ein. Später prüfst du deine Ist-Stände dagegen; der eingefrorene Plan ändert sich nie mehr.",
+    freezeLabel: "Bezeichnung",
+    freezeDefaultLabel: (year: number) => `Plan ${year}`,
+    freezeButton: "Festschreiben",
+    versionsTitle: "Eingefrorene Pläne",
+    noVersions: "Noch kein Plan eingefroren.",
+    compareWith: "Vergleichen mit",
+    noComparison: "Kein Vergleich",
+    delete: "Löschen",
+    saveFailed: "Das hat nicht geklappt. Bitte noch einmal versuchen.",
+    noSnapshot:
+      "Noch kein Ist-Stand erfasst – der Plan startet bei 0 € in allen Töpfen.",
+    staleSnapshot: (date: string) =>
+      `Letzter Ist-Stand vom ${date}. Zeit für den jährlichen Abgleich.`,
+    balancesFrom: (date: string) => `Stände vom ${date}.`,
+    recordSnapshot: "Stand erfassen",
+    openPlan: "Zum Plan",
+    openHistory: "Zum Verlauf",
+    thenNow: {
+      title: "Damals geplant und aus heutiger Sicht",
+      then: "Damals",
+      now: "Heute",
+      wealth: "Vermögen bei Renteneintritt (mittlerer Verlauf)",
+      pension: "Rente pro Monat (mittlerer Verlauf)",
+      probability: "Wahrscheinlichkeit",
+      requiredRate: "Nötige Sparrate",
+    },
+    history: {
+      formTitle: "Ist-Stand erfassen",
+      date: "Stichtag",
+      valuesTitle: "Wert je Topf am Stichtag",
+      contributionsTitle: "Eingezahlt seit dem letzten Stand",
+      inflation: "Inflation seit dem letzten Stand",
+      inflationHint:
+        "Optional, in % pro Jahr. Leer: Es gilt die Annahme des Plans.",
+      note: "Notiz",
+      save: "Stand speichern",
+      listTitle: "Erfasste Stände",
+      empty: "Noch keine Stände erfasst.",
+      total: "Gesamt",
+      contributions: "Eingezahlt",
+      analysisTitle: "Abweichung vom eingefrorenen Plan",
+      analysisEmpty:
+        "Dafür brauchst du einen eingefrorenen Plan und einen späteren Ist-Stand.",
+      analysisFor: (snapshot: string, plan: string) =>
+        `Stand vom ${snapshot} gegenüber „${plan}“, in dessen Kaufkraft.`,
+      planned: "Geplant für diesen Stichtag",
+      actual: "Tatsächlich",
+      deviation: "Abweichung",
+      contributionEffect: "davon Einzahlungen",
+      marketEffect: "davon Markt und Sonstiges",
+      actualReturn: "Erzielte Rendite pro Jahr",
+      assumedReturn: "Angenommene Rendite pro Jahr",
+      position: {
+        below: "Unter dem Korridor",
+        inside: "Im Korridor",
+        above: "Über dem Korridor",
+      },
+      assumptionsTitle: "Wirkung geänderter Annahmen",
+      assumptionsNote: (frozen: string, current: string) =>
+        `Nötige Sparrate ab dem heutigen Stand: mit den Annahmen von damals ${frozen}, mit den heutigen ${current}.`,
+      rateChartTitle: "Nötige und tatsächliche Sparrate je Stichtag",
+      rateChartAria:
+        "Säulendiagramm: nötige Sparrate je Stichtag mit der tatsächlichen Sparrate als Linie",
+      requiredSeries: "Nötige Sparrate",
+      actualSeries: "Tatsächliche Sparrate",
+    },
+    assumptions: [
+      "Alle Beträge in heutiger Kaufkraft; die Inflationsrate wird immer abgezogen, unabhängig vom Schalter in den Einstellungen.",
+      "Der Korridor entsteht aus 2.000 zufälligen Verläufen der Rendite mit gleichbleibender Schwankung; AV-Depot und ETF-Depot bewegen sich gemeinsam. Extremereignisse jenseits dieser Annahme sind nicht abgebildet.",
+      "Sparraten steigen mit der Inflation; die Einzahlungen ins AV-Depot bleiben nominal gleich und folgen dessen Rechner.",
+      "Die nötige Sparrate verändert nur den Anteil des ETF-Depots; AV-Depot und Tagesgeld bleiben wie eingestellt.",
+      "Ab Renteneintritt wird mit der festen Rendite im Ruhestand gerechnet und das Kapital bis zum Ende der Auszahlung aufgebraucht.",
+      "Der Korridor ist ein Modell, keine Garantie. Keine Steuer- oder Anlageberatung.",
+    ],
+  },
+
+  life: {
+    button: "Lebenserwartung in Deutschland anzeigen",
+    title: "Wie alt werden Menschen in Deutschland?",
+    intro: (age: number) =>
+      `Für Menschen, die ${age} Jahre alt geworden sind (dein Renteneintritt). Die Kurven zeigen, welcher Anteil von ihnen in welchem Alter stirbt.`,
+    male: "Männer",
+    female: "Frauen",
+    expectedAge: "Erwartetes Alter",
+    mostCommonAge: "Häufigstes Sterbealter",
+    sigma: "Streuung σ",
+    band: (sigmas: number) => `±${sigmas}σ-Bereich (Anteil)`,
+    olderThan: (age: number) => `werden älter als ${age}`,
+    payoutMarker: (age: number) => `Auszahlung bis ${age}`,
+    chartAria: (men: number, women: number) =>
+      `Grafik: Anteil der Menschen, die in einem bestimmten Alter sterben. Am häufigsten sterben Männer mit ${men} und Frauen mit ${women} Jahren; danach fällt die Kurve steil ab.`,
+    shareAxis: "Anteil, der in diesem Lebensjahr stirbt",
+    outliveLegend: (age: number, men: string, women: string) =>
+      `Fläche: leben länger als ${age} (Männer ${men}, Frauen ${women})`,
+    hover: (age: number, men: string, women: string) =>
+      `${men} der Männer und ${women} der Frauen werden älter als ${age}.`,
+    hoverHint: "Fahre über die Grafik, um abzulesen, wie viele ein Alter überleben.",
+    planning: (age: number, men: string, women: string) =>
+      `Für deinen Plan: Mit „Auszahlung bis ${age}“ erleben ${men} der Männer und ${women} der Frauen dieses Alter – ihr Geld wäre dann aufgebraucht, während sie noch leben.`,
+    sigmaTitle: "Was bedeutet die 3σ-Umgebung – und warum sagt sie hier wenig?",
+    sigmaText:
+      "σ (Sigma) ist die Standardabweichung: Sie misst, wie weit die einzelnen Sterbealter um den Mittelwert streuen. Bei einer symmetrischen Glockenkurve (Normalverteilung) liegen 68,3 % der Werte innerhalb von ±1σ um den Mittelwert, 95,4 % innerhalb von ±2σ und 99,7 % innerhalb von ±3σ.",
+    sigmaCaveat:
+      "Das Sterbealter ist aber nicht symmetrisch verteilt: Die Kurve steigt langsam an, hat ihren Gipfel erst oberhalb des Mittelwerts und fällt danach steil ab. Jede σ-Stufe ist gleich breit, enthält aber sehr unterschiedlich viele Menschen – im äußersten Abschnitt bis +3σ stirbt kaum noch jemand, und nach unten endet der Bereich beim bereits erreichten Alter. Die Anteile in der Tabelle sind deshalb aus der Sterbetafel gezählt. Für die Planung sagen die Zeilen „werden älter als …“ mehr als die σ-Bereiche.",
+    source: "Quelle",
+    sourceText: (period: string, published: string) =>
+      `Statistisches Bundesamt (Destatis), Statistischer Bericht „Sterbetafeln ${period}“, erschienen am ${published}.`,
+    ownCalculation:
+      "Erwartetes Alter, Streuung und Anteile sind daraus selbst berechnet.",
+    periodNote:
+      "Die Tafel beschreibt die heutige Sterblichkeit; steigt die Lebenserwartung weiter, werden Jüngere im Mittel älter als hier gezeigt.",
+  },
+
   settingsPage: {
     title: "Einstellungen",
     intro:
-      "Diese Werte teilen sich die Rechner. Änderungen werden automatisch im gewählten Profil gespeichert.",
+      "Diese Werte teilen sich die Rechner. Änderungen gelten erst, wenn du sie unten rechts speicherst.",
     profileLabel: "Profil der globalen Werte",
     personal: "Persönliche Daten",
     saving: "Sparen und Anlegen",
@@ -601,6 +816,8 @@ export const de = {
     duration: "Laufzeit",
     savingRate: (perInterval: string) => `Sparrate ${perInterval}`,
     durationMonths: (months: number) => `Das sind ${months} Monate.`,
+    durationUntilRetirement: (duration: string, retirementAge: number, age: number) =>
+      `Laufzeit: ${duration} (Renteneintritt ${retirementAge} − Alter ${age}).`,
     chartTitle: "Kapital pro Jahr",
     chartSubtitle:
       "Einzahlungen inklusive Anfangskapital und die darauf aufgelaufenen Zinsen",

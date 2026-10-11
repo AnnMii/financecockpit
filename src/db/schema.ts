@@ -45,3 +45,16 @@ export const profiles = sqliteTable(
     ),
   ],
 );
+
+/** Frozen plan versions and recorded snapshots of the Gesamtplan, see src/lib/plan. */
+export const planRecords = sqliteTable("plan_records", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  // "version" or "snapshot"
+  kind: text("kind").notNull(),
+  // One self-contained JSON document per record.
+  data: text("data").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});

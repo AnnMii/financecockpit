@@ -47,7 +47,7 @@ const GAP = 2;
 const COMPARE_COLOR = "var(--series-compare)";
 
 /** Round tick step so the axis reads 0 / 50 Tsd. / 100 Tsd. ... */
-function niceStep(max: number, targetTicks: number): number {
+export function niceStep(max: number, targetTicks: number): number {
   const raw = max / targetTicks;
   const magnitude = 10 ** Math.floor(Math.log10(raw));
   const normalized = raw / magnitude;
@@ -55,7 +55,7 @@ function niceStep(max: number, targetTicks: number): number {
   return factor * magnitude;
 }
 
-function useWidth() {
+export function useWidth() {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {

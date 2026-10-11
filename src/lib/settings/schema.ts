@@ -74,14 +74,33 @@ export const numberFields = {
     withdrawalAmount: euro(1_200, 100_000_000),
     periodYears: { min: 1, max: 100, default: 10, integer: true },
   },
+  /** The Gesamtplan, see src/lib/plan. */
+  plan: {
+    /** Share of the monthly savings rate per pot; the rest goes to the depot. */
+    avDepotShare: percent(100),
+    cashShare: percent(0),
+    cashReturn: percent(2, 10),
+    /** Yearly fluctuation of the returns. */
+    depotVolatility: percent(15, 50),
+    cashVolatility: percent(1, 10),
+    /** Share of courses that has to reach the goal, and when to act. */
+    confidenceTarget: { min: 50, max: 99, default: 85 },
+    lowerGuardrail: { min: 1, max: 98, default: 75 },
+    upperGuardrail: { min: 2, max: 100, default: 95 },
+  },
 } satisfies Record<string, Record<string, NumberFieldSpec>>;
 
 export const toggleFields = {
   shared: { considerInflation: false },
   "av-depot": {},
   "pension-gap": {},
-  savings: { considerTax: false, considerPartialExemption: false },
+  savings: {
+    untilRetirement: true,
+    considerTax: false,
+    considerPartialExemption: false,
+  },
   "withdrawal-plan": { capitalConsumption: true },
+  plan: {},
 } satisfies Record<SettingsScope, Record<string, boolean>>;
 
 /** Choice fields; the first option is the default. */
@@ -101,6 +120,7 @@ export const selectFields = {
     output: ["amount", "period", "capital"],
     interval: ["monthly", "quarterly", "biannual", "yearly"],
   },
+  plan: {},
 } as const satisfies Record<SettingsScope, Record<string, readonly string[]>>;
 
 export type SettingsScope = keyof typeof numberFields;

@@ -91,14 +91,7 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
   const netPension = grossPension - yearlyTax / 12;
   const gap = Math.max(0, input.desiredPension - netPension);
 
-  const inflation = input.considerInflation ? input.inflationRate : 0;
-  // Yearly rates after inflation and tax, as monthly rates.
-  const payoutRate =
-    (((input.retirementReturn - inflation) / 100) * (1 - taxRate)) / 12;
-  const savingRate =
-    (((input.returnUntilRetirement - inflation) / 100) *
-      (1 - input.capitalGainsTax / 100)) /
-    12;
+  const { payoutRate, savingRate } = pensionGapRates(input);
 
   const yearsUntilRetirement = input.retirementAge - input.age;
   const payoutYears = input.payoutUntilAge - input.retirementAge;
@@ -139,8 +132,26 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
   };
 }
 
+/** Monatliche Zinssätze nach Inflation und Steuern: im Ruhestand und bis dahin. */
+export function pensionGapRates(input: PensionGapInput): {
+  payoutRate: number;
+  savingRate: number;
+} {
+  const inflation = input.considerInflation ? input.inflationRate : 0;
+  return {
+    payoutRate:
+      (((input.retirementReturn - inflation) / 100) *
+        (1 - input.taxPrediction / 100)) /
+      12,
+    savingRate:
+      (((input.returnUntilRetirement - inflation) / 100) *
+        (1 - input.capitalGainsTax / 100)) /
+      12,
+  };
+}
+
 /** Barwert einer vorschüssigen Monatsrente. */
-function presentValueDue(payment: number, rate: number, months: number): number {
+export function presentValueDue(payment: number, rate: number, months: number): number {
   if (rate === 0) return payment * months;
   return ((payment * (1 - (1 + rate) ** -months)) / rate) * (1 + rate);
 }
