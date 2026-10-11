@@ -8,9 +8,12 @@ import { existsSync } from "node:fs";
 
 const SUBMODULE = "vendor/finanzfluss-calculators";
 
-// The files our AV-Depot calculator is derived from.
+// The files our AV-Depot calculator and Sparrechner are derived from.
 const PATHS = [
   "src/calculators/av-depot.ts",
+  "src/calculators/savings.ts",
+  "src/calculators/savings-end-value.ts",
+  "src/calculators/savings-utils.ts",
   "src/calculators/income-tax.ts",
   "src/constants/av-depot.ts",
   "src/utils/Lohnsteuer",

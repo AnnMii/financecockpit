@@ -1,0 +1,297 @@
+{
+  "source": "https://api.finanzfluss.de/calculator/withdrawl-plan-calculator",
+  "cases": [
+    {
+      "name": "Betrag, Standardwerte",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "1.055€"
+      }
+    },
+    {
+      "name": "Betrag, ohne Kapitalverzehr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 0,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "407,41€"
+      }
+    },
+    {
+      "name": "Betrag, vierteljährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 1,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "3.179€"
+      }
+    },
+    {
+      "name": "Betrag, halbjährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 2,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "6.396€"
+      }
+    },
+    {
+      "name": "Betrag, jährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 3,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "12.950€"
+      }
+    },
+    {
+      "name": "Betrag, jährlich, 1 Jahr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 3,
+        "inputWithdrawlPeriod": 1,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "105.000€"
+      }
+    },
+    {
+      "name": "Betrag, monatlich, 1 Jahr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 1,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "8.556€"
+      }
+    },
+    {
+      "name": "Betrag, jährlich, ohne Verzehr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 3,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 0,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "5.000€"
+      }
+    },
+    {
+      "name": "Betrag, 30 Jahre, 2,5 %",
+      "params": {
+        "inputCapitalAssets": 350000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 2.5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 30,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlAmountCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlAmount": "1.378€"
+      }
+    },
+    {
+      "name": "Kapital, Standardwerte",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "capitalAssetsCalc"
+      },
+      "expected": {
+        "outputResultCapitalAssets": "113.719€"
+      }
+    },
+    {
+      "name": "Kapital, ohne Kapitalverzehr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 0,
+        "output": "capitalAssetsCalc"
+      },
+      "expected": {
+        "outputResultCapitalAssets": "294.542€"
+      }
+    },
+    {
+      "name": "Kapital, jährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 3,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "capitalAssetsCalc"
+      },
+      "expected": {
+        "outputResultCapitalAssets": "9.266€"
+      }
+    },
+    {
+      "name": "Kapital, vierteljährlich, ohne Verzehr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 1,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 0,
+        "output": "capitalAssetsCalc"
+      },
+      "expected": {
+        "outputResultCapitalAssets": "97.782€"
+      }
+    },
+    {
+      "name": "Zeitraum, Standardwerte",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "8,50",
+        "outputResultWithdrawlPeriodEndless": false
+      }
+    },
+    {
+      "name": "Zeitraum, endlos",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 400,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "0,00",
+        "outputResultWithdrawlPeriodEndless": true
+      }
+    },
+    {
+      "name": "Zeitraum, vierteljährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 5000,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 1,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "5,77",
+        "outputResultWithdrawlPeriodEndless": false
+      }
+    },
+    {
+      "name": "Zeitraum, jährlich",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 20000,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 3,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "5,90",
+        "outputResultWithdrawlPeriodEndless": false
+      }
+    },
+    {
+      "name": "Zeitraum, unter 1 Jahr",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 9000,
+        "inputInterestRate": 5,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "0,95",
+        "outputResultWithdrawlPeriodEndless": false
+      }
+    },
+    {
+      "name": "Zeitraum, negativer Zins",
+      "params": {
+        "inputCapitalAssets": 100000,
+        "inputWithdrawlAmount": 1200,
+        "inputInterestRate": -2,
+        "inputWithdrawlIntervall": 0,
+        "inputWithdrawlPeriod": 10,
+        "inputCapitalConsumption": 1,
+        "output": "withdrawlPeriodCalc"
+      },
+      "expected": {
+        "outputResultWithdrawlPeriod": "6,49",
+        "outputResultWithdrawlPeriodEndless": false
+      }
+    }
+  ],
+  "recordedAt": "2026-10-11"
+}

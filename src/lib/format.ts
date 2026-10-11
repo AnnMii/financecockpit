@@ -13,6 +13,27 @@ export function formatEuro(value: number): string {
   return euroFormat.format(Math.round(value));
 }
 
+const euroCentsFormat = new Intl.NumberFormat("de-DE", {
+  style: "currency",
+  currency: "EUR",
+});
+
+/** For monthly amounts where cents matter: 327.512 -> "327,51 €" */
+export function formatEuroCents(value: number): string {
+  return euroCentsFormat.format(value);
+}
+
+/** 8.5 -> "8,5 Jahre", 1 -> "1 Jahr" */
+export function formatYears(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  return `${numberFormat.format(rounded)} ${rounded === 1 ? "Jahr" : "Jahre"}`;
+}
+
+/** 5.123 -> "5,12 %" */
+export function formatPercent(value: number): string {
+  return `${numberFormat.format(Math.round(value * 100) / 100)} %`;
+}
+
 /** Axis labels: 0 € / 50 Tsd. € / 1,2 Mio. € */
 export function formatEuroCompact(value: number): string {
   const abs = Math.abs(value);

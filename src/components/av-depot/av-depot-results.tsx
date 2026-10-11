@@ -170,7 +170,7 @@ export function AvDepotResults({
   }));
 
   return (
-    <div className="min-w-0 space-y-5">
+    <>
       <StatTile
         hero
         label={`Endvermögen im Altersvorsorgedepot mit ${input.retirementAge} Jahren`}
@@ -309,6 +309,6 @@ export function AvDepotResults({
           </li>
         </ul>
       </Card>
-    </div>
+    </>
   );
 }

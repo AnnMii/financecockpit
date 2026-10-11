@@ -23,7 +23,14 @@ interface Props {
   data: ColumnDatum[];
   /** Stacked from the baseline upwards, in this order. */
   series: ColumnSeries[];
-  totalLabel: string;
+  /** Label of the sum row in the tooltip. */
+  totalLabel?: string;
+  /**
+   * The series are phases of one quantity (each column belongs to one of
+   * them) rather than parts of a whole: the tooltip then shows only the
+   * column's own series and no sum.
+   */
+  phases?: boolean;
   compareLabel?: string;
   formatValue: (value: number) => string;
   formatAxis: (value: number) => string;
@@ -70,6 +77,7 @@ export function StackedColumns({
   data,
   series,
   totalLabel,
+  phases = false,
   compareLabel,
   formatValue,
   formatAxis,
@@ -104,7 +112,11 @@ export function StackedColumns({
 
   return (
     <div>
-      <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-2">
+      {/* One series needs no legend: the chart title already names it. */}
+      <ul
+        hidden={series.length < 2 && !showCompare}
+        className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-2"
+      >
         {series.map((s) => (
           <li key={s.key} className="flex items-center gap-1.5">
             <span
@@ -274,24 +286,29 @@ export function StackedColumns({
           >
             <p className="mb-2 font-semibold text-ink">{activeRow.title}</p>
             <dl className="space-y-1">
-              {[...series].reverse().map((s) => (
-                <div key={s.key} className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-0.5 w-3 shrink-0 rounded-full"
-                    style={{ background: s.color }}
-                  />
-                  <dt className="flex-1 text-ink-2">{s.label}</dt>
+              {[...series]
+                .reverse()
+                .filter((s) => !phases || value(activeRow, s.key) > 0)
+                .map((s) => (
+                  <div key={s.key} className="flex items-center gap-2">
+                    <span
+                      className="inline-block h-0.5 w-3 shrink-0 rounded-full"
+                      style={{ background: s.color }}
+                    />
+                    <dt className="flex-1 text-ink-2">{s.label}</dt>
+                    <dd className="font-semibold tabular-nums text-ink">
+                      {formatValue(value(activeRow, s.key))}
+                    </dd>
+                  </div>
+                ))}
+              {totalLabel && !phases && series.length > 1 && (
+                <div className="flex items-center gap-2 border-t border-line pt-1">
+                  <dt className="flex-1 pl-5 text-ink-2">{totalLabel}</dt>
                   <dd className="font-semibold tabular-nums text-ink">
-                    {formatValue(value(activeRow, s.key))}
+                    {formatValue(total(activeRow))}
                   </dd>
                 </div>
-              ))}
-              <div className="flex items-center gap-2 border-t border-line pt-1">
-                <dt className="flex-1 pl-5 text-ink-2">{totalLabel}</dt>
-                <dd className="font-semibold tabular-nums text-ink">
-                  {formatValue(total(activeRow))}
-                </dd>
-              </div>
+              )}
               {showCompare && (
                 <div className="flex items-center gap-2">
                   <span

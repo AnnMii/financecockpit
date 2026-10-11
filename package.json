@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
-    "upstream:diff": "node scripts/upstream-diff.mjs"
+    "upstream:diff": "node scripts/upstream-diff.mjs",
+    "upstream:check-api": "node scripts/upstream-check-api.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
