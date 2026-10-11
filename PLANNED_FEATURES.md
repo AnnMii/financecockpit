@@ -216,3 +216,184 @@ Datenbankschema, das Speichern der Profile und die Einstellungen-Seite und
 bringt zwei neue Seiten (Wiederherstellung, Passwort ändern) sowie ein
 Auswertungsskript. Sinnvoll in drei Schritten: erst Verschlüsselung und
 Anmeldung, dann Statistik, dann Dokumentation.
+
+---
+
+## 2. Vermögensplan einfrieren und über die Zeit verfolgen
+
+**Status:** geplant, nicht begonnen (Stand 11.10.2026). Umsetzung erst auf
+ausdrückliches Startsignal.
+
+### Anliegen
+
+Heute einen Plan aufstellen (z. B. mit 7 % für den MSCI World und einer
+Rentenlücke von 0), ihn einfrieren und in einem oder fünf Jahren prüfen, ob du
+noch im Plan bist – auch nach einem Börsencrash, starken Anstiegen, geänderter
+Inflation oder wenn die Renditeannahme nicht eintritt. Ziel: auf keinen Fall zu
+wenig investieren, aber auch nicht unnötig viel.
+
+### Kritisch geprüft: Was davon trägt, was korrigiert werden muss
+
+Das Anliegen ist der Kern professioneller Finanzplanung (eingefrorener
+Ausgangsplan, regelmäßiger Soll-Ist-Vergleich). Drei Korrekturen sind nötig,
+damit der Vergleich nicht zu falschen Entscheidungen führt:
+
+1. **Der Vergleich „Ist gegen alte Plan-Linie" entscheidet nichts.** Bei rund
+   15 % Schwankung pro Jahr liegt ein Aktiendepot nach einem Jahr fast nie auf
+   der Linie; ±15–20 % sind Rauschen. „Unter Plan → mehr sparen" nach einem
+   Crash und vor allem „über Plan → weniger sparen" nach einem Boom wären
+   Fehlschlüsse. Erst ein Korridor macht den Vergleich deutbar.
+2. **Entschieden wird über den Blick nach vorn.** Leitkennzahl ist die
+   **nötige Sparrate**: Was müsstest du ab dem heutigen Ist-Stand sparen, um das
+   Ziel zu erreichen, gegenüber dem, was du tatsächlich sparst? Sie beantwortet
+   „nicht zu wenig, nicht zu viel" direkt. Der eingefrorene Plan bleibt Maßstab
+   und dient der Ursachenanalyse.
+3. **„Auf keinen Fall zu wenig" braucht ein Sicherheitsniveau.** Ein Plan, der
+   bei 7 % genau auf Rentenlücke 0 kommt, geht nur in etwa der Hälfte der
+   möglichen Verläufe auf. Deshalb: eine Zielwahrscheinlichkeit und
+   **Leitplanken**. Unter der unteren wird mehr gespart, über der oberen darf
+   reduziert werden, dazwischen ändert sich nichts – auch wenn das Depot
+   schwankt.
+
+Außerdem:
+
+- **Real statt nominal.** 7 % für den MSCI World sind nominal. Bei einer
+  Wunschrente in heutigen Euro muss die Inflation abgezogen werden, sonst zeigt
+  der Plan eine Lücke von 0, wo real eine große ist.
+- **Ein schlechtes Jahr widerlegt die Annahme nicht.** Renditeannahmen werden
+  bewusst und getrennt geändert, nie automatisch aus dem letzten Jahr.
+- **Der Vermögensstand allein reicht nicht.** Ohne die Einzahlungen seit dem
+  letzten Stichtag lässt sich der Markt nicht vom Sparverhalten trennen, und
+  beides verlangt eine andere Reaktion.
+- **Abgleich jährlich.** Häufiger zeigt vor allem Rauschen; aussagekräftig wird
+  der Vergleich über mehrere Jahre.
+
+### Getroffene Entscheidungen
+
+| Frage | Entscheidung | Verworfen |
+| --- | --- | --- |
+| Was wird verfolgt? | Ein neuer, in sich stimmiger **Gesamtplan**; die Rechner bleiben zum Durchspielen | Ergebnisse der einzelnen Rechner verfolgen (Sparrate bliebe doppelt angesetzt, siehe `TODO.md` Punkt 4) |
+| Ist-Stand | **Je Topf** (z. B. AV-Depot, ETF-Depot, Tagesgeld) | ein einziger Gesamtwert |
+| Unsicherheit | **Korridor aus Schwankung** | drei feste Szenarien; nur eine Linie |
+| Sicherheitsniveau | **Selbst einstellbar**, Vorgabe 85 %, Leitplanken 75 % und 95 % | fest 50 %, 85 % oder 95 % |
+
+### Ablauf
+
+1. **Gesamtplan.** Vorhandenes Vermögen je Topf plus Sparrate (einmal
+   angesetzt, auf die Töpfe aufgeteilt) → Vermögen bei Renteneintritt → daraus
+   die Monatsrente → Rentenlücke.
+2. **Korridor.** Aus erwarteter Rendite und Schwankung je Topf entsteht per
+   Simulation ein Bereich: pessimistisch (10 %), erwartet (50 %), optimistisch
+   (90 %). Der Zufallsgenerator hat einen festen Startwert, damit derselbe Plan
+   dieselben Zahlen liefert.
+3. **Einfrieren.** „Plan festschreiben" hält zu einem Stichtag alle Annahmen,
+   die Ergebnisse des Cockpits und den Korridor fest. Diese Planversion ändert
+   sich nie mehr, auch wenn Profile später geändert werden.
+4. **Jährlicher Abgleich.** Du erfasst den Wert jedes Topfes und die seitdem
+   geleisteten Einzahlungen, optional die tatsächliche Inflation. Die Annahmen
+   bleiben unverändert, bis du sie bewusst änderst.
+5. **Blick nach vorn (entscheidet).** Vom Ist-Stand aus wird neu gerechnet:
+   Wahrscheinlichkeit, das Ziel zu erreichen, und nötige Sparrate für das
+   eingestellte Sicherheitsniveau, verglichen mit deiner tatsächlichen
+   Sparrate. Beide Kennzahlen werden je Stichtag gespeichert und als Verlauf
+   gezeigt.
+6. **Leitplanken.** Status in drei Stufen: „mehr sparen" (mit Betrag),
+   „im Plan – nichts ändern", „Spielraum" (mit dem Betrag, um den du reduzieren
+   könntest).
+7. **Blick zurück (erklärt).** Ist-Stände als Punkte im eingefrorenen Korridor.
+   Die Abweichung wird zerlegt in Markt (tatsächliche statt angenommene
+   Rendite), Einzahlungen (mehr oder weniger als geplant) und bewusst geänderte
+   Annahmen.
+8. **Zurück auf Kurs.** Unter der unteren Leitplanke zeigt die App drei Wege:
+   Sparrate um X erhöhen, Y Jahre später in Rente, Wunschrente um Z senken.
+
+Alle Beträge wahlweise in heutiger Kaufkraft (Vorgabe) oder nominal.
+
+**Beispiel:** Plan 2026 mit 150 € Sparrate, Sicherheitsniveau 85 %. 2027 steht
+das Depot nach einem Crash 30 % unter dem erwarteten Wert. Der Punkt liegt
+unter dem Korridor von 2026; die Wahrscheinlichkeit, das Ziel zu erreichen,
+fällt z. B. auf 70 % und damit unter die untere Leitplanke. Status: „mehr
+sparen", mit der Sparrate, die wieder auf 85 % führt. Erholt sich der Markt
+bis 2028, steigt die Wahrscheinlichkeit wieder; liegt sie über 95 %, lautet der
+Status „Spielraum". (Zahlen zur Veranschaulichung, nicht gerechnet.)
+
+### Bausteine
+
+- **Töpfe** (neuer Bereich `plan` in den Einstellungen): Name, Art (AV-Depot,
+  Depot, Tagesgeld), Anteil an der Sparrate, erwartete Rendite, Schwankung
+  (Vorschlag: 15 % Depot, 1 % Tagesgeld). Das AV-Depot nutzt für Zulagen,
+  Steuerersparnis und Auszahlungssteuer die bestehende Logik aus
+  `src/lib/calculators/av-depot.ts`.
+- **Rechenkern** `src/lib/plan/`: Projektion je Jahr und Topf; Simulation mit
+  Perzentilen; Rente aus dem Endvermögen (Formeln aus
+  `src/lib/calculators/pension-gap.ts`); Wahrscheinlichkeit, die Wunschrente zu
+  erreichen; nötige Sparrate für ein Sicherheitsniveau; Zerlegung der
+  Abweichung; tatsächlich erzielte Rendite zwischen zwei Ständen
+  (geldgewichtet); „zurück auf Kurs"-Lösungen.
+- **Daten:** `plan_versions` (eingefrorene Annahmen, Korridor, Datum,
+  Bezeichnung) und `snapshots` (Datum, Wert und Einzahlungen je Topf,
+  Inflation, Notiz), je Benutzer als abgeschlossene Datenblöcke. So lassen sie
+  sich mit Feature 1 (Verschlüsselung im Browser) ohne Umbau verschlüsseln.
+- **Oberfläche:**
+  - Cockpit oben: Status der Leitplanken, nötige gegenüber tatsächlicher
+    Sparrate, Erfolgswahrscheinlichkeit. Darunter das Korridor-Diagramm mit
+    Ist-Punkten und neuer Prognose, der Verlauf der nötigen Sparrate über die
+    Stichtage und die Kennzahlen „damals geplant" neben „aus heutiger Sicht".
+  - Seite „Plan": Töpfe und Aufteilung bearbeiten, Sicherheitsniveau und
+    Leitplanken einstellen, mit direkter Anzeige, wie die nötige Sparrate
+    darauf reagiert; Plan festschreiben.
+  - Seite „Verlauf": Ist-Stände erfassen und ansehen, Abweichungsanalyse
+    zwischen zwei Ständen.
+  - Hinweis im Cockpit, wenn der letzte Stand älter als ein Jahr ist.
+
+### Reihenfolge
+
+| Phase | Inhalt | Ergebnis |
+| --- | --- | --- |
+| 1 | Töpfe, Gesamtplan in heutiger Kaufkraft, Korridor, Sicherheitsniveau, nötige Sparrate, Diagramm im Cockpit | Stimmiger Plan mit Bandbreite und der Antwort „spare ich genug?", noch ohne Verlauf |
+| 2 | Plan festschreiben, jährliche Ist-Stände, neue Prognose ab Ist-Stand, Leitplanken-Status, Verlauf der nötigen Sparrate | Der Plan lässt sich über die Zeit verfolgen und sagt, ob etwas zu ändern ist |
+| 3 | Abweichungsanalyse (Markt, Einzahlungen, Annahmen), tatsächliche Inflation, „zurück auf Kurs" | Abweichungen werden erklärt und beantwortet |
+| 4 | Optional: Depotwerte aus CSV einlesen, Erinnerung an den Abgleich | Weniger Handarbeit |
+
+### Grenzen
+
+- Der Korridor ist ein Modell: gleichbleibende Schwankung, keine
+  Extremereignisse über die Annahme hinaus, alle Aktien-Töpfe bewegen sich
+  gemeinsam. Er ist keine Garantie und keine Anlageberatung.
+- Ohne erfasste Einzahlungen lassen sich Markt- und Einzahlungseffekt nur
+  schätzen (geplante Sparrate × Monate).
+- Die tatsächliche Inflation trägst du selbst ein (Verbraucherpreisindex des
+  Statistischen Bundesamts); ein automatischer Abruf ist nicht geplant.
+
+### Noch zu entscheiden (vor dem Start)
+
+- Welche Töpfe du tatsächlich hast und wie die Sparrate aufgeteilt ist.
+- Wo Rentenansprüche und Wunschrente leben sollen: heute im Rentenlücke-Rechner,
+  für den Gesamtplan wären sie besser globale Werte.
+- Ob die erwartete Rendite künftig real (nach Inflation) eingegeben wird oder
+  weiter nominal mit Abzug der Inflationsrate. Das betrifft auch die
+  bestehenden Rechner.
+- Welche Schwankung je Topf gelten soll.
+- Ob der Gesamtplan Profile bekommt wie die Rechner (z. B. „Basis",
+  „Teilzeit ab 55").
+- Reihenfolge gegenüber Feature 1: Ist-Stände sind besonders sensible Daten;
+  bei einem Hosting für andere sollte die Verschlüsselung vorher oder
+  gleichzeitig kommen.
+
+### Verifikation nach der Umsetzung (je Phase)
+
+- Rechenkern-Tests:
+  - Ohne Schwankung liefert die Simulation dieselben Werte wie Sparrechner und
+    Rentenlücke-Rechner.
+  - Perzentile sind geordnet; derselbe Plan gibt dieselben Zahlen.
+  - Ein höheres Sicherheitsniveau ergibt nie eine niedrigere nötige Sparrate;
+    bei 50 % entspricht sie der Rechnung mit dem erwarteten Verlauf.
+  - Die Zerlegung der Abweichung summiert sich zur Gesamtabweichung; die
+    geldgewichtete Rendite stimmt an Handbeispielen.
+- Browsertest gegen eine eigene Testdatenbank:
+  - Plan festschreiben; Stand mit −30 % erfassen → Punkt unter dem Korridor,
+    nötige Sparrate steigt, Status je nach Leitplanke.
+  - Stand mit +40 % → Status „Spielraum" mit Betrag.
+  - Der eingefrorene Plan bleibt unverändert, auch wenn Profile geändert werden.
+  - Eine geänderte Renditeannahme erscheint in der Abweichungsanalyse getrennt
+    vom Markt.

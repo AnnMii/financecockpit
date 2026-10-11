@@ -106,6 +106,10 @@ Sparrechner-Karte: 15.689 € nach 7 Jahren. Beide Karten gehen von denselben
 AV-Depot, Rest in einen ETF-Sparplan)? Das wäre ein eigener globaler Wert je
 Verwendung.
 
+**Geplant:** Der Gesamtplan aus `PLANNED_FEATURES.md` (Feature 2) setzt die
+Sparrate einmal an und teilt sie auf Töpfe auf; damit entfällt die
+Doppelzählung.
+
 ---
 
 ## 5. Die Kapitalertragsteuer ist global
