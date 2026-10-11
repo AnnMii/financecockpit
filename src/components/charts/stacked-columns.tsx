@@ -32,13 +32,15 @@ interface Props {
    * column's own series and no sum.
    */
   phases?: boolean;
+  /** Height in pixels. */
+  height?: number;
   compareLabel?: string;
   formatValue: (value: number) => string;
   formatAxis: (value: number) => string;
   ariaLabel: string;
 }
 
-const HEIGHT = 300;
+const DEFAULT_HEIGHT = 300;
 const MARGIN = { top: 12, right: 12, bottom: 28, left: 76 };
 const MAX_BAR_WIDTH = 24;
 const GAP = 2;
@@ -79,6 +81,7 @@ export function StackedColumns({
   series,
   totalLabel,
   phases = false,
+  height = DEFAULT_HEIGHT,
   compareLabel,
   formatValue,
   formatAxis,
@@ -97,12 +100,12 @@ export function StackedColumns({
     1,
     ...data.map((row) => Math.max(total(row), showCompare ? (row.compare ?? 0) : 0)),
   );
-  const step = niceStep(dataMax, 4);
+  const step = niceStep(dataMax, height < 220 ? 3 : 4);
   const yMax = Math.ceil(dataMax / step) * step;
   const ticks = Array.from({ length: Math.round(yMax / step) + 1 }, (_, i) => i * step);
 
   const innerWidth = Math.max(0, width - MARGIN.left - MARGIN.right);
-  const innerHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
+  const innerHeight = height - MARGIN.top - MARGIN.bottom;
   const band = data.length > 0 ? innerWidth / data.length : 0;
   const barWidth = Math.max(1, Math.min(MAX_BAR_WIDTH, band - GAP));
   const centerX = (i: number) => MARGIN.left + band * (i + 0.5);
@@ -145,7 +148,7 @@ export function StackedColumns({
         aria-label={`${ariaLabel}. ${t.common.chartKeyboardHint}`}
         tabIndex={0}
         className="relative rounded-md"
-        style={{ height: HEIGHT }}
+        style={{ height }}
         onKeyDown={(event) => {
           if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
           event.preventDefault();
@@ -158,7 +161,7 @@ export function StackedColumns({
         onPointerLeave={() => setActive(null)}
       >
         {width > 0 && (
-          <svg width={width} height={HEIGHT} aria-hidden="true">
+          <svg width={width} height={height} aria-hidden="true">
             {ticks.map((tick) => (
               <g key={tick}>
                 <line

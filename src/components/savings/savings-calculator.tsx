@@ -5,7 +5,7 @@ import {
   CalculatorShell,
   YearlyTable,
 } from "@/components/calculator-shell";
-import { StackedColumns } from "@/components/charts/stacked-columns";
+import { SavingsChart } from "@/components/charts/calculator-charts";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
@@ -142,18 +142,6 @@ function Results({
     (key) => key !== input.output,
   );
 
-  const series = [
-    { key: "deposits", label: t.common.deposits, color: "var(--series-1)" },
-    { key: "interest", label: t.common.interest, color: "var(--series-3)" },
-  ];
-  const tickEvery = result.years.length > 15 ? 5 : 1;
-  const chartData = result.years.map((year) => ({
-    tick: year.year % tickEvery === 0 ? String(year.year) : "",
-    title: t.common.afterYears(
-      f.years(Math.min(year.year, result.durationYears)),
-    ),
-    values: { deposits: year.deposits, interest: year.interest },
-  }));
   const totals: [string, number][] = [
     [text.totalDeposits, result.deposits],
     [`${t.common.interest}${afterTax}`, result.interest],
@@ -185,14 +173,7 @@ function Results({
           {text.chartSubtitle}
           {afterTax}.
         </p>
-        <StackedColumns
-          data={chartData}
-          series={series}
-          totalLabel={t.common.capital}
-          formatValue={f.euro}
-          formatAxis={f.euroCompact}
-          ariaLabel={text.chartAria}
-        />
+        <SavingsChart result={result} />
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm sm:grid-cols-3">
           {totals.map(([label, value]) => (
             <div key={label}>

@@ -6,7 +6,7 @@ import {
   YearlyTable,
 } from "@/components/calculator-shell";
 import { ShareBar } from "@/components/charts/share-bar";
-import { StackedColumns } from "@/components/charts/stacked-columns";
+import { PensionGapChart } from "@/components/charts/calculator-charts";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
@@ -148,16 +148,6 @@ function Results({
   const { t, f } = useLocale();
   const text = t.pensionGap;
 
-  const series = [
-    { key: "saving", label: text.series.saving, color: "var(--series-1)" },
-    { key: "payout", label: text.series.payout, color: "var(--series-3)" },
-  ];
-  const chartData = result.years.map((year) => ({
-    tick: year.age % 5 === 0 ? String(year.age) : "",
-    title: t.common.ageN(year.age),
-    values: { [year.phase]: year.capital },
-  }));
-
   return (
     <>
       <StatTile
@@ -216,14 +206,7 @@ function Results({
         <p className="mb-4 text-sm text-ink-2">
           {text.chartSubtitle(input.retirementAge)}
         </p>
-        <StackedColumns
-          data={chartData}
-          series={series}
-          phases
-          formatValue={f.euro}
-          formatAxis={f.euroCompact}
-          ariaLabel={text.chartAria}
-        />
+        <PensionGapChart result={result} />
         <YearlyTable
           head={[t.common.age, text.phase, t.common.wealth]}
           rows={result.years.map((year) => [

@@ -5,7 +5,7 @@ import {
   CalculatorShell,
   YearlyTable,
 } from "@/components/calculator-shell";
-import { StackedColumns } from "@/components/charts/stacked-columns";
+import { WithdrawalChart } from "@/components/charts/calculator-charts";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
@@ -126,16 +126,6 @@ function Results({
   );
   const keepsCapital = input.output !== "period" && !input.capitalConsumption;
 
-  const series = [
-    { key: "capital", label: t.common.capital, color: "var(--series-1)" },
-  ];
-  const tickEvery = result.years.length > 15 ? 5 : 1;
-  const chartData = result.years.map((year) => ({
-    tick: year.year % tickEvery === 0 ? String(year.year) : "",
-    title: t.common.afterYears(f.years(year.year)),
-    values: { capital: year.capital },
-  }));
-
   return (
     <>
       <StatTile
@@ -181,13 +171,7 @@ function Results({
           {text.chartSubtitle}
           {endless ? text.chartSubtitleEndless : ""}.
         </p>
-        <StackedColumns
-          data={chartData}
-          series={series}
-          formatValue={f.euro}
-          formatAxis={f.euroCompact}
-          ariaLabel={text.chartAria}
-        />
+        <WithdrawalChart result={result} />
         <YearlyTable
           head={[t.common.year, t.common.capital]}
           rows={result.years.map((year) => [year.year, f.euro(year.capital)])}

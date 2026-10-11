@@ -101,8 +101,10 @@ Rechnern und in den Einstellungen.
 
 ### Cockpit
 
-Die Startseite zeigt für die gewählte Profil-Kombination die Kernzahlen jedes
-Rechners und ein Gesamtbild zum Ruhestand: Wunschrente gegenüber Nettorente
+Die Startseite zeigt für die gewählte Profil-Kombination die Kernzahlen und das
+Diagramm jedes Rechners (dieselben Diagramm-Komponenten wie auf den
+Rechner-Seiten, `src/components/charts/calculator-charts.tsx`) und ein
+Gesamtbild zum Ruhestand: Wunschrente gegenüber Nettorente
 (Rentenlücke-Rechner) plus Netto-Rente aus dem Altersvorsorgedepot, die
 verbleibende Lücke sowie Kapital und zusätzliche Sparrate, die sie schließen
 (`src/lib/calculators/retirement-overview.ts`).

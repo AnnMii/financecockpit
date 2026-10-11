@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useAvDepot } from "@/components/av-depot/use-av-depot";
+import {
+  AvDepotChart,
+  PensionGapChart,
+  SavingsChart,
+  WithdrawalChart,
+} from "@/components/charts/calculator-charts";
 import { ShareBar } from "@/components/charts/share-bar";
 import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
@@ -26,14 +32,19 @@ const calculatorById = Object.fromEntries(
   calculators.map((calculator) => [calculator.id, calculator]),
 ) as Record<CalculatorInfo["id"], CalculatorInfo>;
 
-/** One calculator's key figures, or why it cannot calculate. */
+// Height of the charts on the cockpit cards.
+const CHART_HEIGHT = 190;
+
+/** One calculator's key figures and chart, or why it cannot calculate. */
 function CalculatorCard({
   id,
   figures,
+  chart,
   errors,
 }: {
   id: CalculatorInfo["id"];
   figures: Figure[] | null;
+  chart: React.ReactNode;
   errors: CalculationError[];
 }) {
   const { t } = useLocale();
@@ -49,14 +60,19 @@ function CalculatorCard({
         </Link>
       </div>
       {figures ? (
-        <dl className="divide-y divide-line text-sm">
-          {figures.map((figure) => (
-            <div key={figure.label} className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-2">{figure.label}</dt>
-              <dd className="text-right font-semibold tabular-nums">{figure.value}</dd>
-            </div>
-          ))}
-        </dl>
+        <>
+          <dl className="divide-y divide-line text-sm">
+            {figures.map((figure) => (
+              <div key={figure.label} className="flex justify-between gap-4 py-2">
+                <dt className="text-ink-2">{figure.label}</dt>
+                <dd className="text-right font-semibold tabular-nums">
+                  {figure.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-4">{chart}</div>
+        </>
       ) : (
         <p className="text-sm text-ink-2">
           {t.dashboard.notCalculable} {t.calcErrors[errors[0]]}
@@ -170,10 +186,15 @@ export function Dashboard() {
         <h2 id="calculators-heading" className="text-base font-semibold">
           {text.resultsHeading}
         </h2>
-        <div className="grid gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <CalculatorCard
             id="av-depot"
             errors={avDepot.errors}
+            chart={
+              avDepot.result && (
+                <AvDepotChart result={avDepot.result} height={CHART_HEIGHT} />
+              )
+            }
             figures={
               avDepot.result && [
                 {
@@ -200,6 +221,11 @@ export function Dashboard() {
           <CalculatorCard
             id="pension-gap"
             errors={pensionGap.errors}
+            chart={
+              pensionGap.result && (
+                <PensionGapChart result={pensionGap.result} height={CHART_HEIGHT} />
+              )
+            }
             figures={
               pensionGap.result && [
                 { label: text.gapPerMonth, value: f.euro(pensionGap.result.gap) },
@@ -221,6 +247,11 @@ export function Dashboard() {
           <CalculatorCard
             id="savings"
             errors={savings.errors}
+            chart={
+              savings.result && (
+                <SavingsChart result={savings.result} height={CHART_HEIGHT} />
+              )
+            }
             figures={
               savings.result && [
                 {
@@ -255,6 +286,11 @@ export function Dashboard() {
           <CalculatorCard
             id="withdrawal-plan"
             errors={withdrawal.errors}
+            chart={
+              withdrawal.result && (
+                <WithdrawalChart result={withdrawal.result} height={CHART_HEIGHT} />
+              )
+            }
             figures={
               withdrawal.result && [
                 {

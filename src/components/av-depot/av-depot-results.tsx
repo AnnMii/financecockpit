@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Assumptions, YearlyTable } from "@/components/calculator-shell";
-import { StackedColumns } from "@/components/charts/stacked-columns";
+import { AvDepotChart } from "@/components/charts/calculator-charts";
 import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import { StatTile } from "@/components/stat-tile";
@@ -129,21 +129,6 @@ export function AvDepotResults({
   const { av, normal } = result;
   const consumed = av.taxSavings - av.investedTaxSavings;
 
-  const series = [
-    { key: "own", label: text.series.own, color: "var(--series-1)" },
-    { key: "subsidies", label: text.series.subsidies, color: "var(--series-2)" },
-    { key: "gains", label: text.series.gains, color: "var(--series-3)" },
-  ];
-  const chartData = result.years.map((year) => ({
-    tick: year.age % 5 === 0 ? String(year.age) : "",
-    title: text.chartColumnTitle(year.age, year.calendarYear),
-    values: {
-      own: year.av.cumulativeOwnContributions,
-      subsidies: year.av.cumulativeSubsidies,
-      gains: year.av.cumulativeGains,
-    },
-    compare: year.normal.capitalEnd,
-  }));
   const totals: [string, number][] = [
     [text.series.own, av.ownContributions],
     [text.allowances, av.allowances],
@@ -208,15 +193,7 @@ export function AvDepotResults({
             {text.compareToggle}
           </label>
         </div>
-        <StackedColumns
-          data={chartData}
-          series={series}
-          totalLabel={t.common.wealth}
-          compareLabel={compare ? text.etfPlan : undefined}
-          formatValue={f.euro}
-          formatAxis={f.euroCompact}
-          ariaLabel={text.chartAria}
-        />
+        <AvDepotChart result={result} compare={compare} />
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm sm:grid-cols-4">
           {totals.map(([label, value]) => (
             <div key={label}>
