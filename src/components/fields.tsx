@@ -15,6 +15,23 @@ export function SharedBadge() {
   );
 }
 
+export function ChangedBadge() {
+  return (
+    <span
+      title="Lokal geändert – noch nicht gespeichert"
+      className="rounded-full border border-axis px-1.5 py-px text-[11px] font-medium text-ink-2"
+    >
+      geändert
+    </span>
+  );
+}
+
+export interface SliderSpec {
+  min: number;
+  max: number;
+  step: number;
+}
+
 function isValid(value: number, spec: NumberFieldSpec): boolean {
   return (
     Number.isFinite(value) &&
@@ -32,6 +49,10 @@ interface NumberFieldProps {
   unit?: string;
   hint?: React.ReactNode;
   shared?: boolean;
+  /** Marks a value that differs from the saved settings. */
+  changed?: boolean;
+  /** Adds a slider below the input; it may cover less than the full range. */
+  slider?: SliderSpec;
 }
 
 /**
@@ -46,6 +67,8 @@ export function NumberField({
   unit,
   hint,
   shared,
+  changed,
+  slider,
 }: NumberFieldProps) {
   const id = useId();
   const [text, setText] = useState(() => formatNumber(value));
@@ -66,6 +89,7 @@ export function NumberField({
           {label}
         </label>
         {shared && <SharedBadge />}
+        {changed && <ChangedBadge />}
       </div>
       <div
         className={`flex items-center rounded-md border bg-surface focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent ${
@@ -92,6 +116,18 @@ export function NumberField({
           <span className="shrink-0 pr-3 text-sm text-muted">{unit}</span>
         )}
       </div>
+      {slider && (
+        <input
+          type="range"
+          aria-label={label}
+          min={slider.min}
+          max={slider.max}
+          step={slider.step}
+          value={Math.min(slider.max, Math.max(slider.min, value))}
+          onChange={(event) => onChange(Number(event.target.value))}
+          className="mt-2 block w-full accent-(--accent)"
+        />
+      )}
       <p id={`${id}-hint`} className="mt-1 text-xs text-ink-2">
         {invalid ? (
           <span className="text-critical">

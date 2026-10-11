@@ -9,8 +9,8 @@ export default function AvDepotPage() {
       <h1 className="text-2xl font-semibold">Altersvorsorgedepot-Rechner</h1>
       <p className="mb-6 mt-1 max-w-3xl text-sm text-ink-2">
         Vergleicht das staatlich geförderte Altersvorsorgedepot mit einem
-        normalen ETF-Sparplan bei gleichen Einzahlungen. Änderungen werden
-        automatisch in deinem Konto gespeichert.
+        normalen ETF-Sparplan bei gleichen Einzahlungen. Änderungen gelten nur
+        hier, bis du sie in deine Einstellungen speicherst.
       </p>
       <AvDepotCalculator />
     </>

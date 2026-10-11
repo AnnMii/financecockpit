@@ -26,6 +26,19 @@ interface SettingsContextValue {
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
 
+/**
+ * What input fields read and write. By default these are the saved settings;
+ * <DraftSettings> swaps in a local draft that is only saved on request.
+ */
+export interface SettingsEditor {
+  settings: AllSettings;
+  update: SettingsContextValue["update"];
+  /** True when a value differs from what is saved in the account. */
+  isChanged: (scope: SettingsScope, key: string) => boolean;
+}
+
+export const SettingsEditorContext = createContext<SettingsEditor | null>(null);
+
 const SAVE_DELAY_MS = 500;
 
 export function SettingsProvider({
@@ -96,4 +109,16 @@ export function useSettings(): SettingsContextValue {
     throw new Error("useSettings must be used inside a SettingsProvider");
   }
   return context;
+}
+
+export function useSettingsEditor(): SettingsEditor {
+  const editor = useContext(SettingsEditorContext);
+  const saved = useSettings();
+  return (
+    editor ?? {
+      settings: saved.settings,
+      update: saved.update,
+      isChanged: () => false,
+    }
+  );
 }

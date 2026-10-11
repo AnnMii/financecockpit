@@ -11,8 +11,13 @@ import {
   childBirthYearSpec,
   sharedFields,
 } from "@/lib/settings/schema";
-import { NumberField, SharedBadge } from "./fields";
-import { useSettings } from "./settings-provider";
+import {
+  ChangedBadge,
+  NumberField,
+  SharedBadge,
+  type SliderSpec,
+} from "./fields";
+import { useSettingsEditor } from "./settings-provider";
 
 interface FieldText {
   label: string;
@@ -78,11 +83,13 @@ const taxSavingsModeText: Record<TaxSavingsMode, string> = {
 export function SharedField({
   name,
   hint,
+  slider,
 }: {
   name: keyof typeof sharedFields;
   hint?: React.ReactNode;
+  slider?: SliderSpec;
 }) {
-  const { settings, update } = useSettings();
+  const { settings, update, isChanged } = useSettingsEditor();
   const text = sharedText[name];
   return (
     <NumberField
@@ -95,12 +102,20 @@ export function SharedField({
         update("shared", { [name]: value } as Partial<SharedSettings>)
       }
       shared
+      changed={isChanged("shared", name)}
+      slider={slider}
     />
   );
 }
 
-export function AvDepotField({ name }: { name: keyof typeof avDepotFields }) {
-  const { settings, update } = useSettings();
+export function AvDepotField({
+  name,
+  slider,
+}: {
+  name: keyof typeof avDepotFields;
+  slider?: SliderSpec;
+}) {
+  const { settings, update, isChanged } = useSettingsEditor();
   const text = avDepotText[name];
   return (
     <NumberField
@@ -112,16 +127,19 @@ export function AvDepotField({ name }: { name: keyof typeof avDepotFields }) {
       onChange={(value) =>
         update("av-depot", { [name]: value } as Partial<AvDepotSettings>)
       }
+      changed={isChanged("av-depot", name)}
+      slider={slider}
     />
   );
 }
 
 export function TaxSavingsModeField() {
-  const { settings, update } = useSettings();
+  const { settings, update, isChanged } = useSettingsEditor();
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-medium text-ink">
+      <span className="mb-1 flex items-center gap-2 text-sm font-medium text-ink">
         Verwendung der Steuerersparnis
+        {isChanged("av-depot", "taxSavingsMode") && <ChangedBadge />}
       </span>
       <select
         value={settings["av-depot"].taxSavingsMode}
@@ -143,7 +161,7 @@ export function TaxSavingsModeField() {
 }
 
 export function ChildrenField() {
-  const { settings, update } = useSettings();
+  const { settings, update, isChanged } = useSettingsEditor();
   const years = settings.shared.childBirthYears;
   const setYears = (childBirthYears: number[]) =>
     update("shared", { childBirthYears });
@@ -153,6 +171,7 @@ export function ChildrenField() {
       <div className="flex items-center gap-2">
         <span className="text-sm font-medium text-ink">Kinder</span>
         <SharedBadge />
+        {isChanged("shared", "childBirthYears") && <ChangedBadge />}
       </div>
       {years.length === 0 && (
         <p className="text-xs text-ink-2">Keine Kinder eingetragen.</p>

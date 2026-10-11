@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useSettings } from "@/components/settings-provider";
+import { useSettingsEditor } from "@/components/settings-provider";
 import {
   type AvDepotInput,
   type AvDepotResult,
@@ -17,9 +17,9 @@ export interface AvDepotCalculation {
   result: AvDepotResult | null;
 }
 
-/** AV-Depot calculation for the current user's settings. */
+/** AV-Depot calculation for the settings in effect: the local draft inside a calculator, otherwise the saved ones. */
 export function useAvDepot(): AvDepotCalculation {
-  const { settings } = useSettings();
+  const { settings } = useSettingsEditor();
   return useMemo(() => {
     const input = toAvDepotInput(settings);
     const errors = validateAvDepotInput(input);

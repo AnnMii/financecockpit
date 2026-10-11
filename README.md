@@ -45,7 +45,13 @@ drizzle/               SQL-Migrationen (werden beim Start angewendet)
 Einstellungen liegen je Benutzer in Bereichen (`scope`): `shared` gilt für alle
 Rechner, jeder Rechner hat zusätzlich einen eigenen Bereich. Felder,
 Wertebereiche und Standardwerte stehen in `src/lib/settings/schema.ts`.
-Änderungen in der Oberfläche werden nach kurzer Pause automatisch gespeichert.
+
+- **Einstellungen-Seite:** Änderungen werden nach kurzer Pause automatisch
+  gespeichert.
+- **Rechner:** Änderungen gelten nur lokal in der Ansicht (`DraftSettings` in
+  `src/components/draft-settings.tsx`). Erst „In Einstellungen speichern“
+  schreibt sie ins Konto; „Zurücksetzen“ oder ein Neuladen stellt die
+  gespeicherten Werte wieder her.
 
 ### Einen Rechner hinzufügen
 
