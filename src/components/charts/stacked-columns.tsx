@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/components/locale-provider";
 
 export interface ColumnSeries {
   key: string;
@@ -83,6 +84,7 @@ export function StackedColumns({
   formatAxis,
   ariaLabel,
 }: Props) {
+  const { t } = useLocale();
   const [ref, width] = useWidth();
   const [active, setActive] = useState<number | null>(null);
 
@@ -140,7 +142,7 @@ export function StackedColumns({
       <div
         ref={ref}
         role="group"
-        aria-label={`${ariaLabel}. Mit den Pfeiltasten durch die Jahre blättern.`}
+        aria-label={`${ariaLabel}. ${t.common.chartKeyboardHint}`}
         tabIndex={0}
         className="relative rounded-md"
         style={{ height: HEIGHT }}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import type { CalculationError } from "@/lib/calculators/errors";
 import {
   type PensionGapInput,
   type PensionGapResult,
@@ -32,7 +33,7 @@ import { useSettingsEditor } from "./settings-provider";
  */
 export interface Calculation<Input, Result> {
   input: Input;
-  errors: string[];
+  errors: CalculationError[];
   /** null while the inputs are outside what the calculator covers */
   result: Result | null;
 }

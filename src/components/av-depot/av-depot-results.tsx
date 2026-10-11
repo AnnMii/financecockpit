@@ -1,27 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { Assumptions, YearlyTable } from "@/components/calculator-shell";
 import { StackedColumns } from "@/components/charts/stacked-columns";
 import { Card } from "@/components/fields";
+import { useLocale } from "@/components/locale-provider";
 import { StatTile } from "@/components/stat-tile";
 import type {
   AvDepotInput,
   AvDepotResult,
   PayoutYear,
 } from "@/lib/calculators/av-depot";
-import { formatEuro, formatEuroCompact } from "@/lib/format";
-
-const SERIES = [
-  { key: "own", label: "Einzahlungen", color: "var(--series-1)" },
-  { key: "subsidies", label: "Förderung", color: "var(--series-2)" },
-  { key: "gains", label: "Wertzuwachs", color: "var(--series-3)" },
-];
 
 function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
+  const { t, f } = useLocale();
   const max = Math.max(av, normal, 1);
   const rows = [
-    { label: "Altersvorsorgedepot", value: av, color: "var(--series-1)" },
-    { label: "ETF-Sparplan", value: normal, color: "var(--series-compare)" },
+    { label: t.avDepot.name, value: av, color: "var(--series-1)" },
+    { label: t.avDepot.etfPlan, value: normal, color: "var(--series-compare)" },
   ];
   return (
     <div className="space-y-4">
@@ -38,7 +34,7 @@ function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
               }}
             />
             <span className="text-sm font-semibold tabular-nums text-ink">
-              {formatEuro(row.value)}
+              {f.euro(row.value)}
             </span>
           </div>
         </div>
@@ -48,11 +44,17 @@ function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
 }
 
 function PayoutTable({ result }: { result: AvDepotResult }) {
-  const rows: { label: string; pick: (p: AvDepotResult["av"]["payout"]) => PayoutYear }[] = [
-    { label: "1. Jahr", pick: (p) => p.firstYear },
-    { label: "Folgejahre, je Jahr", pick: (p) => p.regularYear },
-    { label: `Summe (${result.payoutYears} Jahre)`, pick: (p) => p.total },
+  const { t, f } = useLocale();
+  const text = t.avDepot;
+  const rows: {
+    label: string;
+    pick: (p: AvDepotResult["av"]["payout"]) => PayoutYear;
+  }[] = [
+    { label: text.firstYear, pick: (p) => p.firstYear },
+    { label: text.laterYears, pick: (p) => p.regularYear },
+    { label: text.totalYears(result.payoutYears), pick: (p) => p.total },
   ];
+  const columns = [text.gross, text.tax, text.net];
   const cell = "px-2 py-2 text-right tabular-nums";
   return (
     <div className="overflow-x-auto">
@@ -60,27 +62,30 @@ function PayoutTable({ result }: { result: AvDepotResult }) {
         <thead>
           <tr className="text-xs text-ink-2">
             <th className="px-3 py-2 text-left font-medium" rowSpan={2}>
-              Auszahlung
+              {text.payout}
             </th>
             <th className="px-3 pt-2 text-center font-medium" colSpan={3}>
-              Altersvorsorgedepot
+              {text.name}
             </th>
-            <th className="border-l border-line px-3 pt-2 text-center font-medium" colSpan={3}>
-              ETF-Sparplan
+            <th
+              className="border-l border-line px-3 pt-2 text-center font-medium"
+              colSpan={3}
+            >
+              {text.etfPlan}
             </th>
           </tr>
           <tr className="border-b border-line text-xs text-ink-2">
-            {["Brutto", "Steuer", "Netto"].map((h) => (
-              <th key={`av-${h}`} className="px-2 py-2 text-right font-medium">
-                {h}
+            {columns.map((heading) => (
+              <th key={`av-${heading}`} className="px-2 py-2 text-right font-medium">
+                {heading}
               </th>
             ))}
-            {["Brutto", "Steuer", "Netto"].map((h, i) => (
+            {columns.map((heading, i) => (
               <th
-                key={`n-${h}`}
+                key={`etf-${heading}`}
                 className={`px-2 py-2 text-right font-medium ${i === 0 ? "border-l border-line" : ""}`}
               >
-                {h}
+                {heading}
               </th>
             ))}
           </tr>
@@ -94,53 +99,17 @@ function PayoutTable({ result }: { result: AvDepotResult }) {
                 <th className="px-3 py-2 text-left font-normal text-ink-2">
                   {row.label}
                 </th>
-                <td className={cell}>{formatEuro(av.gross)}</td>
-                <td className={cell}>{formatEuro(av.tax)}</td>
-                <td className={`${cell} font-semibold`}>{formatEuro(av.net)}</td>
+                <td className={cell}>{f.euro(av.gross)}</td>
+                <td className={cell}>{f.euro(av.tax)}</td>
+                <td className={`${cell} font-semibold`}>{f.euro(av.net)}</td>
                 <td className={`${cell} border-l border-line`}>
-                  {formatEuro(normal.gross)}
+                  {f.euro(normal.gross)}
                 </td>
-                <td className={cell}>{formatEuro(normal.tax)}</td>
-                <td className={`${cell} font-semibold`}>{formatEuro(normal.net)}</td>
+                <td className={cell}>{f.euro(normal.tax)}</td>
+                <td className={`${cell} font-semibold`}>{f.euro(normal.net)}</td>
               </tr>
             );
           })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-function YearTable({ result }: { result: AvDepotResult }) {
-  const cell = "px-3 py-1.5 text-right tabular-nums";
-  return (
-    <div className="max-h-96 overflow-auto">
-      <table className="w-full min-w-[40rem] text-sm">
-        <thead className="sticky top-0 bg-surface text-xs text-ink-2">
-          <tr className="border-b border-line">
-            <th className="px-3 py-2 text-left font-medium">Alter</th>
-            <th className="px-3 py-2 text-right font-medium">Jahr</th>
-            <th className="px-3 py-2 text-right font-medium">Zulagen</th>
-            <th className="px-3 py-2 text-right font-medium">Steuerersparnis</th>
-            <th className="px-3 py-2 text-right font-medium">Altersvorsorgedepot</th>
-            <th className="px-3 py-2 text-right font-medium">ETF-Sparplan</th>
-          </tr>
-        </thead>
-        <tbody>
-          {result.years.map((year) => (
-            <tr key={year.age} className="border-b border-line last:border-0">
-              <td className="px-3 py-1.5 tabular-nums">{year.age}</td>
-              <td className={cell}>{year.calendarYear}</td>
-              <td className={cell}>
-                {formatEuro(
-                  year.av.grundzulage + year.av.kinderzulage + year.av.starterBonus,
-                )}
-              </td>
-              <td className={cell}>{formatEuro(year.av.taxSaving)}</td>
-              <td className={cell}>{formatEuro(year.av.capitalEnd)}</td>
-              <td className={cell}>{formatEuro(year.normal.capitalEnd)}</td>
-            </tr>
-          ))}
         </tbody>
       </table>
     </div>
@@ -154,13 +123,20 @@ export function AvDepotResults({
   input: AvDepotInput;
   result: AvDepotResult;
 }) {
+  const { t, f } = useLocale();
+  const text = t.avDepot;
   const [compare, setCompare] = useState(true);
   const { av, normal } = result;
   const consumed = av.taxSavings - av.investedTaxSavings;
 
+  const series = [
+    { key: "own", label: text.series.own, color: "var(--series-1)" },
+    { key: "subsidies", label: text.series.subsidies, color: "var(--series-2)" },
+    { key: "gains", label: text.series.gains, color: "var(--series-3)" },
+  ];
   const chartData = result.years.map((year) => ({
     tick: year.age % 5 === 0 ? String(year.age) : "",
-    title: `Alter ${year.age} · ${year.calendarYear}`,
+    title: text.chartColumnTitle(year.age, year.calendarYear),
     values: {
       own: year.av.cumulativeOwnContributions,
       subsidies: year.av.cumulativeSubsidies,
@@ -168,19 +144,24 @@ export function AvDepotResults({
     },
     compare: year.normal.capitalEnd,
   }));
+  const totals: [string, number][] = [
+    [text.series.own, av.ownContributions],
+    [text.allowances, av.allowances],
+    [text.investedTaxSavings, av.investedTaxSavings],
+    [text.series.gains, av.gains],
+  ];
 
   return (
     <>
       <StatTile
         hero
-        label={`Endvermögen im Altersvorsorgedepot mit ${input.retirementAge} Jahren`}
-        value={formatEuro(av.finalCapital)}
+        label={text.heroLabel(input.retirementAge)}
+        value={f.euro(av.finalCapital)}
         note={
           <>
-            Inklusive Förderung und Rendite, nach Kosten, vor Steuern. Ein
-            ETF-Sparplan mit denselben Einzahlungen käme auf{" "}
+            {text.heroNote}{" "}
             <strong className="font-semibold text-ink">
-              {formatEuro(normal.finalCapital)}
+              {f.euro(normal.finalCapital)}
             </strong>
             .
           </>
@@ -189,29 +170,32 @@ export function AvDepotResults({
 
       <div className="grid gap-5 sm:grid-cols-3">
         <StatTile
-          label="Netto-Rente pro Monat"
-          value={formatEuro(av.payout.monthlyNet)}
-          note={`Altersvorsorgedepot, bis Alter ${input.payoutUntilAge}`}
+          label={text.netPensionPerMonth}
+          value={f.euro(av.payout.monthlyNet)}
+          note={text.avUntilAge(input.payoutUntilAge)}
         />
         <StatTile
-          label="Netto-Rente pro Monat"
-          value={formatEuro(normal.payout.monthlyNet)}
-          note="ETF-Sparplan, gleicher Auszahlplan"
+          label={text.netPensionPerMonth}
+          value={f.euro(normal.payout.monthlyNet)}
+          note={text.etfSamePlan}
         />
         <StatTile
-          label="Förderung gesamt"
-          value={formatEuro(av.allowances + av.taxSavings)}
-          note={`${formatEuro(av.allowances)} Zulagen + ${formatEuro(av.taxSavings)} Steuerersparnis`}
+          label={text.totalSubsidies}
+          value={f.euro(av.allowances + av.taxSavings)}
+          note={text.subsidiesBreakdown(
+            f.euro(av.allowances),
+            f.euro(av.taxSavings),
+          )}
         />
       </div>
 
       <Card>
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-semibold">Vermögen in der Ansparphase</h2>
+            <h2 className="text-base font-semibold">{text.chartTitle}</h2>
             <p className="text-sm text-ink-2">
-              Stand am Jahresende nach Alter, im Altersvorsorgedepot
-              {av.secondaryDepotCapital > 0 && " inklusive separatem Depot"}.
+              {text.chartSubtitle}
+              {av.secondaryDepotCapital > 0 && text.chartSubtitleSecondary}.
             </p>
           </div>
           <label className="flex items-center gap-2 text-sm text-ink-2">
@@ -221,54 +205,57 @@ export function AvDepotResults({
               onChange={(event) => setCompare(event.target.checked)}
               className="size-4 accent-(--accent)"
             />
-            Mit ETF-Sparplan vergleichen
+            {text.compareToggle}
           </label>
         </div>
         <StackedColumns
           data={chartData}
-          series={SERIES}
-          totalLabel="Vermögen"
-          compareLabel={compare ? "ETF-Sparplan" : undefined}
-          formatValue={formatEuro}
-          formatAxis={formatEuroCompact}
-          ariaLabel="Säulendiagramm: Vermögen im Altersvorsorgedepot pro Jahr, aufgeteilt in Einzahlungen, Förderung und Wertzuwachs"
+          series={series}
+          totalLabel={t.common.wealth}
+          compareLabel={compare ? text.etfPlan : undefined}
+          formatValue={f.euro}
+          formatAxis={f.euroCompact}
+          ariaLabel={text.chartAria}
         />
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm sm:grid-cols-4">
-          {[
-            ["Einzahlungen", av.ownContributions],
-            ["Zulagen", av.allowances],
-            ["Investierte Steuerersparnis", av.investedTaxSavings],
-            ["Wertzuwachs", av.gains],
-          ].map(([label, value]) => (
+          {totals.map(([label, value]) => (
             <div key={label}>
               <dt className="text-xs text-ink-2">{label}</dt>
-              <dd className="font-semibold tabular-nums">
-                {formatEuro(value as number)}
-              </dd>
+              <dd className="font-semibold tabular-nums">{f.euro(value)}</dd>
             </div>
           ))}
         </dl>
         {consumed > 0.5 && (
           <p className="mt-3 text-xs text-ink-2">
-            {formatEuro(consumed)} Steuerersparnis werden nicht investiert und
-            sind im Vermögen nicht enthalten.
+            {text.consumedNote(f.euro(consumed))}
           </p>
         )}
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-medium text-accent">
-            Jahreswerte als Tabelle
-          </summary>
-          <div className="mt-3">
-            <YearTable result={result} />
-          </div>
-        </details>
+        <YearlyTable
+          head={[
+            t.common.age,
+            t.common.year,
+            text.allowances,
+            text.taxSavings,
+            text.name,
+            text.etfPlan,
+          ]}
+          rows={result.years.map((year) => [
+            year.age,
+            year.calendarYear,
+            f.euro(
+              year.av.grundzulage + year.av.kinderzulage + year.av.starterBonus,
+            ),
+            f.euro(year.av.taxSaving),
+            f.euro(year.av.capitalEnd),
+            f.euro(year.normal.capitalEnd),
+          ])}
+        />
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold">Monatliche Netto-Rente</h2>
+        <h2 className="text-base font-semibold">{text.monthlyTitle}</h2>
         <p className="mb-4 text-sm text-ink-2">
-          Auszahlung von {input.retirementAge} bis {input.payoutUntilAge}, nach
-          Steuern, ab dem zweiten Jahr.
+          {text.monthlySubtitle(input.retirementAge, input.payoutUntilAge)}
         </p>
         <MonthlyPayoutBars
           av={av.payout.monthlyNet}
@@ -277,38 +264,12 @@ export function AvDepotResults({
       </Card>
 
       <Card>
-        <h2 className="text-base font-semibold">Auszahlung im Detail</h2>
-        <p className="mb-3 text-sm text-ink-2">
-          Pro Jahr; das 1. Jahr enthält die Einmalauszahlung.
-        </p>
+        <h2 className="text-base font-semibold">{text.payoutTitle}</h2>
+        <p className="mb-3 text-sm text-ink-2">{text.payoutSubtitle}</p>
         <PayoutTable result={result} />
       </Card>
 
-      <Card>
-        <h2 className="mb-2 text-base font-semibold">Annahmen</h2>
-        <ul className="list-disc space-y-1 pl-5 text-sm text-ink-2">
-          <li>
-            Einzahlungen erfolgen am Jahresende, Entnahmen zu Jahresbeginn; alle
-            Beträge sind nominal, ohne Inflation.
-          </li>
-          <li>
-            Beitragsjahre ab 2027, Einkommensteuer nach Grundtarif 2026 inklusive
-            Solidaritätszuschlag, ohne Kirchensteuer.
-          </li>
-          <li>
-            Kinderzulage bis zum 18. Geburtstag; Zulagen nur für Einzahlungen bis
-            1.800 € pro Jahr.
-          </li>
-          <li>
-            Der ETF-Sparplan läuft in einem kostenlosen Depot mit 30 %
-            Teilfreistellung und Günstigerprüfung.
-          </li>
-          <li>
-            Rechenweg nach der Dokumentation des Finanzfluss-Rechners. Keine
-            Steuer- oder Anlageberatung.
-          </li>
-        </ul>
-      </Card>
+      <Assumptions items={text.assumptions} />
     </>
   );
 }

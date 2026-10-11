@@ -12,7 +12,7 @@ import {
   setActiveProfile,
 } from "@/lib/settings/store";
 
-const SIGNED_OUT = { ok: false, error: "Bitte neu anmelden." } as const;
+const SIGNED_OUT = { ok: false, error: "signedOut" } as const;
 
 export async function saveProfileDataAction(
   profileId: string,

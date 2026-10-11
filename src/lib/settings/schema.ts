@@ -6,8 +6,9 @@ import { z } from "zod";
  * rate, expected return, ...); each calculator has a scope of its own for the
  * inputs only it needs.
  *
- * To add a calculator: add its scope and fields here, their texts in
- * labels.ts, then build its page on top of `useSettingsEditor()`.
+ * To add a calculator: add its scope and fields here, their texts in both
+ * dictionaries (src/lib/i18n), then build its page on top of
+ * `useSettingsEditor()`.
  */
 
 export interface NumberFieldSpec {

@@ -3,14 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { calculators } from "@/lib/calculators/registry";
-import { type SaveState, useSettings } from "./settings-provider";
-
-const saveStateText: Record<SaveState, string> = {
-  idle: "",
-  saving: "Speichert …",
-  saved: "Gespeichert",
-  error: "Speichern fehlgeschlagen",
-};
+import { useLocale } from "./locale-provider";
+import { useSettings } from "./settings-provider";
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,37 +24,43 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   );
 }
 
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="hidden px-3 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-muted lg:block">
+      {children}
+    </p>
+  );
+}
+
 export function AppNav() {
+  const { t } = useLocale();
   return (
     <nav
-      aria-label="Hauptnavigation"
+      aria-label={t.nav.main}
       className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
     >
-      <NavLink href="/">Cockpit</NavLink>
-      <p className="hidden px-3 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-muted lg:block">
-        Rechner
-      </p>
+      <NavLink href="/">{t.nav.cockpit}</NavLink>
+      <GroupLabel>{t.nav.calculators}</GroupLabel>
       {calculators.map((calculator) => (
         <NavLink key={calculator.id} href={calculator.href}>
-          {calculator.title}
+          {t.calculators[calculator.id].title}
         </NavLink>
       ))}
-      <p className="hidden px-3 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-muted lg:block">
-        Konto
-      </p>
-      <NavLink href="/einstellungen">Einstellungen</NavLink>
+      <GroupLabel>{t.nav.account}</GroupLabel>
+      <NavLink href="/einstellungen">{t.nav.settings}</NavLink>
     </nav>
   );
 }
 
 export function SaveIndicator() {
+  const { t } = useLocale();
   const { saveState } = useSettings();
   return (
     <span
       aria-live="polite"
       className={`text-xs ${saveState === "error" ? "text-critical" : "text-ink-2"}`}
     >
-      {saveStateText[saveState]}
+      {t.saveState[saveState]}
     </span>
   );
 }

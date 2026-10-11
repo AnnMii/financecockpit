@@ -8,6 +8,8 @@
  * ist nicht öffentlich. Die Antworten liegen in test/fixtures/pension-gap.json.
  */
 
+import type { CalculationError } from "./errors";
+
 export interface PensionGapInput {
   /** Erwartete Rentenansprüche, jeweils brutto pro Monat. */
   statePension: number;
@@ -61,16 +63,18 @@ export interface PensionGapResult {
   years: PensionGapYear[];
 }
 
-export function validatePensionGapInput(input: PensionGapInput): string[] {
-  const errors: string[] = [];
+export function validatePensionGapInput(
+  input: PensionGapInput,
+): CalculationError[] {
+  const errors: CalculationError[] = [];
   if (input.age >= input.retirementAge) {
-    errors.push("Das Alter muss unter dem Renteneintrittsalter liegen.");
+    errors.push("ageBeforeRetirement");
   }
   if (input.payoutUntilAge <= input.retirementAge) {
-    errors.push("Die Auszahlung muss nach dem Renteneintritt enden.");
+    errors.push("payoutAfterRetirement");
   }
   if (input.taxPrediction >= 100 || input.capitalGainsTax >= 100) {
-    errors.push("Die Steuersätze müssen unter 100 % liegen.");
+    errors.push("taxBelow100");
   }
   return errors;
 }

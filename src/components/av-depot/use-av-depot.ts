@@ -8,11 +8,12 @@ import {
   calculateAvDepot,
   validateAvDepotInput,
 } from "@/lib/calculators/av-depot";
+import type { CalculationError } from "@/lib/calculators/errors";
 import { toAvDepotInput } from "@/lib/calculators/registry";
 
 export interface AvDepotCalculation {
   input: AvDepotInput;
-  errors: string[];
+  errors: CalculationError[];
   /** null while the inputs are outside what the model covers */
   result: AvDepotResult | null;
 }

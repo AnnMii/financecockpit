@@ -12,6 +12,8 @@
  * durch Suche nach dem Wert, der zum gewünschten Endkapital führt.
  */
 
+import type { CalculationError } from "./errors";
+
 export type SavingsOutput =
   | "endValue"
   | "startValue"
@@ -136,25 +138,22 @@ function solve(
   return (lower + upper) / 2;
 }
 
-const UNREACHABLE: Record<Exclude<SavingsOutput, "endValue">, string> = {
-  startValue:
-    "Das Endkapital wird schon ohne Anfangskapital erreicht oder übertroffen.",
-  savingRate: "Das Endkapital wird schon ohne Sparrate erreicht oder übertroffen.",
-  yearlyInterest:
-    "Mit diesen Einzahlungen lässt sich das Endkapital mit keinem Zinssatz ab 0 % genau erreichen.",
-  duration:
-    "Das Endkapital lässt sich mit diesen Werten nicht erreichen, oder es ist schon erreicht.",
+const UNREACHABLE: Record<Exclude<SavingsOutput, "endValue">, CalculationError> = {
+  startValue: "unreachableStartValue",
+  savingRate: "unreachableSavingRate",
+  yearlyInterest: "unreachableYearlyInterest",
+  duration: "unreachableDuration",
 };
 
 export function calculateSavings(input: SavingsInput): {
   result: SavingsResult | null;
-  errors: string[];
+  errors: CalculationError[];
 } {
   const { output, endValue: target, ...given } = input;
   const plan: Plan = { ...given };
 
   if (output !== "duration" && plan.durationYears <= 0) {
-    return { result: null, errors: ["Die Laufzeit muss größer als 0 sein."] };
+    return { result: null, errors: ["durationPositive"] };
   }
 
   if (output !== "endValue") {

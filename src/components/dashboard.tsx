@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAvDepot } from "@/components/av-depot/use-av-depot";
 import { ShareBar } from "@/components/charts/share-bar";
 import { Card } from "@/components/fields";
+import { useLocale } from "@/components/locale-provider";
 import { ProfilePicker } from "@/components/profile-picker";
 import { useSettings } from "@/components/settings-provider";
 import {
@@ -11,15 +12,10 @@ import {
   useSavings,
   useWithdrawalPlan,
 } from "@/components/use-calculators";
+import { perIntervalText } from "@/components/withdrawal-plan/withdrawal-plan-calculator";
+import type { CalculationError } from "@/lib/calculators/errors";
 import { type CalculatorInfo, calculators } from "@/lib/calculators/registry";
 import { calculateRetirementOverview } from "@/lib/calculators/retirement-overview";
-import {
-  formatEuro,
-  formatEuroCents,
-  formatPercent,
-  formatYears,
-} from "@/lib/format";
-import { selectText } from "@/lib/settings/labels";
 
 interface Figure {
   label: string;
@@ -38,15 +34,18 @@ function CalculatorCard({
 }: {
   id: CalculatorInfo["id"];
   figures: Figure[] | null;
-  errors: string[];
+  errors: CalculationError[];
 }) {
-  const calculator = calculatorById[id];
+  const { t } = useLocale();
   return (
     <Card>
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h3 className="text-base font-semibold">{calculator.title}</h3>
-        <Link href={calculator.href} className="shrink-0 text-sm font-medium text-accent">
-          Zum Rechner
+        <h3 className="text-base font-semibold">{t.calculators[id].title}</h3>
+        <Link
+          href={calculatorById[id].href}
+          className="shrink-0 text-sm font-medium text-accent"
+        >
+          {t.dashboard.openCalculator}
         </Link>
       </div>
       {figures ? (
@@ -60,7 +59,7 @@ function CalculatorCard({
         </dl>
       ) : (
         <p className="text-sm text-ink-2">
-          Mit den gewählten Profilen nicht berechenbar: {errors[0]}
+          {t.dashboard.notCalculable} {t.calcErrors[errors[0]]}
         </p>
       )}
     </Card>
@@ -68,6 +67,8 @@ function CalculatorCard({
 }
 
 export function Dashboard() {
+  const { t, f } = useLocale();
+  const text = t.dashboard;
   const { settings } = useSettings();
   const avDepot = useAvDepot();
   const pensionGap = usePensionGap();
@@ -78,23 +79,12 @@ export function Dashboard() {
   const overview = pensionGap.result
     ? calculateRetirementOverview(pensionGap.input, avMonthlyNet)
     : null;
-  const savingsRate = settings.shared.savingsRateMonthly;
-
-  const perInterval = {
-    monthly: "pro Monat",
-    quarterly: "pro Quartal",
-    biannual: "pro Halbjahr",
-    yearly: "pro Jahr",
-  }[withdrawal.input.interval];
 
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="text-base font-semibold">Profile</h2>
-        <p className="mb-4 text-sm text-ink-2">
-          Die Auswahl gilt auch in den Rechnern. Profile anlegen und ändern
-          kannst du dort und in den Einstellungen.
-        </p>
+        <h2 className="text-base font-semibold">{t.profiles.heading}</h2>
+        <p className="mb-4 text-sm text-ink-2">{text.profilesHint}</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <ProfilePicker scope="shared" />
           {calculators.map((calculator) => (
@@ -105,71 +95,72 @@ export function Dashboard() {
 
       <section aria-labelledby="retirement-heading" className="space-y-5">
         <h2 id="retirement-heading" className="text-base font-semibold">
-          Ruhestand im Gesamtbild
+          {text.retirementHeading}
         </h2>
         {overview ? (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <Card>
-              <p className="text-sm text-ink-2">Verbleibende Rentenlücke pro Monat</p>
+              <p className="text-sm text-ink-2">{text.remainingGap}</p>
               <p className="mt-1 text-5xl font-semibold">
-                {formatEuro(overview.remainingGap)}
+                {f.euro(overview.remainingGap)}
               </p>
               <p className="mt-2 text-xs text-ink-2">
-                {overview.remainingGap === 0
-                  ? "Rente und Altersvorsorgedepot decken deine Wunschrente."
-                  : "Nach erwarteter Rente und Altersvorsorgedepot."}
+                {overview.remainingGap === 0 ? text.gapCovered : text.gapAfter}
               </p>
             </Card>
             <Card>
               <ShareBar
-                ariaLabel="Wunschrente pro Monat"
-                formatValue={formatEuro}
+                ariaLabel={text.shareBarLabel}
+                formatValue={f.euro}
                 shares={[
                   {
-                    label: "Nettorente",
+                    label: text.netPension,
                     value: Math.min(overview.netPension, overview.desiredPension),
                     color: "var(--series-1)",
                   },
                   {
-                    label: "Altersvorsorgedepot",
+                    label: text.avDepot,
                     value: overview.avDepotPension,
                     color: "var(--series-2)",
                   },
-                  { label: "Verbleibende Lücke", value: overview.remainingGap },
+                  { label: text.remaining, value: overview.remainingGap },
                 ]}
               />
               <dl className="mt-4 grid gap-4 border-t border-line pt-4 text-sm sm:grid-cols-3">
                 <div>
-                  <dt className="text-xs text-ink-2">Wunschrente</dt>
+                  <dt className="text-xs text-ink-2">{text.desiredPension}</dt>
                   <dd className="font-semibold tabular-nums">
-                    {formatEuro(overview.desiredPension)}
+                    {f.euro(overview.desiredPension)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-2">Nötiges Kapital für die Lücke</dt>
+                  <dt className="text-xs text-ink-2">{text.capitalForGap}</dt>
                   <dd className="font-semibold tabular-nums">
-                    {formatEuro(overview.closing.capital)}
+                    {f.euro(overview.closing.capital)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-ink-2">Zusätzliche Sparrate pro Monat</dt>
+                  <dt className="text-xs text-ink-2">{text.extraSavingsRate}</dt>
                   <dd className="font-semibold tabular-nums">
-                    {formatEuroCents(overview.closing.savingsRate)}
+                    {f.euroCents(overview.closing.savingsRate)}
                   </dd>
                 </div>
               </dl>
               <p className="mt-3 text-xs text-ink-2">
                 {avDepot.result
-                  ? `Die zusätzliche Sparrate kommt zu den ${formatEuro(savingsRate)} pro Monat hinzu, die in dieser Rechnung ins Altersvorsorgedepot fließen. Dessen Rente läuft bis Alter ${avDepot.input.payoutUntilAge}; das Kapital für die Lücke ist mit Kapitalverzehr gerechnet.`
-                  : "Das Altersvorsorgedepot ist mit den gewählten Profilen nicht berechenbar und hier nicht eingerechnet."}{" "}
-                Alle Beträge nominal.
+                  ? text.noteWithAvDepot(
+                      f.euro(settings.shared.savingsRateMonthly),
+                      avDepot.input.payoutUntilAge,
+                    )
+                  : text.noteWithoutAvDepot}{" "}
+                {text.nominal}
               </p>
             </Card>
           </div>
         ) : (
           <Card>
             <p className="text-sm text-ink-2">
-              Mit den gewählten Profilen nicht berechenbar: {pensionGap.errors[0]}
+              {text.notCalculable} {t.calcErrors[pensionGap.errors[0]]}
             </p>
           </Card>
         )}
@@ -177,7 +168,7 @@ export function Dashboard() {
 
       <section aria-labelledby="calculators-heading" className="space-y-5">
         <h2 id="calculators-heading" className="text-base font-semibold">
-          Ergebnisse der Rechner
+          {text.resultsHeading}
         </h2>
         <div className="grid gap-5 lg:grid-cols-2">
           <CalculatorCard
@@ -186,20 +177,20 @@ export function Dashboard() {
             figures={
               avDepot.result && [
                 {
-                  label: `Endvermögen mit ${avDepot.input.retirementAge}`,
-                  value: formatEuro(avDepot.result.av.finalCapital),
+                  label: text.avFinalCapital(avDepot.input.retirementAge),
+                  value: f.euro(avDepot.result.av.finalCapital),
                 },
                 {
-                  label: "Netto-Rente pro Monat",
-                  value: formatEuro(avDepot.result.av.payout.monthlyNet),
+                  label: text.netPensionPerMonth,
+                  value: f.euro(avDepot.result.av.payout.monthlyNet),
                 },
                 {
-                  label: "Zum Vergleich: ETF-Sparplan pro Monat",
-                  value: formatEuro(avDepot.result.normal.payout.monthlyNet),
+                  label: text.etfComparison,
+                  value: f.euro(avDepot.result.normal.payout.monthlyNet),
                 },
                 {
-                  label: "Förderung gesamt",
-                  value: formatEuro(
+                  label: text.totalSubsidies,
+                  value: f.euro(
                     avDepot.result.av.allowances + avDepot.result.av.taxSavings,
                   ),
                 },
@@ -211,23 +202,18 @@ export function Dashboard() {
             errors={pensionGap.errors}
             figures={
               pensionGap.result && [
+                { label: text.gapPerMonth, value: f.euro(pensionGap.result.gap) },
                 {
-                  label: "Rentenlücke pro Monat",
-                  value: formatEuro(pensionGap.result.gap),
+                  label: text.netPensionMonthly,
+                  value: f.euro(pensionGap.result.netPension),
                 },
                 {
-                  label: "Nettorente pro Monat",
-                  value: formatEuro(pensionGap.result.netPension),
+                  label: text.capitalWithConsumption,
+                  value: f.euro(pensionGap.result.withConsumption.capital),
                 },
                 {
-                  label: "Nötiges Kapital (mit Kapitalverzehr)",
-                  value: formatEuro(pensionGap.result.withConsumption.capital),
-                },
-                {
-                  label: "Nötige Sparrate pro Monat",
-                  value: formatEuroCents(
-                    pensionGap.result.withConsumption.savingsRate,
-                  ),
+                  label: text.savingsRateNeeded,
+                  value: f.euroCents(pensionGap.result.withConsumption.savingsRate),
                 },
               ]
             }
@@ -238,29 +224,31 @@ export function Dashboard() {
             figures={
               savings.result && [
                 {
-                  label: `Gesucht: ${selectText.savings.output.options[savings.input.output]}`,
+                  label: text.searchedFor(
+                    t.selects.savings.output.options[savings.input.output],
+                  ),
                   value: {
-                    endValue: formatEuro(savings.result.endValue),
-                    startValue: formatEuro(savings.result.startValue),
-                    yearlyInterest: formatPercent(savings.result.yearlyInterest),
-                    duration: formatYears(savings.result.durationYears),
-                    savingRate: formatEuroCents(savings.result.savingRate),
+                    endValue: f.euro(savings.result.endValue),
+                    startValue: f.euro(savings.result.startValue),
+                    yearlyInterest: f.percent(savings.result.yearlyInterest),
+                    duration: f.years(savings.result.durationYears),
+                    savingRate: f.euroCents(savings.result.savingRate),
                   }[savings.input.output],
                 },
                 savings.input.output === "endValue"
                   ? {
-                      label: "Laufzeit",
-                      value: formatYears(savings.result.durationYears),
+                      label: text.duration,
+                      value: f.years(savings.result.durationYears),
                     }
                   : {
-                      label: "Endkapital",
-                      value: formatEuro(savings.result.endValue),
+                      label: t.common.endValue,
+                      value: f.euro(savings.result.endValue),
                     },
                 {
-                  label: "Einzahlungen gesamt",
-                  value: formatEuro(savings.result.deposits),
+                  label: text.totalDeposits,
+                  value: f.euro(savings.result.deposits),
                 },
-                { label: "Zinsen", value: formatEuro(savings.result.interest) },
+                { label: t.common.interest, value: f.euro(savings.result.interest) },
               ]
             }
           />
@@ -270,26 +258,28 @@ export function Dashboard() {
             figures={
               withdrawal.result && [
                 {
-                  label: "Gesucht",
+                  label: text.searched,
                   value:
-                    selectText["withdrawal-plan"].output.options[
+                    t.selects["withdrawal-plan"].output.options[
                       withdrawal.input.output
                     ],
                 },
                 {
-                  label: `Entnahmebetrag ${perInterval}`,
-                  value: formatEuroCents(withdrawal.result.amount),
+                  label: text.withdrawalAmount(
+                    perIntervalText(t, withdrawal.input.interval),
+                  ),
+                  value: f.euroCents(withdrawal.result.amount),
                 },
                 {
-                  label: "Entnahmezeitraum",
+                  label: text.withdrawalPeriod,
                   value:
                     withdrawal.result.periodYears === null
-                      ? "endlos"
-                      : formatYears(withdrawal.result.periodYears),
+                      ? t.common.endless
+                      : f.years(withdrawal.result.periodYears),
                 },
                 {
-                  label: "Anlagevermögen",
-                  value: formatEuro(withdrawal.result.capital),
+                  label: text.capitalAssets,
+                  value: f.euro(withdrawal.result.capital),
                 },
               ]
             }

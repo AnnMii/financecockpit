@@ -1,9 +1,14 @@
 "use client";
 
-import { Assumptions, CalculatorShell } from "@/components/calculator-shell";
+import {
+  Assumptions,
+  CalculatorShell,
+  YearlyTable,
+} from "@/components/calculator-shell";
 import { StackedColumns } from "@/components/charts/stacked-columns";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
+import { useLocale } from "@/components/locale-provider";
 import {
   NumberSetting,
   SelectSetting,
@@ -13,24 +18,24 @@ import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
 import { useWithdrawalPlan } from "@/components/use-calculators";
 import type {
+  WithdrawalInterval,
   WithdrawalPlanInput,
   WithdrawalPlanResult,
 } from "@/lib/calculators/withdrawal-plan";
-import {
-  formatEuro,
-  formatEuroCents,
-  formatEuroCompact,
-  formatYears,
-} from "@/lib/format";
+import type { Dictionary } from "@/lib/i18n";
 
-const SERIES = [{ key: "capital", label: "Kapital", color: "var(--series-1)" }];
-
-const PER_INTERVAL = {
-  monthly: "pro Monat",
-  quarterly: "pro Quartal",
-  biannual: "pro Halbjahr",
-  yearly: "pro Jahr",
-};
+/** "pro Monat" / "per month" for a withdrawal interval. */
+export function perIntervalText(
+  t: Dictionary,
+  interval: WithdrawalInterval,
+): string {
+  return {
+    monthly: t.common.perMonth,
+    quarterly: t.common.perQuarter,
+    biannual: t.common.perHalfYear,
+    yearly: t.common.perYear,
+  }[interval];
+}
 
 export function WithdrawalPlanCalculator() {
   return (
@@ -41,6 +46,8 @@ export function WithdrawalPlanCalculator() {
 }
 
 function Workspace() {
+  const { t } = useLocale();
+  const text = t.withdrawal;
   const { input, errors, result } = useWithdrawalPlan();
   const { settings } = useSettingsEditor();
   const { output, interval } = settings["withdrawal-plan"];
@@ -51,15 +58,12 @@ function Workspace() {
       errors={errors}
       form={
         <>
-          <Section title="Berechnung">
+          <Section title={text.sections.calculation}>
             <SelectSetting scope="withdrawal-plan" name="output" />
-            <p className="text-xs text-ink-2">
-              Das gesuchte Feld entfällt bei den Eingaben und erscheint als
-              Ergebnis.
-            </p>
+            <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
           </Section>
 
-          <Section title="Entnahme">
+          <Section title={text.sections.withdrawal}>
             {output !== "capital" && (
               <NumberSetting scope="withdrawal-plan" name="capitalAssets" />
             )}
@@ -67,7 +71,7 @@ function Workspace() {
               <NumberSetting
                 scope="withdrawal-plan"
                 name="withdrawalAmount"
-                unit={`€ ${PER_INTERVAL[interval]}`}
+                unit={`€ ${perIntervalText(t, interval)}`}
               />
             )}
             <SelectSetting scope="withdrawal-plan" name="interval" />
@@ -79,12 +83,12 @@ function Workspace() {
             )}
           </Section>
 
-          <Section title="Zinsen">
+          <Section title={text.sections.interest}>
             <NumberSetting
               scope="shared"
               name="retirementReturn"
-              label="Zinssatz p. a."
-              hint="Deine Rendite im Ruhestand aus den globalen Werten."
+              label={text.interestRate}
+              hint={text.interestRateHint}
             />
           </Section>
         </>
@@ -102,17 +106,19 @@ function Results({
   input: WithdrawalPlanInput;
   result: WithdrawalPlanResult;
 }) {
+  const { t, f } = useLocale();
+  const text = t.withdrawal;
   const endless = result.periodYears === null;
   const figures = {
     amount: {
-      label: `Entnahmebetrag ${PER_INTERVAL[input.interval]}`,
-      value: formatEuroCents(result.amount),
+      label: text.amount(perIntervalText(t, input.interval)),
+      value: f.euroCents(result.amount),
     },
     period: {
-      label: "Entnahmezeitraum",
-      value: endless ? "endlos" : formatYears(result.periodYears!),
+      label: text.period,
+      value: endless ? t.common.endless : f.years(result.periodYears!),
     },
-    capital: { label: "Anlagevermögen", value: formatEuro(result.capital) },
+    capital: { label: text.capital, value: f.euro(result.capital) },
   };
   const searched = figures[input.output];
   const others = (Object.keys(figures) as (keyof typeof figures)[]).filter(
@@ -120,10 +126,13 @@ function Results({
   );
   const keepsCapital = input.output !== "period" && !input.capitalConsumption;
 
+  const series = [
+    { key: "capital", label: t.common.capital, color: "var(--series-1)" },
+  ];
   const tickEvery = result.years.length > 15 ? 5 : 1;
   const chartData = result.years.map((year) => ({
     tick: year.year % tickEvery === 0 ? String(year.year) : "",
-    title: `Nach ${formatYears(year.year)}`,
+    title: t.common.afterYears(f.years(year.year)),
     values: { capital: year.capital },
   }));
 
@@ -135,9 +144,9 @@ function Results({
         value={searched.value}
         note={
           endless
-            ? "Die Entnahme übersteigt die Zinsen nicht; das Kapital wird nie aufgebraucht."
+            ? text.endlessNote
             : keepsCapital
-              ? "Entnommen werden nur die Zinsen; das Kapital bleibt erhalten."
+              ? text.keepsCapitalNote
               : undefined
         }
       />
@@ -147,65 +156,45 @@ function Results({
           <StatTile key={key} label={figures[key].label} value={figures[key].value} />
         ))}
         <StatTile
-          label="Summe der Entnahmen"
+          label={text.totalWithdrawn}
           value={
-            result.totalWithdrawn === null ? "–" : formatEuro(result.totalWithdrawn)
+            result.totalWithdrawn === null ? "–" : f.euro(result.totalWithdrawn)
           }
           note={
             result.totalWithdrawn === null
               ? undefined
-              : `davon ${formatEuro(Math.max(0, result.totalWithdrawn - (keepsCapital ? 0 : result.capital)))} Zinsen`
+              : text.ofWhichInterest(
+                  f.euro(
+                    Math.max(
+                      0,
+                      result.totalWithdrawn - (keepsCapital ? 0 : result.capital),
+                    ),
+                  ),
+                )
           }
         />
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold">Kapital pro Jahr</h2>
+        <h2 className="text-base font-semibold">{text.chartTitle}</h2>
         <p className="mb-4 text-sm text-ink-2">
-          Verbleibendes Anlagevermögen am Ende jedes Jahres
-          {endless ? " (die ersten 30 Jahre)" : ""}.
+          {text.chartSubtitle}
+          {endless ? text.chartSubtitleEndless : ""}.
         </p>
         <StackedColumns
           data={chartData}
-          series={SERIES}
-          formatValue={formatEuro}
-          formatAxis={formatEuroCompact}
-          ariaLabel="Säulendiagramm: verbleibendes Kapital am Ende jedes Jahres"
+          series={series}
+          formatValue={f.euro}
+          formatAxis={f.euroCompact}
+          ariaLabel={text.chartAria}
         />
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-medium text-accent">
-            Jahreswerte als Tabelle
-          </summary>
-          <div className="mt-3 max-h-96 overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-surface text-xs text-ink-2">
-                <tr className="border-b border-line">
-                  <th className="px-3 py-2 text-left font-medium">Jahr</th>
-                  <th className="px-3 py-2 text-right font-medium">Kapital</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.years.map((year) => (
-                  <tr key={year.year} className="border-b border-line last:border-0">
-                    <td className="px-3 py-1.5 tabular-nums">{year.year}</td>
-                    <td className="px-3 py-1.5 text-right tabular-nums">
-                      {formatEuro(year.capital)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
+        <YearlyTable
+          head={[t.common.year, t.common.capital]}
+          rows={result.years.map((year) => [year.year, f.euro(year.capital)])}
+        />
       </Card>
 
-      <Assumptions
-        items={[
-          "Entnahmen erfolgen am Ende jedes Intervalls; der Jahreszins wird auf das Intervall umgerechnet, sodass sich über ein Jahr genau der Zinssatz ergibt.",
-          "Steuern und Inflation sind nicht berücksichtigt; trage dafür einen entsprechend niedrigeren Zinssatz ein.",
-          "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet. Keine Steuer- oder Anlageberatung.",
-        ]}
-      />
+      <Assumptions items={text.assumptions} />
     </>
   );
 }

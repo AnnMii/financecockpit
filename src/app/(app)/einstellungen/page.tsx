@@ -6,22 +6,23 @@ import {
   NumberSetting,
   ToggleSetting,
 } from "@/components/setting-fields";
+import { getDictionary } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Einstellungen" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDictionary()).settingsPage.title };
+}
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const text = (await getDictionary()).settingsPage;
   return (
     <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Einstellungen</h1>
-      <p className="mb-6 mt-1 text-sm text-ink-2">
-        Diese Werte teilen sich die Rechner. Änderungen werden automatisch im
-        gewählten Profil gespeichert.
-      </p>
+      <h1 className="text-2xl font-semibold">{text.title}</h1>
+      <p className="mb-6 mt-1 text-sm text-ink-2">{text.intro}</p>
       <Card className="mb-5">
-        <ProfilePicker scope="shared" label="Profil der globalen Werte" manage />
+        <ProfilePicker scope="shared" label={text.profileLabel} manage />
       </Card>
       <Card className="space-y-7">
-        <Section title="Persönliche Daten">
+        <Section title={text.personal}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberSetting scope="shared" name="age" />
             <NumberSetting scope="shared" name="retirementAge" />
@@ -29,7 +30,7 @@ export default function SettingsPage() {
           </div>
           <ChildrenField />
         </Section>
-        <Section title="Sparen und Anlegen">
+        <Section title={text.saving}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberSetting scope="shared" name="savingsRateMonthly" />
             <NumberSetting scope="shared" name="currentCapital" />
@@ -37,13 +38,13 @@ export default function SettingsPage() {
             <NumberSetting scope="shared" name="retirementReturn" />
           </div>
         </Section>
-        <Section title="Inflation">
+        <Section title={text.inflation}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberSetting scope="shared" name="inflationRate" />
             <ToggleSetting scope="shared" name="considerInflation" />
           </div>
         </Section>
-        <Section title="Einkommen und Steuern">
+        <Section title={text.incomeAndTax}>
           <div className="grid gap-4 sm:grid-cols-2">
             <NumberSetting scope="shared" name="zveSavingsPhase" />
             <NumberSetting scope="shared" name="zveRetirement" />

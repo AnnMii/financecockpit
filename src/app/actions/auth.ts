@@ -5,12 +5,12 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getDb, schema } from "@/db";
-import { registrationAllowed } from "@/lib/auth/config";
+import { type AuthError, registrationAllowed } from "@/lib/auth/config";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { createSession, deleteSession } from "@/lib/auth/session";
 
 export interface AuthFormState {
-  error?: string;
+  error?: AuthError;
   email?: string;
 }
 
@@ -30,7 +30,7 @@ export async function login(
   const parsed = credentials.safeParse(Object.fromEntries(formData));
   const email = String(formData.get("email") ?? "");
   if (!parsed.success) {
-    return { error: "Bitte E-Mail-Adresse und Passwort eingeben.", email };
+    return { error: "missingCredentials", email };
   }
 
   const db = await getDb();
@@ -45,7 +45,7 @@ export async function login(
     user?.passwordHash ?? DUMMY_HASH,
   );
   if (!user || !valid) {
-    return { error: "E-Mail-Adresse oder Passwort ist falsch.", email };
+    return { error: "wrongCredentials", email };
   }
 
   await createSession(user.id);
@@ -58,18 +58,18 @@ export async function register(
 ): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "");
   if (!registrationAllowed()) {
-    return { error: "Die Registrierung ist deaktiviert.", email };
+    return { error: "registrationClosed", email };
   }
 
   const parsed = credentials.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { error: "Bitte eine gültige E-Mail-Adresse eingeben.", email };
+    return { error: "invalidEmail", email };
   }
   if (parsed.data.password.length < 10) {
-    return { error: "Das Passwort braucht mindestens 10 Zeichen.", email };
+    return { error: "passwordTooShort", email };
   }
   if (parsed.data.password !== formData.get("passwordRepeat")) {
-    return { error: "Die Passwörter stimmen nicht überein.", email };
+    return { error: "passwordMismatch", email };
   }
 
   const db = await getDb();
@@ -85,7 +85,7 @@ export async function register(
     .onConflictDoNothing({ target: schema.users.email })
     .returning({ id: schema.users.id });
   if (inserted.length === 0) {
-    return { error: "Für diese E-Mail-Adresse gibt es schon ein Konto.", email };
+    return { error: "emailTaken", email };
   }
 
   await createSession(id);

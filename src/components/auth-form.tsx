@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { type AuthFormState, login, register } from "@/app/actions/auth";
+import { useLocale } from "./locale-provider";
 
 const inputClass =
   "w-full rounded-md border border-axis bg-surface px-3 py-2 text-sm text-ink";
@@ -14,6 +15,7 @@ export function AuthForm({
   mode: "login" | "register";
   registrationOpen: boolean;
 }) {
+  const { t } = useLocale();
   const isLogin = mode === "login";
   const [state, formAction, pending] = useActionState<AuthFormState, FormData>(
     isLogin ? login : register,
@@ -23,7 +25,7 @@ export function AuthForm({
   return (
     <form action={formAction} className="space-y-4">
       <label className="block">
-        <span className="mb-1 block text-sm font-medium">E-Mail-Adresse</span>
+        <span className="mb-1 block text-sm font-medium">{t.auth.email}</span>
         <input
           name="email"
           type="email"
@@ -34,7 +36,7 @@ export function AuthForm({
         />
       </label>
       <label className="block">
-        <span className="mb-1 block text-sm font-medium">Passwort</span>
+        <span className="mb-1 block text-sm font-medium">{t.auth.password}</span>
         <input
           name="password"
           type="password"
@@ -45,14 +47,14 @@ export function AuthForm({
         />
         {!isLogin && (
           <span className="mt-1 block text-xs text-ink-2">
-            Mindestens 10 Zeichen.
+            {t.auth.passwordHint}
           </span>
         )}
       </label>
       {!isLogin && (
         <label className="block">
           <span className="mb-1 block text-sm font-medium">
-            Passwort wiederholen
+            {t.auth.passwordRepeat}
           </span>
           <input
             name="passwordRepeat"
@@ -65,7 +67,7 @@ export function AuthForm({
       )}
 
       <p aria-live="polite" className="min-h-5 text-sm text-critical">
-        {state.error}
+        {state.error && t.auth.errors[state.error]}
       </p>
 
       <button
@@ -73,23 +75,23 @@ export function AuthForm({
         disabled={pending}
         className="w-full rounded-md bg-accent px-4 py-2 text-sm font-semibold text-on-accent disabled:opacity-60"
       >
-        {isLogin ? "Anmelden" : "Konto anlegen"}
+        {isLogin ? t.auth.loginButton : t.auth.registerButton}
       </button>
 
       {isLogin
         ? registrationOpen && (
             <p className="text-center text-sm text-ink-2">
-              Noch kein Konto?{" "}
+              {t.auth.noAccount}{" "}
               <Link href="/registrieren" className="font-medium text-accent">
-                Registrieren
+                {t.auth.registerLink}
               </Link>
             </p>
           )
         : (
             <p className="text-center text-sm text-ink-2">
-              Schon registriert?{" "}
+              {t.auth.hasAccount}{" "}
               <Link href="/login" className="font-medium text-accent">
-                Anmelden
+                {t.auth.loginLink}
               </Link>
             </p>
           )}

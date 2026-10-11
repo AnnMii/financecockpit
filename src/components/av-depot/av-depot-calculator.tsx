@@ -3,11 +3,11 @@
 import { CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
 import { Section } from "@/components/fields";
+import { useLocale } from "@/components/locale-provider";
 import {
   ChildrenField,
   NumberSetting,
   SelectSetting,
-  yearlySavingsHint,
 } from "@/components/setting-fields";
 import { AvDepotResults } from "./av-depot-results";
 import { useAvDepot } from "./use-av-depot";
@@ -30,7 +30,9 @@ export function AvDepotCalculator() {
 }
 
 function AvDepotWorkspace() {
+  const { t, f } = useLocale();
   const { input, errors, result } = useAvDepot();
+  const text = t.avDepot;
 
   return (
     <CalculatorShell
@@ -38,41 +40,59 @@ function AvDepotWorkspace() {
       errors={errors}
       form={
         <>
-          <Section title="Persönliche Daten">
+          <Section title={text.sections.personal}>
             <NumberSetting scope="shared" name="age" slider={sliders.age} />
-            <NumberSetting scope="shared" name="retirementAge" hint="Zwischen 65 und 70 Jahren." />
+            <NumberSetting
+              scope="shared"
+              name="retirementAge"
+              hint={text.retirementAgeHint}
+            />
           </Section>
 
-          <Section title="Einkommen">
-            <NumberSetting scope="shared" name="zveSavingsPhase" slider={sliders.income} />
-            <NumberSetting scope="shared" name="zveRetirement" slider={sliders.income} />
+          <Section title={text.sections.income}>
+            <NumberSetting
+              scope="shared"
+              name="zveSavingsPhase"
+              slider={sliders.income}
+            />
+            <NumberSetting
+              scope="shared"
+              name="zveRetirement"
+              slider={sliders.income}
+            />
           </Section>
 
-          <Section title="Ansparphase">
+          <Section title={text.sections.saving}>
             <NumberSetting
               scope="shared"
               name="savingsRateMonthly"
               slider={sliders.savingsRateMonthly}
-              hint={`${yearlySavingsHint(input.savingsRate / 12)}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`}
+              hint={text.savingsRateHint(
+                t.common.perYearEquals(f.euro(input.savingsRate)),
+              )}
             />
             <NumberSetting scope="shared" name="expectedReturn" />
           </Section>
 
-          <Section title="Kinder">
+          <Section title={text.sections.children}>
             <ChildrenField />
           </Section>
 
-          <Section title="Auszahlphase">
-            <NumberSetting scope="av-depot" name="oneTimePayout" slider={sliders.oneTimePayout} />
+          <Section title={text.sections.payout}>
+            <NumberSetting
+              scope="av-depot"
+              name="oneTimePayout"
+              slider={sliders.oneTimePayout}
+            />
             <NumberSetting
               scope="shared"
               name="payoutUntilAge"
-              hint="Im Altersvorsorgedepot mindestens bis 85."
+              hint={text.payoutUntilHint}
             />
             <NumberSetting scope="shared" name="retirementReturn" />
           </Section>
 
-          <Section title="Erweitert">
+          <Section title={text.sections.advanced}>
             <NumberSetting scope="av-depot" name="avDepotCosts" />
             <SelectSetting scope="av-depot" name="taxSavingsMode" />
             <NumberSetting scope="shared" name="exemptionOrder" />

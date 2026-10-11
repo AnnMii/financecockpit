@@ -1,7 +1,6 @@
 "use client";
 
-import { formatEuro } from "@/lib/format";
-import { numberText, selectText, toggleText } from "@/lib/settings/labels";
+import type { FieldText } from "@/lib/settings/labels";
 import {
   type AllSettings,
   MAX_CHILDREN,
@@ -22,6 +21,7 @@ import {
   type SliderSpec,
   ToggleField,
 } from "./fields";
+import { useLocale } from "./locale-provider";
 import { useSettingsEditor } from "./settings-provider";
 
 /**
@@ -46,8 +46,9 @@ export function NumberSetting<S extends SettingsScope>({
   hint?: React.ReactNode;
   slider?: SliderSpec;
 }) {
+  const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
-  const text = numberText[scope][name];
+  const text = (t.numbers[scope] as Record<string, FieldText>)[name];
   const spec = (numberFields[scope] as Record<string, NumberFieldSpec>)[name];
   return (
     <NumberField
@@ -73,8 +74,9 @@ export function ToggleSetting<S extends SettingsScope>({
   scope: S;
   name: ToggleFieldName<S>;
 }) {
+  const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
-  const text = toggleText[scope][name];
+  const text = (t.toggles[scope] as Record<string, FieldText>)[name];
   return (
     <ToggleField
       label={text.label}
@@ -96,12 +98,14 @@ export function SelectSetting<S extends SettingsScope>({
   scope: S;
   name: SelectFieldName<S>;
 }) {
+  const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
-  const text = selectText[scope][name] as {
-    label: string;
-    hint?: string;
-    options: Record<string, string>;
-  };
+  const text = (
+    t.selects[scope] as Record<
+      string,
+      FieldText & { options: Record<string, string> }
+    >
+  )[name];
   const values = (selectFields[scope] as Record<string, readonly string[]>)[name];
   return (
     <SelectField
@@ -119,6 +123,7 @@ export function SelectSetting<S extends SettingsScope>({
 }
 
 export function ChildrenField() {
+  const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
   const years = settings.shared.childBirthYears;
   const setYears = (childBirthYears: number[]) =>
@@ -127,18 +132,18 @@ export function ChildrenField() {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-ink">Kinder</span>
+        <span className="text-sm font-medium text-ink">{t.children.label}</span>
         <SharedBadge />
         {isChanged("shared", "childBirthYears") && <ChangedBadge />}
       </div>
       {years.length === 0 && (
-        <p className="text-xs text-ink-2">Keine Kinder eingetragen.</p>
+        <p className="text-xs text-ink-2">{t.children.none}</p>
       )}
       {years.map((year, index) => (
         <div key={index} className="flex items-start gap-2">
           <div className="flex-1">
             <NumberField
-              label={`Geburtsjahr Kind ${index + 1}`}
+              label={t.children.birthYear(index + 1)}
               spec={childBirthYearSpec}
               value={year}
               onChange={(value) =>
@@ -150,9 +155,9 @@ export function ChildrenField() {
             type="button"
             onClick={() => setYears(years.filter((_, i) => i !== index))}
             className="mt-6 rounded-md border border-axis px-3 py-2 text-sm text-ink-2 hover:text-ink"
-            aria-label={`Kind ${index + 1} entfernen`}
+            aria-label={t.children.removeAria(index + 1)}
           >
-            Entfernen
+            {t.children.remove}
           </button>
         </div>
       ))}
@@ -162,14 +167,9 @@ export function ChildrenField() {
           onClick={() => setYears([...years, childBirthYearSpec.default])}
           className="rounded-md border border-axis px-3 py-2 text-sm font-medium text-ink hover:bg-accent-wash"
         >
-          Kind hinzufügen
+          {t.children.add}
         </button>
       )}
     </div>
   );
-}
-
-/** "= 1.800 € pro Jahr" under the monthly savings rate. */
-export function yearlySavingsHint(monthly: number): string {
-  return `= ${formatEuro(monthly * 12)} pro Jahr`;
 }

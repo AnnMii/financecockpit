@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState } from "react";
-import { scopeLabels } from "@/lib/settings/labels";
+import type { ProfileError } from "@/lib/settings/labels";
 import type { SettingsScope } from "@/lib/settings/schema";
 import { useDraft } from "./draft-settings";
+import { useLocale } from "./locale-provider";
 import { useSettings, useSettingsEditor } from "./settings-provider";
 
 type Mode = "idle" | "create" | "rename" | "delete";
@@ -19,7 +21,7 @@ const primaryButtonClass =
  */
 export function ProfilePicker({
   scope,
-  label = scopeLabels[scope],
+  label,
   manage = false,
 }: {
   scope: SettingsScope;
@@ -27,6 +29,8 @@ export function ProfilePicker({
   manage?: boolean;
 }) {
   const id = useId();
+  const { t } = useLocale();
+  const text = t.profiles;
   const { profiles, selectProfile, createProfile, renameProfile, deleteProfile } =
     useSettings();
   const { settings: visible } = useSettingsEditor();
@@ -34,7 +38,7 @@ export function ProfilePicker({
 
   const [mode, setMode] = useState<Mode>("idle");
   const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ProfileError | null>(null);
   const [busy, setBusy] = useState(false);
 
   const { activeId, profiles: list } = profiles[scope];
@@ -47,7 +51,7 @@ export function ProfilePicker({
   };
 
   const run = async (
-    action: () => Promise<string | null>,
+    action: () => Promise<ProfileError | null>,
     profileReplaced = true,
   ) => {
     setBusy(true);
@@ -66,7 +70,7 @@ export function ProfilePicker({
   return (
     <div>
       <label htmlFor={id} className="mb-1 block text-xs font-medium text-ink-2">
-        {label}
+        {label ?? t.scopes[scope]}
       </label>
       <select
         id={id}
@@ -88,14 +92,14 @@ export function ProfilePicker({
       {manage && mode === "idle" && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           <button type="button" className={buttonClass} onClick={() => open("create")}>
-            Neu …
+            {text.create}
           </button>
           <button
             type="button"
             className={buttonClass}
             onClick={() => open("rename", active.name)}
           >
-            Umbenennen
+            {text.rename}
           </button>
           <button
             type="button"
@@ -103,7 +107,7 @@ export function ProfilePicker({
             disabled={list.length < 2}
             onClick={() => open("delete")}
           >
-            Löschen
+            {text.delete}
           </button>
         </div>
       )}
@@ -123,21 +127,21 @@ export function ProfilePicker({
             value={name}
             maxLength={40}
             onChange={(event) => setName(event.target.value)}
-            aria-label={mode === "create" ? "Name des neuen Profils" : "Neuer Name"}
-            placeholder="Name des Profils"
+            aria-label={mode === "create" ? text.newNameAria : text.renameAria}
+            placeholder={text.namePlaceholder}
             className="w-full rounded-md border border-axis bg-surface px-3 py-1.5 text-sm text-ink"
           />
           {mode === "create" && (
             <p className="text-xs text-ink-2">
-              Übernimmt die Werte, die du gerade siehst.
+              {text.takesVisibleValues}
             </p>
           )}
           <div className="flex gap-1.5">
             <button type="submit" className={primaryButtonClass} disabled={busy}>
-              {mode === "create" ? "Anlegen" : "Umbenennen"}
+              {mode === "create" ? text.confirmCreate : text.rename}
             </button>
             <button type="button" className={buttonClass} onClick={() => open("idle")}>
-              Abbrechen
+              {text.cancel}
             </button>
           </div>
         </form>
@@ -146,7 +150,7 @@ export function ProfilePicker({
       {manage && mode === "delete" && (
         <div className="mt-2 space-y-2">
           <p className="text-xs text-ink">
-            Profil „{active.name}“ endgültig löschen?
+            {text.confirmDelete(active.name)}
           </p>
           <div className="flex gap-1.5">
             <button
@@ -155,10 +159,10 @@ export function ProfilePicker({
               disabled={busy}
               onClick={() => void run(() => deleteProfile(scope, active.id))}
             >
-              Löschen
+              {text.delete}
             </button>
             <button type="button" className={buttonClass} onClick={() => open("idle")}>
-              Abbrechen
+              {text.cancel}
             </button>
           </div>
         </div>
@@ -166,22 +170,36 @@ export function ProfilePicker({
 
       {error && (
         <p role="alert" className="mt-1 text-xs text-critical">
-          {error}
+          {text.errors[error]}
         </p>
       )}
     </div>
   );
 }
 
-/** The two pickers every calculator shows: shared values and its own. */
+/**
+ * The two pickers every calculator shows. The shared profiles can only be
+ * switched here; they are managed on the settings page, and new ones can be
+ * created when saving a draft.
+ */
 export function CalculatorProfiles({ scope }: { scope: SettingsScope }) {
+  const { t } = useLocale();
   return (
     <section className="space-y-4 rounded-xl border border-line bg-surface p-5">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-ink-2">
-        Profile
+        {t.profiles.heading}
       </h2>
-      <ProfilePicker scope="shared" manage />
-      <ProfilePicker scope={scope} label="Werte dieses Rechners" manage />
+      <div>
+        <ProfilePicker scope="shared" />
+        <p className="mt-1 text-xs text-ink-2">
+          {t.profiles.managedInSettings}{" "}
+          <Link href="/einstellungen" className="font-medium text-accent">
+            {t.nav.settings}
+          </Link>
+          .
+        </p>
+      </div>
+      <ProfilePicker scope={scope} label={t.profiles.ownValues} manage />
     </section>
   );
 }

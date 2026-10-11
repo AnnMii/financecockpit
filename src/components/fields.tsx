@@ -1,27 +1,29 @@
 "use client";
 
 import { useId, useState } from "react";
-import { formatNumber, parseNumber } from "@/lib/format";
 import type { NumberFieldSpec } from "@/lib/settings/schema";
+import { useLocale } from "./locale-provider";
 
 export function SharedBadge() {
+  const { t } = useLocale();
   return (
     <span
-      title="Geteilte Einstellung – gilt für alle Rechner"
+      title={t.common.sharedTitle}
       className="rounded-full bg-accent-wash px-1.5 py-px text-[11px] font-medium text-accent"
     >
-      geteilt
+      {t.common.shared}
     </span>
   );
 }
 
 export function ChangedBadge() {
+  const { t } = useLocale();
   return (
     <span
-      title="Lokal geändert – noch nicht gespeichert"
+      title={t.common.changedTitle}
       className="rounded-full border border-axis px-1.5 py-px text-[11px] font-medium text-ink-2"
     >
-      geändert
+      {t.common.changed}
     </span>
   );
 }
@@ -56,8 +58,9 @@ interface NumberFieldProps {
 }
 
 /**
- * Text input for numbers in German notation. Only values inside the field's
- * range are passed on, so the settings never hold a half-typed number.
+ * Text input for numbers in the notation of the current language. Only values
+ * inside the field's range are passed on, so the settings never hold a
+ * half-typed number.
  */
 export function NumberField({
   label,
@@ -71,16 +74,19 @@ export function NumberField({
   slider,
 }: NumberFieldProps) {
   const id = useId();
-  const [text, setText] = useState(() => formatNumber(value));
-  const [lastValue, setLastValue] = useState(value);
+  const { locale, t, f } = useLocale();
+  const [text, setText] = useState(() => f.number(value));
+  const [shown, setShown] = useState({ value, locale });
 
-  // Follow changes made elsewhere, e.g. the same shared field on another page.
-  if (value !== lastValue) {
-    setLastValue(value);
-    if (parseNumber(text) !== value) setText(formatNumber(value));
+  // Follow changes made elsewhere (the same shared field on another page, a
+  // slider, a profile switch) and re-write the number when the language changes.
+  if (value !== shown.value || locale !== shown.locale) {
+    const languageChanged = locale !== shown.locale;
+    setShown({ value, locale });
+    if (languageChanged || f.parse(text) !== value) setText(f.number(value));
   }
 
-  const invalid = !isValid(parseNumber(text), spec);
+  const invalid = !isValid(f.parse(text), spec);
 
   return (
     <div>
@@ -106,10 +112,10 @@ export function NumberField({
           aria-describedby={`${id}-hint`}
           onChange={(event) => {
             setText(event.target.value);
-            const parsed = parseNumber(event.target.value);
+            const parsed = f.parse(event.target.value);
             if (isValid(parsed, spec) && parsed !== value) onChange(parsed);
           }}
-          onBlur={() => setText(formatNumber(value))}
+          onBlur={() => setText(f.number(value))}
           className="w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-ink outline-none"
         />
         {unit && (
@@ -131,8 +137,11 @@ export function NumberField({
       <p id={`${id}-hint`} className="mt-1 text-xs text-ink-2">
         {invalid ? (
           <span className="text-critical">
-            Bitte {spec.integer ? "eine ganze Zahl" : "einen Wert"} zwischen{" "}
-            {formatNumber(spec.min)} und {formatNumber(spec.max)} eingeben.
+            {t.common.numberRange(
+              spec.integer ?? false,
+              f.number(spec.min),
+              f.number(spec.max),
+            )}
           </span>
         ) : (
           hint

@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { AvDepotCalculator } from "@/components/av-depot/av-depot-calculator";
+import { getDictionary } from "@/lib/i18n/server";
 
-export const metadata: Metadata = { title: "Altersvorsorgedepot-Rechner" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getDictionary()).calculators["av-depot"].pageTitle };
+}
 
-export default function AvDepotPage() {
+export default async function Page() {
+  const t = await getDictionary();
+  const text = t.calculators["av-depot"];
   return (
     <>
-      <h1 className="text-2xl font-semibold">Altersvorsorgedepot-Rechner</h1>
+      <h1 className="text-2xl font-semibold">{text.pageTitle}</h1>
       <p className="mb-6 mt-1 max-w-3xl text-sm text-ink-2">
-        Vergleicht das staatlich geförderte Altersvorsorgedepot mit einem
-        normalen ETF-Sparplan bei gleichen Einzahlungen. Änderungen gelten nur
-        hier, bis du sie im Profil speicherst.
+        {text.intro} {t.common.localChangesHint}
       </p>
       <AvDepotCalculator />
     </>

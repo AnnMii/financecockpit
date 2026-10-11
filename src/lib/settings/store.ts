@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
+import type { ProfileError } from "./labels";
 import {
   type AllSettings,
   SETTINGS_SCOPES,
@@ -27,7 +28,7 @@ export type ProfileState = {
 
 export type ProfileResult<T = object> =
   | ({ ok: true } & T)
-  | { ok: false; error: string };
+  | { ok: false; error: ProfileError };
 
 const { profiles } = schema;
 
@@ -46,11 +47,7 @@ function cleanName(name: string): string | null {
     : null;
 }
 
-const NAME_ERROR = `Der Name braucht 1 bis ${MAX_PROFILE_NAME_LENGTH} Zeichen.`;
-const NOT_FOUND: ProfileResult<never> = {
-  ok: false,
-  error: "Das Profil gibt es nicht mehr.",
-};
+const NOT_FOUND = { ok: false, error: "notFound" } as const;
 
 async function ownProfile(userId: string, profileId: string) {
   const db = await getDb();
@@ -150,17 +147,14 @@ export async function createProfile(
   data: unknown,
 ): Promise<ProfileResult<{ profile: Profile }>> {
   const cleaned = cleanName(name);
-  if (!cleaned) return { ok: false, error: NAME_ERROR };
+  if (!cleaned) return { ok: false, error: "nameLength" };
 
   const existing = await scopeRows(userId, scope);
   if (existing.length >= MAX_PROFILES_PER_SCOPE) {
-    return {
-      ok: false,
-      error: `Mehr als ${MAX_PROFILES_PER_SCOPE} Profile sind nicht möglich.`,
-    };
+    return { ok: false, error: "tooMany" };
   }
   if (existing.some((row) => row.name === cleaned)) {
-    return { ok: false, error: "Ein Profil mit diesem Namen gibt es schon." };
+    return { ok: false, error: "duplicateName" };
   }
 
   const db = await getDb();
@@ -190,14 +184,14 @@ export async function renameProfile(
   name: string,
 ): Promise<ProfileResult<{ name: string }>> {
   const cleaned = cleanName(name);
-  if (!cleaned) return { ok: false, error: NAME_ERROR };
+  if (!cleaned) return { ok: false, error: "nameLength" };
 
   const profile = await ownProfile(userId, profileId);
   if (!profile) return NOT_FOUND;
 
   const siblings = await scopeRows(userId, profile.scope);
   if (siblings.some((row) => row.name === cleaned && row.id !== profileId)) {
-    return { ok: false, error: "Ein Profil mit diesem Namen gibt es schon." };
+    return { ok: false, error: "duplicateName" };
   }
 
   const db = await getDb();
@@ -220,7 +214,7 @@ export async function deleteProfile(
     (row) => row.id !== profileId,
   );
   if (remaining.length === 0) {
-    return { ok: false, error: "Das letzte Profil kann nicht gelöscht werden." };
+    return { ok: false, error: "lastProfile" };
   }
 
   const db = await getDb();

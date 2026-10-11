@@ -47,6 +47,7 @@ src/
     auth/              Passwort-Hashing (scrypt), Sitzungen
     calculators/       Rechenlogik ohne UI, mit Tests
     settings/          Felder, Wertebereiche und Standardwerte der Einstellungen
+    i18n/              Wörterbücher (Deutsch, Englisch) und Sprachwahl
 drizzle/               SQL-Migrationen (werden beim Start angewendet)
 test/upstream/         Vergleichstests gegen das Finanzfluss-Original
 test/fixtures/         Aufgezeichnete Ergebnisse der Finanzfluss-Seite
@@ -59,7 +60,8 @@ scripts/               Hilfsskripte
 Werte liegen in Bereichen (`scope`): `shared` enthält die **globalen Werte**,
 die mehrere Rechner nutzen; jeder Rechner hat zusätzlich einen eigenen Bereich
 für das, was nur er braucht. Felder, Wertebereiche und Standardwerte stehen in
-`src/lib/settings/schema.ts`, die Beschriftungen in `src/lib/settings/labels.ts`.
+`src/lib/settings/schema.ts`, die Beschriftungen in den Wörterbüchern
+(`src/lib/i18n/`).
 
 | Globaler Wert | AV-Depot | Rentenlücke | Sparrechner | Entnahmeplan |
 | --- | --- | --- | --- | --- |
@@ -83,11 +85,17 @@ Rechnern und in den Einstellungen.
 - **Einstellungen-Seite:** Änderungen an den globalen Werten werden nach kurzer
   Pause automatisch im aktiven Profil gespeichert.
 - **Rechner:** Änderungen gelten zunächst nur lokal in der Ansicht
-  (`DraftSettings` in `src/components/draft-settings.tsx`). „Im Profil
-  speichern“ schreibt sie in die aktiven Profile, „Zurücksetzen“ oder ein
-  Neuladen stellt die gespeicherten Werte wieder her.
-- **Neues Profil:** „Neu …“ legt ein Profil mit den Werten an, die gerade zu
-  sehen sind – inklusive ungespeicherter Änderungen dieses Bereichs.
+  (`DraftSettings` in `src/components/draft-settings.tsx`). „Zurücksetzen“ oder
+  ein Neuladen stellt die gespeicherten Werte wieder her. „Speichern“ im Fenster
+  unten rechts schreibt Rechner-Werte ins aktive Profil des Rechners. Für
+  geänderte globale Werte fragt das Fenster, in welches globale Profil sie
+  sollen: das aktive (Vorgabe), ein anderes oder ein neues. Das gewählte Profil
+  wird danach das aktive.
+- **Globale Profile verwalten:** Umbenennen und Löschen gehen nur auf der
+  Einstellungen-Seite. In den Rechnern lässt sich das aktive globale Profil
+  sehen und wechseln; ein neues entsteht dort nur über das Speichern-Fenster.
+- **Profile eines Rechners:** „Neu …“ im Rechner legt ein Profil mit den Werten
+  an, die gerade zu sehen sind – inklusive ungespeicherter Änderungen.
 - Ein Profilwechsel verwirft lokale Änderungen des betroffenen Bereichs. Das
   letzte Profil eines Bereichs lässt sich nicht löschen.
 
@@ -99,11 +107,36 @@ Rechners und ein Gesamtbild zum Ruhestand: Wunschrente gegenüber Nettorente
 verbleibende Lücke sowie Kapital und zusätzliche Sparrate, die sie schließen
 (`src/lib/calculators/retirement-overview.ts`).
 
+### Sprachen
+
+Die Oberfläche gibt es auf Deutsch und Englisch; umgeschaltet wird oben rechts
+(DE/EN), auch auf der Anmeldeseite. Die Wahl liegt in einem Cookie, gilt also
+je Browser, und bleibt über Abmelden und Neuladen erhalten.
+
+- **Texte:** `src/lib/i18n/de.ts` ist die Vorlage, `en.ts` hat dieselbe
+  Struktur. Fehlt dort ein Text, meldet die Typprüfung das. Texte mit Zahlen
+  oder Namen sind Funktionen.
+- **Zahlen:** `src/lib/format.ts` schreibt und liest Zahlen je Sprache
+  (228.547 € und 0,5 auf Deutsch, €228,547 und 0.5 auf Englisch). Die Währung
+  ist immer Euro.
+- **Fehlermeldungen:** Rechner, Anmeldung und Profilverwaltung liefern Codes
+  (z. B. `avPayoutMin85`); die Texte dazu stehen in den Wörterbüchern.
+- **In Komponenten:** `useLocale()` liefert `t` (Texte) und `f` (Formate); in
+  Server Components `getDictionary()` aus `src/lib/i18n/server.ts`.
+- **Nicht übersetzt:** die Adressen der Seiten (`/rechner/sparrechner` usw.),
+  diese README und deutsche Fachbegriffe ohne englische Entsprechung
+  (Altersvorsorgedepot, Riester, Rürup).
+
+Eine weitere Sprache: Kürzel in `src/lib/i18n/locale.ts` ergänzen, ein
+Wörterbuch nach dem Muster von `en.ts` anlegen und in `index.ts` eintragen,
+Zahlenformat in `format.ts` ergänzen.
+
 ### Einen Rechner hinzufügen
 
 1. Rechenlogik als reine Funktion in `src/lib/calculators/` schreiben und testen.
-2. Bereich und Felder in `src/lib/settings/schema.ts` ergänzen, Beschriftungen in
-   `labels.ts`. Was ein anderer Rechner schon nutzt, gehört in `shared`.
+2. Bereich und Felder in `src/lib/settings/schema.ts` ergänzen, Beschriftungen und
+   alle weiteren Texte in beiden Wörterbüchern (`src/lib/i18n/de.ts`, `en.ts`).
+   Was ein anderer Rechner schon nutzt, gehört in `shared`.
 3. Rechner und die Abbildung der Werte auf seine Eingaben in
    `src/lib/calculators/registry.ts` eintragen, dazu einen Hook in
    `src/components/use-calculators.ts`.

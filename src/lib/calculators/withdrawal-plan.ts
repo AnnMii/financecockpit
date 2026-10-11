@@ -7,6 +7,8 @@
  * nicht öffentlich. Die Antworten liegen in test/fixtures/withdrawal-plan.json.
  */
 
+import type { CalculationError } from "./errors";
+
 export type WithdrawalOutput = "amount" | "period" | "capital";
 export type WithdrawalInterval = "monthly" | "quarterly" | "biannual" | "yearly";
 
@@ -46,25 +48,25 @@ export interface WithdrawalPlanResult {
 /** Longest chart for plans that never run out. */
 const ENDLESS_CHART_YEARS = 30;
 
-export function validateWithdrawalPlanInput(input: WithdrawalPlanInput): string[] {
-  const errors: string[] = [];
+export function validateWithdrawalPlanInput(
+  input: WithdrawalPlanInput,
+): CalculationError[] {
+  const errors: CalculationError[] = [];
   if (input.interestRate <= -100) {
-    errors.push("Der Zinssatz muss über −100 % liegen.");
+    errors.push("interestAboveMinus100");
   }
   if (input.output !== "capital" && input.capital <= 0) {
-    errors.push("Das Anlagevermögen muss größer als 0 sein.");
+    errors.push("capitalPositive");
   }
   if (input.output !== "amount" && input.amount <= 0) {
-    errors.push("Der Entnahmebetrag muss größer als 0 sein.");
+    errors.push("amountPositive");
   }
   if (
     input.output !== "period" &&
     !input.capitalConsumption &&
     input.interestRate <= 0
   ) {
-    errors.push(
-      "Ohne Kapitalverzehr braucht es einen positiven Zinssatz: Entnommen werden nur die Zinsen.",
-    );
+    errors.push("needsInterest");
   }
   return errors;
 }

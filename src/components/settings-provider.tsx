@@ -21,6 +21,7 @@ import {
   SETTINGS_SCOPES,
   type SettingsScope,
 } from "@/lib/settings/schema";
+import type { ProfileError } from "@/lib/settings/labels";
 import type { Profile, ProfileState } from "@/lib/settings/store";
 
 export type SaveState = "idle" | "saving" | "saved" | "error";
@@ -36,22 +37,28 @@ interface SettingsContextValue {
   profiles: ProfileState;
   /** Changes values of the profile in use and saves them shortly after. */
   update: Update;
+  /** Like `update`, for any profile of the scope, in use or not. */
+  updateProfile: <S extends SettingsScope>(
+    scope: S,
+    profileId: string,
+    patch: Partial<AllSettings[S]>,
+  ) => void;
   selectProfile: (scope: SettingsScope, profileId: string) => void;
-  /** These three return an error message, or null when they succeeded. */
+  /** These three return why they failed, or null when they succeeded. */
   createProfile: <S extends SettingsScope>(
     scope: S,
     name: string,
     data: AllSettings[S],
-  ) => Promise<string | null>;
+  ) => Promise<ProfileError | null>;
   renameProfile: (
     scope: SettingsScope,
     profileId: string,
     name: string,
-  ) => Promise<string | null>;
+  ) => Promise<ProfileError | null>;
   deleteProfile: (
     scope: SettingsScope,
     profileId: string,
-  ) => Promise<string | null>;
+  ) => Promise<ProfileError | null>;
   saveState: SaveState;
 }
 
@@ -74,7 +81,7 @@ export const SettingsEditorContext = createContext<SettingsEditor | null>(null);
 type ScopeProfiles = { activeId: string; profiles: Profile[] };
 
 const SAVE_DELAY_MS = 500;
-const FAILED = "Das hat nicht geklappt. Bitte noch einmal versuchen.";
+const FAILED: ProfileError = "failed";
 
 function activeSettings(state: ProfileState): AllSettings {
   return Object.fromEntries(
@@ -135,9 +142,8 @@ export function SettingsProvider({
     [report],
   );
 
-  const update = useCallback<Update>(
-    (scope, patch) => {
-      const profileId = latest.current[scope].activeId;
+  const updateProfile = useCallback<SettingsContextValue["updateProfile"]>(
+    (scope, profileId, patch) => {
       setScope(scope, (current) => ({
         ...current,
         profiles: current.profiles.map((p) =>
@@ -152,6 +158,12 @@ export function SettingsProvider({
       );
     },
     [save, setScope],
+  );
+
+  const update = useCallback<Update>(
+    (scope, patch) =>
+      updateProfile(scope, latest.current[scope].activeId, patch),
+    [updateProfile],
   );
 
   const selectProfile = useCallback<SettingsContextValue["selectProfile"]>(
@@ -229,6 +241,7 @@ export function SettingsProvider({
       settings: activeSettings(profiles),
       profiles,
       update,
+      updateProfile,
       selectProfile,
       createProfile,
       renameProfile,
@@ -238,6 +251,7 @@ export function SettingsProvider({
     [
       profiles,
       update,
+      updateProfile,
       selectProfile,
       createProfile,
       renameProfile,

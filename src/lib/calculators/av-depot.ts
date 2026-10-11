@@ -9,6 +9,7 @@
  * README, Abschnitt "Abgleich mit dem Finanzfluss-Original".
  */
 import type { TaxSavingsMode } from "@/lib/settings/schema";
+import type { CalculationError } from "./errors";
 import { incomeTax, marginalTax } from "./income-tax";
 
 export const ABGELTUNGSTEUERSATZ = 0.26375;
@@ -119,41 +120,37 @@ interface DepotSavings {
 }
 
 /** Prüft die Eingaben; eine leere Liste bedeutet, dass gerechnet werden kann. */
-export function validateAvDepotInput(input: AvDepotInput): string[] {
-  const errors: string[] = [];
+export function validateAvDepotInput(input: AvDepotInput): CalculationError[] {
+  const errors: CalculationError[] = [];
   if (input.age < 18 || input.age > 67) {
-    errors.push("Das Alter muss zwischen 18 und 67 Jahren liegen.");
+    errors.push("avAgeRange");
   }
   if (input.retirementAge < 65 || input.retirementAge > 70) {
-    errors.push("Der Renteneintritt muss zwischen 65 und 70 Jahren liegen.");
+    errors.push("avRetirementRange");
   }
   if (input.age >= input.retirementAge) {
-    errors.push("Das Alter muss unter dem Renteneintrittsalter liegen.");
+    errors.push("ageBeforeRetirement");
   }
   if (input.payoutUntilAge < 85) {
-    errors.push(
-      "Im Altersvorsorgedepot muss die Auszahlung mindestens bis zum Alter 85 laufen.",
-    );
+    errors.push("avPayoutMin85");
   }
   if (input.payoutUntilAge <= input.retirementAge) {
-    errors.push("Die Auszahlung muss nach dem Renteneintritt enden.");
+    errors.push("payoutAfterRetirement");
   }
   if (
     input.savingsRate < MIN_OWN_CONTRIBUTION ||
     input.savingsRate > AV_CONTRIBUTION_CAP
   ) {
-    errors.push(
-      "Die Sparrate muss zwischen 120 € und 13.680 € pro Jahr liegen (10 € bis 1.140 € pro Monat).",
-    );
+    errors.push("avSavingsRateRange");
   }
   if (input.etfReturnRate <= 0 || input.payoutReturnRate <= 0) {
-    errors.push("Die Renditen müssen größer als 0 % sein.");
+    errors.push("avReturnsPositive");
   }
   if (
     input.avDepotCosts >= input.etfReturnRate ||
     input.avDepotCosts >= input.payoutReturnRate
   ) {
-    errors.push("Die Kosten des AV-Depots müssen unter den Renditen liegen.");
+    errors.push("avCostsBelowReturns");
   }
   return errors;
 }

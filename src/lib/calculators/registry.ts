@@ -8,40 +8,17 @@ export interface CalculatorInfo {
   /** Also the settings scope of the calculator. */
   id: Exclude<SettingsScope, "shared">;
   href: string;
-  title: string;
-  description: string;
 }
 
-/** Every calculator of the cockpit; drives the navigation and the start page. */
+/**
+ * Every calculator of the cockpit; drives the navigation and the start page.
+ * Titles and descriptions are in src/lib/i18n, under `calculators`.
+ */
 export const calculators: CalculatorInfo[] = [
-  {
-    id: "av-depot",
-    href: "/rechner/altersvorsorgedepot",
-    title: "Altersvorsorgedepot",
-    description:
-      "Gefördertes AV-Depot gegen einen normalen ETF-Sparplan: Endvermögen, Förderung und Netto-Rente.",
-  },
-  {
-    id: "pension-gap",
-    href: "/rechner/rentenluecke",
-    title: "Rentenlücke",
-    description:
-      "Lücke zwischen erwarteter Rente und Wunschrente – und welches Kapital und welche Sparrate sie schließen.",
-  },
-  {
-    id: "savings",
-    href: "/rechner/sparrechner",
-    title: "Sparrechner",
-    description:
-      "Endkapital, Anfangskapital, Zinssatz, Laufzeit oder Sparrate eines Sparplans berechnen, auf Wunsch mit Steuern.",
-  },
-  {
-    id: "withdrawal-plan",
-    href: "/rechner/entnahmeplan",
-    title: "Entnahmeplan",
-    description:
-      "Wie viel sich aus einem Vermögen entnehmen lässt, wie lange es reicht oder wie groß es sein muss.",
-  },
+  { id: "av-depot", href: "/rechner/altersvorsorgedepot" },
+  { id: "pension-gap", href: "/rechner/rentenluecke" },
+  { id: "savings", href: "/rechner/sparrechner" },
+  { id: "withdrawal-plan", href: "/rechner/entnahmeplan" },
 ];
 
 export function toAvDepotInput(settings: AllSettings): AvDepotInput {

@@ -1,31 +1,23 @@
 "use client";
 
-import { Assumptions, CalculatorShell } from "@/components/calculator-shell";
+import {
+  Assumptions,
+  CalculatorShell,
+  YearlyTable,
+} from "@/components/calculator-shell";
 import { StackedColumns } from "@/components/charts/stacked-columns";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
+import { useLocale } from "@/components/locale-provider";
 import {
   NumberSetting,
   SelectSetting,
   ToggleSetting,
-  yearlySavingsHint,
 } from "@/components/setting-fields";
 import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
 import { useSavings } from "@/components/use-calculators";
 import type { SavingsInput, SavingsResult } from "@/lib/calculators/savings";
-import {
-  formatEuro,
-  formatEuroCents,
-  formatEuroCompact,
-  formatPercent,
-  formatYears,
-} from "@/lib/format";
-
-const SERIES = [
-  { key: "deposits", label: "Einzahlungen", color: "var(--series-1)" },
-  { key: "interest", label: "Zinsen", color: "var(--series-3)" },
-];
 
 export function SavingsCalculator() {
   return (
@@ -36,11 +28,15 @@ export function SavingsCalculator() {
 }
 
 function Workspace() {
+  const { t, f } = useLocale();
+  const text = t.savings;
   const { input, errors, result } = useSavings();
   const { settings } = useSettingsEditor();
   const { output, considerTax, considerPartialExemption, saveInterval } =
     settings.savings;
-  const monthlyRate = settings.shared.savingsRateMonthly;
+  const perYear = t.common.perYearEquals(
+    f.euro(settings.shared.savingsRateMonthly * 12),
+  );
 
   return (
     <CalculatorShell
@@ -48,21 +44,18 @@ function Workspace() {
       errors={errors}
       form={
         <>
-          <Section title="Berechnung">
+          <Section title={text.sections.calculation}>
             <SelectSetting scope="savings" name="output" />
-            <p className="text-xs text-ink-2">
-              Das gesuchte Feld entfällt bei den Eingaben und erscheint als
-              Ergebnis.
-            </p>
+            <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
           </Section>
 
-          <Section title="Sparplan">
+          <Section title={text.sections.plan}>
             {output !== "startValue" && (
               <NumberSetting
                 scope="shared"
                 name="currentCapital"
-                label="Anfangskapital"
-                hint="Dein vorhandenes Kapital aus den globalen Werten."
+                label={text.startValue}
+                hint={text.startValueHint}
               />
             )}
             {output !== "savingRate" && (
@@ -71,8 +64,8 @@ function Workspace() {
                 name="savingsRateMonthly"
                 hint={
                   saveInterval === "yearly"
-                    ? `${yearlySavingsHint(monthlyRate)}, einmal jährlich eingezahlt.`
-                    : yearlySavingsHint(monthlyRate)
+                    ? text.yearlyDepositHint(perYear)
+                    : perYear
                 }
               />
             )}
@@ -85,19 +78,19 @@ function Workspace() {
             )}
           </Section>
 
-          <Section title="Zinsen">
+          <Section title={text.sections.interest}>
             {output !== "yearlyInterest" && (
               <NumberSetting
                 scope="shared"
                 name="expectedReturn"
-                label="Zinssatz p. a."
-                hint="Deine erwartete Rendite aus den globalen Werten."
+                label={text.interestRate}
+                hint={text.interestRateHint}
               />
             )}
             <SelectSetting scope="savings" name="interestInterval" />
           </Section>
 
-          <Section title="Steuern">
+          <Section title={text.sections.tax}>
             <ToggleSetting scope="savings" name="considerTax" />
             {considerTax && (
               <>
@@ -125,18 +118,23 @@ function Results({
   input: SavingsInput;
   result: SavingsResult;
 }) {
-  const perInterval = input.saveInterval === "monthly" ? "pro Monat" : "pro Jahr";
+  const { t, f } = useLocale();
+  const text = t.savings;
+  const perInterval =
+    input.saveInterval === "monthly" ? t.common.perMonth : t.common.perYear;
+  const afterTax = input.considerTax ? text.afterTax : "";
+
   const figures = {
-    endValue: { label: "Endkapital", value: formatEuro(result.endValue) },
-    startValue: { label: "Anfangskapital", value: formatEuro(result.startValue) },
+    endValue: { label: t.common.endValue, value: f.euro(result.endValue) },
+    startValue: { label: text.startValue, value: f.euro(result.startValue) },
     yearlyInterest: {
-      label: "Zinssatz p. a.",
-      value: formatPercent(result.yearlyInterest),
+      label: text.interestRate,
+      value: f.percent(result.yearlyInterest),
     },
-    duration: { label: "Laufzeit", value: formatYears(result.durationYears) },
+    duration: { label: text.duration, value: f.years(result.durationYears) },
     savingRate: {
-      label: `Sparrate ${perInterval}`,
-      value: formatEuroCents(result.savingRate),
+      label: text.savingRate(perInterval),
+      value: f.euroCents(result.savingRate),
     },
   };
   const searched = figures[input.output];
@@ -144,12 +142,23 @@ function Results({
     (key) => key !== input.output,
   );
 
+  const series = [
+    { key: "deposits", label: t.common.deposits, color: "var(--series-1)" },
+    { key: "interest", label: t.common.interest, color: "var(--series-3)" },
+  ];
   const tickEvery = result.years.length > 15 ? 5 : 1;
   const chartData = result.years.map((year) => ({
     tick: year.year % tickEvery === 0 ? String(year.year) : "",
-    title: `Nach ${formatYears(Math.min(year.year, result.durationYears))}`,
+    title: t.common.afterYears(
+      f.years(Math.min(year.year, result.durationYears)),
+    ),
     values: { deposits: year.deposits, interest: year.interest },
   }));
+  const totals: [string, number][] = [
+    [text.totalDeposits, result.deposits],
+    [`${t.common.interest}${afterTax}`, result.interest],
+    [t.common.endValue, result.endValue],
+  ];
 
   return (
     <>
@@ -159,7 +168,7 @@ function Results({
         value={searched.value}
         note={
           input.output === "duration"
-            ? `Das sind ${Math.ceil(result.durationYears * 12)} Monate.`
+            ? text.durationMonths(Math.ceil(result.durationYears * 12))
             : undefined
         }
       />
@@ -171,78 +180,44 @@ function Results({
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold">Kapital pro Jahr</h2>
+        <h2 className="text-base font-semibold">{text.chartTitle}</h2>
         <p className="mb-4 text-sm text-ink-2">
-          Einzahlungen inklusive Anfangskapital und die darauf aufgelaufenen
-          Zinsen{input.considerTax ? " nach Steuern" : ""}.
+          {text.chartSubtitle}
+          {afterTax}.
         </p>
         <StackedColumns
           data={chartData}
-          series={SERIES}
-          totalLabel="Kapital"
-          formatValue={formatEuro}
-          formatAxis={formatEuroCompact}
-          ariaLabel="Säulendiagramm: Kapital pro Jahr, aufgeteilt in Einzahlungen und Zinsen"
+          series={series}
+          totalLabel={t.common.capital}
+          formatValue={f.euro}
+          formatAxis={f.euroCompact}
+          ariaLabel={text.chartAria}
         />
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm sm:grid-cols-3">
-          <div>
-            <dt className="text-xs text-ink-2">Einzahlungen gesamt</dt>
-            <dd className="font-semibold tabular-nums">{formatEuro(result.deposits)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-ink-2">
-              Zinsen{input.considerTax ? " nach Steuern" : ""}
-            </dt>
-            <dd className="font-semibold tabular-nums">{formatEuro(result.interest)}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-ink-2">Endkapital</dt>
-            <dd className="font-semibold tabular-nums">{formatEuro(result.endValue)}</dd>
-          </div>
+          {totals.map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-xs text-ink-2">{label}</dt>
+              <dd className="font-semibold tabular-nums">{f.euro(value)}</dd>
+            </div>
+          ))}
         </dl>
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-medium text-accent">
-            Jahreswerte als Tabelle
-          </summary>
-          <div className="mt-3 max-h-96 overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-surface text-xs text-ink-2">
-                <tr className="border-b border-line">
-                  <th className="px-3 py-2 text-left font-medium">Jahr</th>
-                  <th className="px-3 py-2 text-right font-medium">Einzahlungen</th>
-                  <th className="px-3 py-2 text-right font-medium">Zinsen</th>
-                  <th className="px-3 py-2 text-right font-medium">Kapital</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.years.map((year) => (
-                  <tr key={year.year} className="border-b border-line last:border-0">
-                    <td className="px-3 py-1.5 tabular-nums">{year.year}</td>
-                    <td className="px-3 py-1.5 text-right tabular-nums">
-                      {formatEuro(year.deposits)}
-                    </td>
-                    <td className="px-3 py-1.5 text-right tabular-nums">
-                      {formatEuro(year.interest)}
-                    </td>
-                    <td className="px-3 py-1.5 text-right tabular-nums">
-                      {formatEuro(year.deposits + year.interest)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
+        <YearlyTable
+          head={[
+            t.common.year,
+            t.common.deposits,
+            t.common.interest,
+            t.common.capital,
+          ]}
+          rows={result.years.map((year) => [
+            year.year,
+            f.euro(year.deposits),
+            f.euro(year.interest),
+            f.euro(year.deposits + year.interest),
+          ])}
+        />
       </Card>
 
-      <Assumptions
-        items={[
-          "Einzahlungen erfolgen zu Beginn des Sparintervalls; Zinsen werden im gewählten Zinsintervall gutgeschrieben und mitverzinst.",
-          "Ausschüttend: Die Steuer mindert die Zinsen laufend. Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an.",
-          "Die Teilfreistellung stellt den gewählten Anteil der Erträge steuerfrei; ein Sparerpauschbetrag ist nicht berücksichtigt.",
-          "Rechenweg nach dem Finanzfluss-Sparrechner. Keine Steuer- oder Anlageberatung.",
-        ]}
-      />
+      <Assumptions items={text.assumptions} />
     </>
   );
 }
