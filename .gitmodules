@@ -1,0 +1,3 @@
+[submodule "vendor/finanzfluss-calculators"]
+	path = vendor/finanzfluss-calculators
+	url = https://github.com/finanzfluss/calculators

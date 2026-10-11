@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "upstream:diff": "node scripts/upstream-diff.mjs"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
@@ -21,10 +22,13 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@formulajs/formulajs": "^4.6.1",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "bignumber.js": "^9.3.1",
+    "dinero.js": "^2.0.2",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.0",

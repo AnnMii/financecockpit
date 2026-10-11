@@ -2,9 +2,11 @@
  * Altersvorsorgedepot-Rechner: vergleicht ein gefördertes AV-Depot mit einem
  * normalen ETF-Depot über Anspar- und Auszahlungsphase.
  *
- * Eigene Umsetzung nach der Finanzfluss-Dokumentation
- * (https://www.finanzfluss.de/rechner/altersvorsorgedepot/). Die Ergebnisse
- * werden in av-depot.test.ts gegen @finanzfluss/calculators geprüft.
+ * Eigene Umsetzung, die dem Finanzfluss-Rechner folgt
+ * (https://www.finanzfluss.de/rechner/altersvorsorgedepot/). Das Original liegt
+ * als Submodul unter vendor/finanzfluss-calculators;
+ * test/upstream/av-depot.parity.test.ts vergleicht beide. Ablauf für Updates:
+ * README, Abschnitt "Abgleich mit dem Finanzfluss-Original".
  */
 import type { TaxSavingsMode } from "@/lib/settings/schema";
 import { incomeTax, marginalTax } from "./income-tax";

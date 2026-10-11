@@ -7,9 +7,10 @@ import {
 } from "./av-depot";
 
 /**
- * Expected values are the published test results of the reference
- * implementation, github.com/finanzfluss/calculators at commit dcc29a6
- * (test/calculators/av-depot.test.ts and its snapshot), rounded to whole euros.
+ * Regression tests that run without the submodule. The expected values are
+ * the test results of the original (github.com/finanzfluss/calculators at
+ * commit dcc29a6), rounded to whole euros. The live comparison with the
+ * original is test/upstream/av-depot.parity.test.ts.
  */
 
 function sampleInput(overrides: Partial<AvDepotInput> = {}): AvDepotInput {

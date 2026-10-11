@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Finanzfluss original, used as a test reference only:
+    "vendor/**",
   ]),
 ]);
 
