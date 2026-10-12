@@ -53,6 +53,7 @@ export function PlanStatus({
   const text = t.plan;
   const percent = (value: number) => f.percent(value);
   const amount = f.euro(result.amount);
+  const budget = input.budget;
 
   return (
     <Card>
@@ -90,6 +91,20 @@ export function PlanStatus({
           </dd>
         </div>
       </dl>
+
+      {budget !== undefined && (
+        <p className="mt-3 text-xs text-ink-2">
+          {t.budget.hint(f.euro(budget), f.euro(result.currentRate))}{" "}
+          {Math.round(budget - result.currentRate) === 0
+            ? t.budget.exact
+            : budget > result.currentRate
+              ? t.budget.free(f.euro(budget - result.currentRate))
+              : t.budget.over(f.euro(result.currentRate - budget))}{" "}
+          {budget >= result.requiredRate
+            ? t.budget.enough(f.euro(budget), f.euro(budget - result.requiredRate))
+            : t.budget.short(f.euro(budget), f.euro(result.requiredRate - budget))}
+        </p>
+      )}
 
       <p className="mt-4 text-sm text-ink">
         {result.status === "increase"

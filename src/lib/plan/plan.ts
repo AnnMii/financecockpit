@@ -80,6 +80,8 @@ export interface PlanInput {
   /** Savings per month into each pot, and what is in them today. */
   rates: Pots;
   values: Pots;
+  /** What can be invested per month in all; the rates are compared with it. */
+  budget?: number;
   /**
    * How the savings rate is split, as entered; `rates` follows from it (see
    * `splitSavingsRate`). Plans frozen before the shares were stored lack them.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BudgetHint, RestButton } from "@/components/budget";
 import { CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
 import { Section } from "@/components/fields";
@@ -44,7 +45,7 @@ export function AvDepotCalculator() {
 function SavingsPresets() {
   const { t, f } = useLocale();
   const { settings, update } = useSettingsEditor();
-  const current = settings.shared.savingsRateMonthly;
+  const current = settings["av-depot"].savingsRateMonthly;
   // 120 €, 1.800 € and 13.680 € per year
   const presets = [
     { value: 10, label: t.avDepot.presets.minimum },
@@ -58,7 +59,7 @@ function SavingsPresets() {
           key={preset.label}
           type="button"
           aria-pressed={current === preset.value}
-          onClick={() => update("shared", { savingsRateMonthly: preset.value })}
+          onClick={() => update("av-depot", { savingsRateMonthly: preset.value })}
           className={`rounded-md border px-2 py-1.5 text-center ${
             current === preset.value
               ? "border-accent bg-accent-wash"
@@ -78,9 +79,7 @@ function SavingsPresets() {
 function AvDepotWorkspace() {
   const { t, f } = useLocale();
   const { input, errors, result } = useAvDepot();
-  const { settings } = useSettingsEditor();
   const text = t.avDepot;
-  const capped = settings.shared.savingsRateMonthly > AV_DEPOT_MAX_MONTHLY;
 
   // The advanced inputs start hidden to keep the calculator simple. With an
   // error they are shown anyway: it may be one of them that has to change.
@@ -130,16 +129,18 @@ function AvDepotWorkspace() {
           <Section title={text.sections.saving}>
             <SavingsPresets />
             <NumberSetting
-              scope="shared"
+              scope="av-depot"
               name="savingsRateMonthly"
               slider={sliders.savingsRateMonthly}
               hint={
-                capped
-                  ? text.savingsRateCapped(f.euro(AV_DEPOT_MAX_MONTHLY))
-                  : text.savingsRateHint(
-                      t.common.perYearEquals(f.euro(input.savingsRate)),
-                    )
+                <>
+                  {text.savingsRateHint(
+                    t.common.perYearEquals(f.euro(input.savingsRate)),
+                  )}{" "}
+                  <BudgetHint />
+                </>
               }
+              action={<RestButton part="av" />}
             />
             {showAdvanced && (
               <>

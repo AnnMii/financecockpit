@@ -90,10 +90,8 @@ export const en: Dictionary = {
     plan: {
       nominalView:
         "The overall plan works in today's purchasing power. With the box checked, the card “Pension from all sources” shows the amounts in euros of the year of retirement, raised by the inflation rate; they then match the nominal results of the AV-Depot and savings calculators. Unchecked, it stays in today's purchasing power.",
-      avDepotShare:
-        "The part of your monthly savings rate that goes into the Altersvorsorgedepot, at most €1,140 per month. What is left after it and the savings account goes into the regular ETF portfolio.",
-      cashShare:
-        "The part of your savings rate that goes into a savings account. It hardly fluctuates but returns less.",
+      cashMonthly:
+        "What you put into the savings account per month. It hardly fluctuates but returns less.",
       cashReturn:
         "The interest you expect on the savings account in the long run, per year.",
       depotVolatility:
@@ -114,8 +112,8 @@ export const en: Dictionary = {
         "The age at which you stop saving and start withdrawing. The standard retirement age in Germany is 67 for those born in 1964 or later.",
       payoutUntilAge:
         "Your assets should last until this age; after that they are used up by calculation. Rather choose it high: many people live longer than average.",
-      savingsRateMonthly:
-        "The total amount you invest every month.",
+      investableMonthly:
+        "The budget you have to invest per month. How you split it over the Altersvorsorgedepot, the ETF account (savings calculator) and the savings account you set there; the overall plan shows whether the sum exceeds or falls short of the budget.",
       currentCapital:
         "Assets you have already invested today, which keep growing at the expected return. In the overall plan they count as the balance of the ETF account until you record an actual balance in the history.",
       expectedReturn:
@@ -140,6 +138,8 @@ export const en: Dictionary = {
         "Applies to the pension gap calculator. Checked, it uses the return after deducting the inflation rate; the results are then in today's purchasing power. Unchecked, they are nominal, i.e. in future euros. The overall plan always uses today's purchasing power, the withdrawal plan has a switch of its own, the other calculators are always nominal.",
     },
     "av-depot": {
+      savingsRateMonthly:
+        "What you pay into the Altersvorsorgedepot per month. Up to €150 per month (€1,800 per year) is subsidised, up to €1,140 (€13,680 per year) is possible. You invest the rest of your budget in the savings calculator.",
       avDepotCosts:
         "Running costs of the Altersvorsorgedepot per year, on top of the fund costs – such as custody or administration fees. They reduce the return.",
       baseRate:
@@ -166,6 +166,8 @@ export const en: Dictionary = {
         "The amount you want to have available per month in retirement, net. A rule of thumb is about 80% of your last net income.",
     },
     savings: {
+      savingsRateMonthly:
+        "What you pay into your savings plan, i.e. the ETF account, per month. The value belongs to the profile of the savings calculator and is used as the rate of the ETF account in the overall plan.",
       durationYears:
         "How many years you save.",
       endValue:
@@ -304,12 +306,7 @@ export const en: Dictionary = {
 
   numbers: {
     plan: {
-      avDepotShare: {
-        label: "Share Altersvorsorgedepot",
-        unit: "%",
-        hint: "Of the savings rate; what is left after the savings account goes to the ETF account.",
-      },
-      cashShare: { label: "Share savings account", unit: "%" },
+      cashMonthly: { label: "Savings rate savings account", unit: "€" },
       cashReturn: { label: "Interest savings account", unit: "% p.a." },
       depotVolatility: {
         label: "Fluctuation ETF account",
@@ -341,7 +338,11 @@ export const en: Dictionary = {
         unit: "years",
         hint: "The money should last until this age.",
       },
-      savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
+      investableMonthly: {
+        label: "Available to invest per month",
+        unit: "€",
+        hint: "Your budget for all calculators; you set the split there.",
+      },
       currentCapital: {
         label: "Existing capital",
         unit: "€",
@@ -380,6 +381,7 @@ export const en: Dictionary = {
       },
     },
     "av-depot": {
+      savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
       avDepotCosts: {
         label: "Costs of the AV-Depot",
         unit: "% p.a.",
@@ -424,6 +426,7 @@ export const en: Dictionary = {
       },
     },
     savings: {
+      savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
       durationYears: { label: "Duration", unit: "years" },
       endValue: { label: "Final capital", unit: "€" },
       partialExemption: {
@@ -576,6 +579,19 @@ export const en: Dictionary = {
       "The lower guardrail must be below, the upper one above the confidence level.",
   },
 
+  budget: {
+    hint: (available, planned) => `Available ${available}, planned ${planned}.`,
+    free: (amount) => `Still free: ${amount}.`,
+    over: (amount) => `${amount} more planned than available.`,
+    exact: "The budget is planned exactly.",
+    rest: "Rest",
+    restTitle: "Enters what is still free of the budget",
+    enough: (budget, left) =>
+      `Your budget of ${budget} is enough for the required savings rate; ${left} would be left.`,
+    short: (budget, missing) =>
+      `Your budget of ${budget} is not enough for the required savings rate: ${missing} are missing.`,
+  },
+
   plan: {
     pageTitle: "Overall plan",
     intro:
@@ -619,8 +635,12 @@ export const en: Dictionary = {
       taxNote: (rate) =>
         `Tax on the returns in the payout phase: estimated tax deduction of ${rate} (from the pension gap profile). The Altersvorsorgedepot is taxed by its own rules.`,
     },
-    splitSummary: (av, depot, cash) =>
-      `Per month: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
+    rateLabels: {
+      av: "Savings rate Altersvorsorgedepot",
+      depot: "Savings rate ETF account (savings calculator)",
+    },
+    ratesNote:
+      "The rates for the Altersvorsorgedepot and the ETF account belong to the profiles of those calculators and apply there too.",
     sourcesNote:
       "The details of the AV-Depot (costs, taxes, children) come from its calculator.",
     capitalHint:
@@ -629,7 +649,7 @@ export const en: Dictionary = {
       `Actual balance of ${date}: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
     changeInHistory: "Change in the history",
     avErrorHint:
-      "Or set the share of the Altersvorsorgedepot to 0%; the plan then calculates without it.",
+      "Or set the savings rate of the Altersvorsorgedepot to 0; the plan then calculates without it.",
     alsoUses: "The plan also uses",
     pensionNote:
       "These values belong to the profile of the pension gap calculator and apply there too.",
@@ -853,8 +873,6 @@ export const en: Dictionary = {
     retirementAgeHint: "Between 65 and 70.",
     savingsRateHint: (perYear) =>
       `${perYear}. Subsidised up to €150 per month, possible up to €1,140.`,
-    savingsRateCapped: (max) =>
-      `At most ${max} per month go into the AV-Depot; that is what is calculated here.`,
     payoutUntilHint: "In the Altersvorsorgedepot at least until 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF savings plan",

@@ -41,7 +41,7 @@ export default async function SettingsPage() {
             </Section>
             <Section title={text.saving}>
               <div className="grid gap-4 sm:grid-cols-2">
-                <NumberSetting scope="shared" name="savingsRateMonthly" />
+                <NumberSetting scope="shared" name="investableMonthly" />
                 <NumberSetting scope="shared" name="currentCapital" />
                 <NumberSetting scope="shared" name="expectedReturn" />
                 <NumberSetting scope="shared" name="retirementReturn" />

@@ -1,5 +1,6 @@
 "use client";
 
+import { BudgetHint, RestButton } from "@/components/budget";
 import {
   Assumptions,
   CalculatorShell,
@@ -47,7 +48,7 @@ function Workspace() {
   // Targets at or below this are already reached without the searched figure.
   const minimum = minimumEndValue(input);
   const perYear = t.common.perYearEquals(
-    f.euro(settings.shared.savingsRateMonthly * 12),
+    f.euro(settings.savings.savingsRateMonthly * 12),
   );
 
   return (
@@ -72,13 +73,17 @@ function Workspace() {
             )}
             {output !== "savingRate" && (
               <NumberSetting
-                scope="shared"
+                scope="savings"
                 name="savingsRateMonthly"
                 hint={
-                  saveInterval === "yearly"
-                    ? text.yearlyDepositHint(perYear)
-                    : perYear
+                  <>
+                    {saveInterval === "yearly"
+                      ? text.yearlyDepositHint(perYear)
+                      : perYear}{" "}
+                    <BudgetHint />
+                  </>
                 }
+                action={<RestButton part="depot" />}
               />
             )}
             <SelectSetting scope="savings" name="saveInterval" />

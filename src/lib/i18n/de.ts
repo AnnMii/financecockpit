@@ -72,12 +72,7 @@ const scopes: ScopeLabels = {
 
 const numbers: NumberTexts = {
   plan: {
-    avDepotShare: {
-      label: "Anteil Altersvorsorgedepot",
-      unit: "%",
-      hint: "Von der Sparrate; der Rest nach Tagesgeld fließt ins ETF-Depot.",
-    },
-    cashShare: { label: "Anteil Tagesgeld", unit: "%" },
+    cashMonthly: { label: "Sparrate Tagesgeld", unit: "€" },
     cashReturn: { label: "Zins Tagesgeld", unit: "% p. a." },
     depotVolatility: {
       label: "Schwankung Depot",
@@ -109,7 +104,11 @@ const numbers: NumberTexts = {
       unit: "Jahre",
       hint: "Bis zu diesem Alter soll das Geld reichen.",
     },
-    savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
+    investableMonthly: {
+      label: "Zum Investieren verfügbar pro Monat",
+      unit: "€",
+      hint: "Dein Budget für alle Rechner; die Verteilung stellst du dort ein.",
+    },
     currentCapital: {
       label: "Vorhandenes Kapital",
       unit: "€",
@@ -148,6 +147,7 @@ const numbers: NumberTexts = {
     },
   },
   "av-depot": {
+    savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
     avDepotCosts: {
       label: "Kosten des AV-Depots",
       unit: "% p. a.",
@@ -192,6 +192,7 @@ const numbers: NumberTexts = {
     },
   },
   savings: {
+    savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
     durationYears: { label: "Laufzeit", unit: "Jahre" },
     endValue: { label: "Endkapital", unit: "€" },
     partialExemption: {
@@ -318,10 +319,8 @@ const fieldInfo: FieldInfoTexts = {
   plan: {
     nominalView:
       "Der Gesamtplan rechnet in heutiger Kaufkraft. Mit Haken zeigt die Karte „Rente aus allen Quellen“ die Beträge in Euro des Renteneintrittsjahres, mit der Inflationsrate hochgerechnet; so passen sie zu den nominalen Ergebnissen von AV-Depot-Rechner und Sparrechner. Ohne Haken bleibt sie bei heutiger Kaufkraft.",
-    avDepotShare:
-      "Welcher Teil deiner monatlichen Sparrate ins Altersvorsorgedepot fließt, höchstens 1.140 € pro Monat. Was nach AV-Depot und Tagesgeld übrig bleibt, geht ins normale ETF-Depot.",
-    cashShare:
-      "Welcher Teil deiner Sparrate aufs Tagesgeld geht. Tagesgeld schwankt kaum, bringt aber weniger Rendite.",
+    cashMonthly:
+      "Was du pro Monat aufs Tagesgeld legst. Tagesgeld schwankt kaum, bringt aber weniger Rendite.",
     cashReturn:
       "Der Zins, den du langfristig aufs Tagesgeld erwartest, pro Jahr.",
     depotVolatility:
@@ -342,8 +341,8 @@ const fieldInfo: FieldInfoTexts = {
       "Das Alter, in dem du aufhörst zu sparen und mit der Entnahme beginnst. Die Regelaltersgrenze liegt für Jahrgänge ab 1964 bei 67.",
     payoutUntilAge:
       "Bis zu diesem Alter soll dein Vermögen reichen; danach ist es rechnerisch aufgebraucht. Wähle es eher hoch: Viele werden älter als der Durchschnitt.",
-    savingsRateMonthly:
-      "Der Betrag, den du jeden Monat insgesamt anlegst.",
+    investableMonthly:
+      "Das Budget, das du pro Monat zum Investieren hast. Wie du es auf Altersvorsorgedepot, ETF-Depot (Sparrechner) und Tagesgeld verteilst, stellst du dort ein; der Gesamtplan zeigt, ob die Summe das Budget übersteigt oder unterschreitet.",
     currentCapital:
       "Vermögen, das du heute schon angelegt hast und das mit der erwarteten Rendite weiterwächst. Im Gesamtplan gilt es als Stand im ETF-Depot, bis du im Verlauf einen Ist-Stand erfasst.",
     expectedReturn:
@@ -368,6 +367,8 @@ const fieldInfo: FieldInfoTexts = {
       "Gilt für den Rentenlücke-Rechner. Mit Haken rechnet er mit der Rendite nach Abzug der Inflationsrate; die Ergebnisse stehen dann in heutiger Kaufkraft. Ohne Haken sind sie nominal, also in künftigen Euro. Der Gesamtplan rechnet immer in heutiger Kaufkraft, der Entnahmeplan hat dafür einen eigenen Schalter, die übrigen Rechner rechnen immer nominal.",
   },
   "av-depot": {
+    savingsRateMonthly:
+      "Was du pro Monat ins Altersvorsorgedepot einzahlst. Gefördert werden bis zu 150 € im Monat (1.800 € im Jahr), möglich sind bis zu 1.140 € (13.680 € im Jahr). Den Rest deines Budgets legst du im Sparrechner an.",
     avDepotCosts:
       "Laufende Kosten des Altersvorsorgedepots pro Jahr, zusätzlich zu den Fondskosten – etwa Depot- oder Verwaltungsgebühr. Sie mindern die Rendite.",
     baseRate:
@@ -394,6 +395,8 @@ const fieldInfo: FieldInfoTexts = {
       "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
   },
   savings: {
+    savingsRateMonthly:
+      "Was du pro Monat in deinen Sparplan, also das ETF-Depot, einzahlst. Der Wert gehört zum Profil des Sparrechners und wird im Gesamtplan als Rate des ETF-Depots genutzt.",
     durationYears:
       "Wie viele Jahre du sparst.",
     endValue:
@@ -614,6 +617,20 @@ export const de = {
   fieldInfo,
   calcErrors,
 
+  budget: {
+    hint: (available: string, planned: string) =>
+      `Verfügbar ${available}, verplant ${planned}.`,
+    free: (amount: string) => `Noch frei: ${amount}.`,
+    over: (amount: string) => `${amount} mehr verplant als verfügbar.`,
+    exact: "Das Budget ist genau verplant.",
+    rest: "Rest",
+    restTitle: "Setzt den noch freien Betrag des Budgets ein",
+    enough: (budget: string, left: string) =>
+      `Dein Budget von ${budget} reicht für die nötige Sparrate; ${left} blieben übrig.`,
+    short: (budget: string, missing: string) =>
+      `Dein Budget von ${budget} reicht nicht für die nötige Sparrate: Es fehlen ${missing}.`,
+  },
+
   plan: {
     pageTitle: "Gesamtplan",
     intro:
@@ -658,8 +675,12 @@ export const de = {
       taxNote: (rate: string) =>
         `Steuern auf die Erträge in der Auszahlphase: geschätzter Steuerabzug von ${rate} (aus dem Rentenlücke-Profil). Das Altersvorsorgedepot versteuert nach seinen eigenen Regeln.`,
     },
-    splitSummary: (av: string, depot: string, cash: string) =>
-      `Pro Monat: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
+    rateLabels: {
+      av: "Sparrate Altersvorsorgedepot",
+      depot: "Sparrate ETF-Depot (Sparrechner)",
+    },
+    ratesNote:
+      "Die Raten für Altersvorsorgedepot und ETF-Depot gehören zu den Profilen dieser Rechner und gelten auch dort.",
     sourcesNote:
       "Die Einzelheiten des AV-Depots (Kosten, Steuern, Kinder) kommen aus dessen Rechner.",
     capitalHint:
@@ -668,7 +689,7 @@ export const de = {
       `Ist-Stand vom ${date}: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
     changeInHistory: "Im Verlauf ändern",
     avErrorHint:
-      "Oder setze den Anteil des Altersvorsorgedepots auf 0 %; dann rechnet der Plan ohne es.",
+      "Oder setze die Sparrate des Altersvorsorgedepots auf 0; dann rechnet der Plan ohne es.",
     alsoUses: "Der Plan nutzt außerdem",
     pensionNote:
       "Diese Werte gehören zum Profil des Rentenlücke-Rechners und gelten auch dort.",
@@ -899,8 +920,6 @@ export const de = {
     retirementAgeHint: "Zwischen 65 und 70 Jahren.",
     savingsRateHint: (perYear: string) =>
       `${perYear}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`,
-    savingsRateCapped: (max: string) =>
-      `Ins AV-Depot fließen höchstens ${max} pro Monat; damit ist hier gerechnet.`,
     payoutUntilHint: "Im Altersvorsorgedepot mindestens bis 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF-Sparplan",

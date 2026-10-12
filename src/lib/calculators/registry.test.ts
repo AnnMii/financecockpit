@@ -54,7 +54,7 @@ describe("the withdrawal plan next to the overall plan", () => {
         {
           ...base,
           shared: { ...base.shared, currentCapital: 50_000, retirementReturn },
-          plan: { ...base.plan, avDepotShare: 0 },
+          "av-depot": { ...base["av-depot"], savingsRateMonthly: 0 },
         },
         { realTerms: true, considerTax: true },
       );

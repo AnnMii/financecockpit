@@ -72,7 +72,7 @@ für das, was nur er braucht. Felder, Wertebereiche und Standardwerte stehen in
 | Globaler Wert | AV-Depot | Rentenlücke | Sparrechner | Entnahmeplan |
 | --- | --- | --- | --- | --- |
 | Alter, Renteneintritt | ✓ | ✓ | ✓ Laufzeit (abschaltbar) | |
-| Sparrate pro Monat | ✓ (höchstens 1.140 €) | | ✓ | |
+| Zum Investieren verfügbar pro Monat (Budget) | Hinweis unter der Rate | | Hinweis unter der Rate | |
 | Erwartete Rendite | ✓ | ✓ bis zur Rente | ✓ Zinssatz | |
 | Rendite im Ruhestand | ✓ | ✓ | | ✓ Zinssatz |
 | Auszahlung bis Alter | ✓ (mind. 85) | ✓ | | |
@@ -134,9 +134,8 @@ bearbeiten und im anderen das Cockpit beobachten. Ungespeicherte lokale
 ### Gesamtplan und Verlauf
 
 Der Gesamtplan (`/plan`, Rechenkern in `src/lib/plan/`) beantwortet „spare ich
-genug?" über drei Töpfe: Altersvorsorgedepot, ETF-Depot, Tagesgeld. Die globale
-Sparrate wird einmal angesetzt und per Anteil aufgeteilt. Alle Beträge sind in
-heutiger Kaufkraft.
+genug?" über drei Töpfe: Altersvorsorgedepot, ETF-Depot, Tagesgeld. Alle Beträge
+sind in heutiger Kaufkraft.
 
 - **Korridor:** 2.000 zufällige Verläufe der Rendite (fester Startwert, also
   reproduzierbar) ergeben den Bereich der mittleren 80 % und den mittleren
@@ -148,9 +147,14 @@ heutiger Kaufkraft.
 - **Nötige Sparrate:** die gesamte Sparrate, mit der das Sicherheitsniveau
   erreicht wird, bei gleicher Aufteilung auf die Töpfe. Wer sie als Sparrate
   einträgt, landet genau beim Sicherheitsniveau.
-- **Aufteilung:** Ins AV-Depot fließen mindestens 10 € und höchstens 1.140 €
-  pro Monat; was der Anteil darüber hinaus ergibt, geht ins ETF-Depot, darunter
-  alles (`splitSavingsRate` in `src/lib/plan/plan.ts`).
+- **Budget und Sparraten:** Das globale „Zum Investieren verfügbar pro Monat"
+  ist das Budget. Die Sparraten sind lokal: Altersvorsorgedepot (Vorgabe 150 €,
+  die Fördergrenze; höchstens 1.140 €) und Sparrechner (das ETF-Depot) haben ihre
+  Rate im eigenen Profil, das Tagesgeld im Plan. Der Plan addiert sie und
+  zeigt, ob sie das Budget über- oder unterschreiten, und ob das Budget für die
+  nötige Sparrate reicht. Neben jeder Rate setzt der Knopf „Rest" den noch freien
+  Betrag ein (`src/lib/calculators/budget.ts`). Unter 10 € im AV-Depot rechnet
+  der Plan ohne es und legt das Geld ins ETF-Depot.
 - **Auszahlung:** Die Karte „Rente aus allen Quellen" (Plan-Seite und Cockpit)
   zerlegt den mittleren Verlauf in Vermögen bei Renteneintritt und Rente pro
   Monat: gesetzliche Rente, AV-Depot, Entnahme aus dem freien Vermögen (ETF-Depot

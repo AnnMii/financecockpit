@@ -1,9 +1,10 @@
 import type { AllSettings, SettingsScope } from "@/lib/settings/schema";
-import { type PlanInput, type Pots, splitSavingsRate } from "@/lib/plan/plan";
+import type { PlanInput, Pots } from "@/lib/plan/plan";
 import {
   AV_CONTRIBUTION_CAP,
   AV_DEPOT_START_YEAR,
   type AvDepotInput,
+  MIN_OWN_CONTRIBUTION,
 } from "./av-depot";
 import type { PensionGapInput } from "./pension-gap";
 import type { SavingsInput } from "./savings";
@@ -34,19 +35,19 @@ export const AV_DEPOT_MAX_MONTHLY = AV_CONTRIBUTION_CAP / 12;
 
 export function toAvDepotInput(settings: AllSettings): AvDepotInput {
   const { shared } = settings;
+  const { savingsRateMonthly, ...own } = settings["av-depot"];
   return {
     age: shared.age,
     retirementAge: shared.retirementAge,
     zveSavingsPhase: shared.zveSavingsPhase,
     zveRetirement: shared.zveRetirement,
-    // What the savings rate exceeds the maximum by cannot go into the AV-Depot.
-    savingsRate: Math.min(shared.savingsRateMonthly, AV_DEPOT_MAX_MONTHLY) * 12,
+    savingsRate: savingsRateMonthly * 12,
     etfReturnRate: shared.expectedReturn,
     exemptionOrder: shared.exemptionOrder,
     childBirthYears: shared.childBirthYears,
     payoutReturnRate: shared.retirementReturn,
     payoutUntilAge: shared.payoutUntilAge,
-    ...settings["av-depot"],
+    ...own,
   };
 }
 
@@ -71,9 +72,9 @@ export function toSavingsInput(settings: AllSettings): SavingsInput {
   return {
     output: savings.output,
     startValue: shared.currentCapital,
-    // The shared rate is per month; a yearly plan pays twelve of them at once.
+    // The rate is per month; a yearly plan pays twelve of them at once.
     savingRate:
-      shared.savingsRateMonthly * (savings.saveInterval === "monthly" ? 1 : 12),
+      savings.savingsRateMonthly * (savings.saveInterval === "monthly" ? 1 : 12),
     saveInterval: savings.saveInterval,
     yearlyInterest: shared.expectedReturn,
     interestInterval: savings.interestInterval,
@@ -115,12 +116,19 @@ export function toWithdrawalPlanInput(
  * The Gesamtplan for the given settings. `values` are the current balances
  * of the pots, from the latest recorded snapshot; before the first snapshot
  * the plan starts with the existing capital of the shared values, held in the
- * ETF-Depot.
+ * ETF-Depot. The savings rates are those of the calculators: the AV-Depot, the
+ * savings calculator (the ETF depot) and the savings account of the plan.
  */
 export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
   const { shared, plan } = settings;
-  const shares = { av: plan.avDepotShare, cash: plan.cashShare };
-  const rates = splitSavingsRate(shared.savingsRateMonthly, shares);
+  let av = settings["av-depot"].savingsRateMonthly;
+  let depot = settings.savings.savingsRateMonthly;
+  // Below its minimum contribution there is no AV-Depot; the money goes to the depot.
+  if (av * 12 < MIN_OWN_CONTRIBUTION) {
+    depot += av;
+    av = 0;
+  }
+  const rates = { av, depot, cash: plan.cashMonthly };
 
   return {
     age: shared.age,
@@ -134,8 +142,8 @@ export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
     depotVolatility: plan.depotVolatility,
     cashVolatility: plan.cashVolatility,
     pension: settings["pension-gap"],
-    shares,
     rates,
+    budget: shared.investableMonthly,
     values: values ?? { av: 0, depot: shared.currentCapital, cash: 0 },
     avDepot: {
       ...toAvDepotInput(settings),

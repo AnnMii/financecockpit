@@ -35,7 +35,8 @@ export const numberFields = {
     retirementAge: { min: 60, max: 75, default: 67, integer: true },
     /** Until which age the savings have to last. */
     payoutUntilAge: { min: 68, max: 120, default: 85, integer: true },
-    savingsRateMonthly: euro(150, 100_000),
+    /** What can be invested per month in all; the calculators split it. */
+    investableMonthly: euro(300, 1_000_000),
     currentCapital: euro(0),
     /** Expected yearly return while saving (on the invested capital, after fund costs). */
     expectedReturn: percent(6, 20),
@@ -51,6 +52,8 @@ export const numberFields = {
     exemptionOrder: euro(1_000, 2_000),
   },
   "av-depot": {
+    /** Per month into the AV-Depot: 150 € is the subsidy limit, 1.140 € the maximum. */
+    savingsRateMonthly: euro(150, 1_140),
     avDepotCosts: percent(0.2, 5),
     baseRate: percent(0, 10),
     oneTimePayout: percent(0, 30),
@@ -65,6 +68,8 @@ export const numberFields = {
     desiredPension: euro(2_200, 1_000_000),
   },
   savings: {
+    /** Per month into the savings plan, which is the ETF depot. */
+    savingsRateMonthly: euro(150, 100_000),
     // Used when the duration does not follow the retirement age.
     durationYears: { min: 1, max: 100, default: 30, integer: true },
     // Above what the default plan reaches anyway, so every searched figure
@@ -79,9 +84,8 @@ export const numberFields = {
   },
   /** The Gesamtplan, see src/lib/plan. */
   plan: {
-    /** Share of the monthly savings rate per pot; the rest goes to the depot. */
-    avDepotShare: percent(100),
-    cashShare: percent(0),
+    /** Per month into the savings account. */
+    cashMonthly: euro(0, 100_000),
     cashReturn: percent(2, 10),
     /** Yearly fluctuation of the returns. */
     depotVolatility: percent(15, 50),

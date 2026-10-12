@@ -229,7 +229,7 @@ Entscheidungen ausgefallen sind, steht direkt darunter.
 ### So umgesetzt (Abweichungen und getroffene Vorgaben)
 
 - **Töpfe:** drei feste (Altersvorsorgedepot, ETF-Depot, Tagesgeld), keine frei
-  benennbaren. Die Sparrate wird per Anteil aufgeteilt.
+  benennbaren. Die Sparraten kommen aus den Profilen von Altersvorsorgedepot und Sparrechner und dem Plan; das globale Budget wird dagegen geprüft.
 - **Rentenansprüche und Wunschrente** bleiben im Profil des
   Rentenlücke-Rechners; die Plan-Seite zeigt und ändert sie dort.
 - **Rendite** bleibt nominal eingegeben; der Plan zieht die Inflationsrate

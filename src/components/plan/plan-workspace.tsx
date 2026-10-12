@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { BudgetHint, RestButton } from "@/components/budget";
 import { Assumptions, CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
@@ -36,7 +37,7 @@ function Workspace() {
   return (
     <CalculatorShell
       scope="plan"
-      uses={["pension-gap", "av-depot", "withdrawal-plan"]}
+      uses={["pension-gap", "av-depot", "savings", "withdrawal-plan"]}
       errors={errors}
       errorHint={
         errors.some((error) => error.startsWith("av")) ? text.avErrorHint : null
@@ -77,16 +78,28 @@ function Workspace() {
           </Section>
 
           <Section title={text.sections.split}>
-            <NumberSetting scope="shared" name="savingsRateMonthly" />
-            <NumberSetting scope="plan" name="avDepotShare" />
-            <NumberSetting scope="plan" name="cashShare" />
+            <NumberSetting scope="shared" name="investableMonthly" />
+            <NumberSetting
+              scope="av-depot"
+              name="savingsRateMonthly"
+              label={text.rateLabels.av}
+              action={<RestButton part="av" />}
+            />
+            <NumberSetting
+              scope="savings"
+              name="savingsRateMonthly"
+              label={text.rateLabels.depot}
+              action={<RestButton part="depot" />}
+            />
+            <NumberSetting
+              scope="plan"
+              name="cashMonthly"
+              action={<RestButton part="cash" />}
+            />
             <p className="text-xs text-ink-2">
-              {text.splitSummary(
-                f.euro(input.rates.av),
-                f.euro(input.rates.depot),
-                f.euro(input.rates.cash),
-              )}
+              <BudgetHint />
             </p>
+            <p className="text-xs text-ink-2">{text.ratesNote}</p>
           </Section>
 
           <Section title={text.sections.payout}>

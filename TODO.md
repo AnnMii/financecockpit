@@ -72,46 +72,46 @@ getrennte (Auszahlplan des AV-Depots und Lebenserwartung für die Rentenlücke)?
 
 ---
 
-## 3. Die Sparrate im Sparrechner ist der globale Monatswert
+## 3. Budget global, Sparraten lokal
 
 - [ ] **Geprüft und für mich in Ordnung**
 
-**Was gilt:** Der Sparrechner hat kein eigenes Sparraten-Feld, er nutzt die
-globale „Sparrate pro Monat". Beim Sparintervall „jährlich" wird das Zwölffache
-einmal im Jahr zu Jahresbeginn eingezahlt.
+**Was gilt:** Global ist nur „Zum Investieren verfügbar pro Monat" (Vorgabe
+300 €). Die Sparrate hat jeder Rechner selbst: Altersvorsorgedepot 150 € (die
+Fördergrenze), Sparrechner 150 € (dein ETF-Depot), Tagesgeld im Gesamtplan 0 €.
+Zusammen sind das die 300 € des Budgets. Unter jeder Rate steht, wie viel vom
+Budget verplant und frei ist; der Knopf „Rest" setzt den freien Betrag ein.
 
-**Beispiel:** Sparrate 150 € pro Monat, Sparintervall „jährlich" → gerechnet
-wird mit 1.800 € einmal pro Jahr. Unter dem Feld steht dann „= 1.800 € pro
-Jahr, einmal jährlich eingezahlt". Ist die Sparrate das gesuchte Ergebnis,
-zeigt der Rechner sie je Intervall: bei Ziel 20.000 €, 5.000 € Anfangskapital,
-1,5 %, 7 Jahren freier Laufzeit monatlich sind das 163,02 € pro Monat.
+**Beispiel:** Budget 500 €, AV-Depot 150 €, Sparrechner 150 € → „Verfügbar
+500 €, verplant 300 €. Noch frei: 200 €." Ein Klick auf „Rest" beim Sparrechner
+macht daraus 350 €. Beim Sparintervall „jährlich" zahlt der Sparrechner das
+Zwölffache einmal im Jahr ein; sucht er die Sparrate, zeigt er sie je Intervall.
 
-**Zu entscheiden:** Reicht das, oder soll der Sparrechner eine eigene Sparrate
-bekommen, weil du dort andere Beträge durchspielen willst als deine
-tatsächliche Sparrate? (Lokal ändern geht jetzt schon, ohne zu speichern.)
+**Gespeichert:** Die frühere globale „Sparrate pro Monat" gibt es nicht mehr.
+Bestehende Profile starten mit den Vorgaben; trage Budget und Raten einmal neu
+ein.
+
+**Zu entscheiden:** Ist 150 € ins AV-Depot (nur der geförderte Teil) die richtige
+Vorgabe? Mehr geht bis 1.140 €, ist aber ungefördert.
 
 ---
 
-## 4. Dieselbe Sparrate wird in mehreren Rechnern voll angesetzt
+## 4. Alle Sparraten zusammen gegen das Budget
 
 - [ ] **Geprüft und für mich in Ordnung**
 
-**Was gilt:** AV-Depot-Rechner und Sparrechner nehmen beide die gesamte globale
-Sparrate. Das Cockpit zeigt beide Ergebnisse nebeneinander, als würde das Geld
-zweimal angelegt.
+**Was gilt:** Der Gesamtplan addiert die Raten von Altersvorsorgedepot,
+Sparrechner und Tagesgeld und vergleicht sie mit dem Budget. Das Cockpit zeigt
+dieselbe Zeile in der Karte des Plans. Damit zählt dasselbe Geld nicht doppelt.
+Die Karten im Cockpit rechnen weiter jede für sich mit ihrer Rate.
 
-**Beispiel:** Sparrate 150 € → AV-Depot-Karte: 228.547 € Endvermögen mit 67;
-Sparrechner-Karte: 174.520 € nach 32 Jahren. Beide Karten gehen von denselben
-150 € aus; die Ergebnisse dürfen nicht addiert werden.
+**Beispiel:** Budget 500 €, Raten 150 + 350 + 0 → „Das Budget ist genau
+verplant." Mit 20 € Tagesgeld: „520 € verplant, 20 € mehr verplant als
+verfügbar." Reicht das Budget nicht für die nötige Sparrate, steht z. B. „Dein
+Budget von 500 € reicht nicht für die nötige Sparrate: Es fehlen 199 €."
 
-**Zu entscheiden:** Soll die Sparrate aufgeteilt werden können (z. B. 150 € ins
-AV-Depot, Rest in einen ETF-Sparplan)? Das wäre ein eigener globaler Wert je
-Verwendung.
-
-**Stand:** Der Gesamtplan (`/plan`) setzt die Sparrate einmal an und teilt sie
-auf Töpfe auf. Die einzelnen Rechner und ihre Karten im Cockpit rechnen
-weiterhin jeweils mit der vollen Sparrate; der AV-Depot-Rechner nimmt davon
-höchstens 1.140 € pro Monat und sagt das unter dem Feld.
+**Zu entscheiden:** Soll zu viel verplantes Geld nur warnen (wie jetzt) oder die
+Berechnung bremsen?
 
 ---
 
@@ -268,17 +268,18 @@ Zinssatz im Sparrechner, Entnahmebetrag im Entnahmeplan)?
 **Was gilt:** Der Gesamtplan wurde mit Vorgaben umgesetzt, die du nicht einzeln
 bestätigt hast (Liste in `PLANNED_FEATURES.md`, Feature 2, „So umgesetzt").
 
-**Beispiel mit den Standardwerten** (150 € Sparrate ganz ins AV-Depot, Alter
-35, Wunschrente 2.200 €): Der Plan zeigt rund 5 % Wahrscheinlichkeit und eine
+**Beispiel** (Alter 35, Wunschrente 2.200 €, 150 € ins AV-Depot, sonst nichts,
+Vorhandenes Kapital 0 €): Der Plan zeigt rund 5 % Wahrscheinlichkeit und eine
 nötige Sparrate von 813 €. Der Rentenlücke-Rechner zeigt für dieselben
 Werte ohne Inflation 237,50 €. Der Unterschied kommt aus drei Dingen: Der Plan
 zieht 2 % Inflation ab, verlangt 85 % Sicherheit statt des erwarteten Verlaufs
 und rechnet die AV-Depot-Rente in heutiger Kaufkraft.
 
-**So prüfst du es:** Auf `/plan` die nötige Sparrate als „Sparrate pro Monat"
-eintragen: Die Wahrscheinlichkeit landet beim Sicherheitsniveau (85 %), der
-Status wird „Im Plan". Zum Abgleich mit dem Rentenlücke-Rechner den Anteil des
-AV-Depots auf 0 %, das Sicherheitsniveau auf 50 % und die Schwankung auf 0
+**So prüfst du es:** Auf `/plan` die nötige Sparrate als Sparrate des
+Altersvorsorgedepots eintragen (bis 1.140 €): Die Wahrscheinlichkeit landet beim
+Sicherheitsniveau (85 %), der Status wird „Im Plan". Zum Abgleich mit dem
+Rentenlücke-Rechner die Rate des AV-Depots auf 0 und die des Sparrechners auf die
+nötige Sparrate setzen, das Sicherheitsniveau auf 50 % und die Schwankung auf 0
 stellen (Leitplanken z. B. 1 % und 99 %) und dort „Inflation berücksichtigen"
 einschalten: Beide nennen dann dieselbe Sparrate.
 
@@ -287,9 +288,9 @@ einschalten: Beide nennen dann dieselbe Sparrate.
 - Passen 85 % / 75 % / 95 % und 15 % Schwankung zu dir?
 - Ist 2.200 € Wunschrente in **heutigen** Euro gemeint? Der Plan liest es so.
 - Reichen drei feste Töpfe?
-- Die nötige Sparrate behält deine Aufteilung bei. Mit 100 % AV-Depot heißt
-  „mehr sparen" also: mehr ins AV-Depot, bis zu dessen Höchstbetrag von 1.140 €
-  pro Monat, danach ins ETF-Depot. Ist das die Aufteilung, die du willst?
+- Die nötige Sparrate behält das Verhältnis deiner Raten bei. Ist es 150 € ins
+  AV-Depot und 150 € ins ETF-Depot, steigt sie je zur Hälfte, das AV-Depot bis
+  zu dessen Höchstbetrag von 1.140 €. Ist das die Aufteilung, die du willst?
 
 ## 13. Gesamtplan: Alter jährlich mitführen
 

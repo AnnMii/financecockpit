@@ -87,7 +87,7 @@ describe("calculators with arbitrary settings", () => {
         settings.shared.age = 18 + Math.floor(random() * 47);
         settings.shared.retirementAge = 65 + Math.floor(random() * 6);
         settings.shared.payoutUntilAge = 85 + Math.floor(random() * 20);
-        settings.shared.savingsRateMonthly = 10 + random() * 1_100;
+        settings["av-depot"].savingsRateMonthly = 10 + random() * 1_100;
       }
       const context = JSON.stringify(settings);
 
@@ -171,8 +171,9 @@ describe("calculators with arbitrary settings", () => {
       settings.plan.lowerGuardrail = 50 + random() * 20;
       settings.plan.confidenceTarget = 75 + random() * 10;
       settings.plan.upperGuardrail = 90 + random() * 10;
-      settings.plan.avDepotShare = random() * 60;
-      settings.plan.cashShare = random() * 40;
+      settings["av-depot"].savingsRateMonthly = 10 + random() * 400;
+      settings.savings.savingsRateMonthly = random() * 800;
+      settings.plan.cashMonthly = random() * 200;
       const context = JSON.stringify(settings);
       const input = {
         ...toPlanInput(settings, {
