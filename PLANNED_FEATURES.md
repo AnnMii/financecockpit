@@ -230,8 +230,8 @@ Entscheidungen ausgefallen sind, steht direkt darunter.
 
 - **Töpfe:** drei feste (Altersvorsorgedepot, ETF-Depot, Tagesgeld), keine frei
   benennbaren. Die Sparrate wird per Anteil aufgeteilt.
-- **Rentenansprüche und Wunschrente** bleiben im Rentenlücke-Rechner; der Plan
-  liest das dort aktive Profil.
+- **Rentenansprüche und Wunschrente** bleiben im Profil des
+  Rentenlücke-Rechners; die Plan-Seite zeigt und ändert sie dort.
 - **Rendite** bleibt nominal eingegeben; der Plan zieht die Inflationsrate
   immer ab und rechnet nur in heutiger Kaufkraft. Eine nominale Ansicht gibt
   es nicht.
@@ -239,7 +239,11 @@ Entscheidungen ausgefallen sind, steht direkt darunter.
 - **Profile:** Der Gesamtplan hat Profile wie die Rechner.
 - **Verschlüsselung (Feature 1)** kam nicht vorher; Planversionen und
   Ist-Stände liegen im Klartext in `plan_records`.
-- **Nötige Sparrate** verändert nur den Anteil des ETF-Depots.
+- **Nötige Sparrate** ist die gesamte Sparrate bei gleicher Aufteilung auf die
+  Töpfe (anfangs veränderte sie nur den Anteil des ETF-Depots; damit ließ sich
+  bei 100 % AV-Depot kein Spielraum erkennen).
+- **Heutiger Stand** vor dem ersten Ist-Stand: das „Vorhandene Kapital" der
+  globalen Werte, im ETF-Depot.
 - **Die Rente aus dem AV-Depot** wird im Verhältnis zu dessen Kapital
   hochgerechnet statt je Verlauf neu versteuert.
 - **Das frühere „Ruhestand im Gesamtbild"** im Cockpit ist entfallen; es

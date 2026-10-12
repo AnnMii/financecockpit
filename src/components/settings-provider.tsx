@@ -12,6 +12,7 @@ import {
 import {
   createProfileAction,
   deleteProfileAction,
+  loadProfilesAction,
   renameProfileAction,
   saveProfileDataAction,
   setActiveProfileAction,
@@ -23,6 +24,7 @@ import {
 } from "@/lib/settings/schema";
 import type { ProfileError } from "@/lib/settings/labels";
 import type { Profile, ProfileState } from "@/lib/settings/store";
+import { notifyTabs, useTabSync } from "./tab-sync";
 
 export type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -105,10 +107,15 @@ export function SettingsProvider({
   const latest = useRef(initialProfiles);
   // Pending saves, by profile id.
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>());
+  // Requests on their way, and a count of local changes: what was fetched
+  // before one of them must not overwrite it.
+  const inFlight = useRef(0);
+  const changes = useRef(0);
 
   /** Replaces the profile list of one scope. */
   const setScope = useCallback(
     (scope: SettingsScope, change: (current: ScopeProfiles) => ScopeProfiles) => {
+      changes.current++;
       latest.current = {
         ...latest.current,
         [scope]: change(latest.current[scope] as ScopeProfiles),
@@ -122,16 +129,34 @@ export function SettingsProvider({
     request: Promise<T>,
   ): Promise<T | null> => {
     setSaveState("saving");
+    inFlight.current++;
     try {
       const result = await request;
       // A newer change is already waiting; its own save reports the outcome.
       if (timers.current.size === 0) setSaveState(result.ok ? "saved" : "error");
+      if (result.ok) notifyTabs("settings");
       return result;
     } catch {
       setSaveState("error");
       return null;
+    } finally {
+      inFlight.current--;
     }
   }, []);
+
+  /** Takes over what another tab (or browser) saved; never over own unsaved changes. */
+  const refresh = useCallback(async () => {
+    const busy = () => timers.current.size > 0 || inFlight.current > 0;
+    if (busy()) return;
+    const seen = changes.current;
+    const fresh = await loadProfilesAction().catch(() => null);
+    if (!fresh || busy() || changes.current !== seen) return;
+    // Equal data must not cause a new render and with it new calculations.
+    if (JSON.stringify(fresh) === JSON.stringify(latest.current)) return;
+    latest.current = fresh;
+    setProfiles(fresh);
+  }, []);
+  useTabSync("settings", refresh);
 
   const save = useCallback(
     (scope: SettingsScope, profileId: string) => {

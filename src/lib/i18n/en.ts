@@ -55,6 +55,7 @@ export const en: Dictionary = {
 
   common: {
     shared: "shared",
+    infoAbout: (label) => `Explanation of “${label}”`,
     sharedTitle: "Shared value – applies to all calculators",
     changed: "changed",
     changedTitle: "Changed locally – not saved yet",
@@ -80,11 +81,134 @@ export const en: Dictionary = {
     perQuarter: "per quarter",
     perHalfYear: "per half-year",
     perYear: "per year",
+    eurosPerMonth: "€ / month",
+    eurosPerYear: "€ / year",
     endless: "endless",
-    noAdvice: "Not tax or investment advice.",
+  },
+
+  fieldInfo: {
+    plan: {
+      nominalView:
+        "The overall plan works in today's purchasing power. With the box checked, the card “Pension from all sources” shows the amounts in euros of the year of retirement, raised by the inflation rate; they then match the nominal results of the AV-Depot and savings calculators. Unchecked, it stays in today's purchasing power.",
+      avDepotShare:
+        "The part of your monthly savings rate that goes into the Altersvorsorgedepot, at most €1,140 per month. What is left after it and the savings account goes into the regular ETF portfolio.",
+      cashShare:
+        "The part of your savings rate that goes into a savings account. It hardly fluctuates but returns less.",
+      cashReturn:
+        "The interest you expect on the savings account in the long run, per year.",
+      depotVolatility:
+        "How much the yearly return of the portfolio scatters around the expected value (standard deviation). The higher, the wider the corridor of possible courses. A global equity ETF is at about 15%.",
+      cashVolatility:
+        "How much the savings account interest changes from year to year. A small value around 1% is usual.",
+      confidenceTarget:
+        "The probability with which your plan should work out. 85% means: the desired pension is reached in 85 of 100 simulated courses. A higher value requires a higher savings rate.",
+      lowerGuardrail:
+        "If the probability of success falls below this value, the plan recommends saving more. Between the guardrails nothing changes, even when the portfolio fluctuates.",
+      upperGuardrail:
+        "If the probability of success rises above this value, you have leeway and could lower the savings rate.",
+    },
+    shared: {
+      age:
+        "Your age today. Together with the retirement age it determines how many years you keep saving.",
+      retirementAge:
+        "The age at which you stop saving and start withdrawing. The standard retirement age in Germany is 67 for those born in 1964 or later.",
+      payoutUntilAge:
+        "Your assets should last until this age; after that they are used up by calculation. Rather choose it high: many people live longer than average.",
+      savingsRateMonthly:
+        "The total amount you invest every month.",
+      currentCapital:
+        "Assets you have already invested today, which keep growing at the expected return. In the overall plan they count as the balance of the ETF account until you record an actual balance in the history.",
+      expectedReturn:
+        "Yearly return at which the invested money grows while saving – after fund costs, before taxes. A global equity ETF returned about 6 to 7% per year nominally in the long run; that is no guarantee.",
+      retirementReturn:
+        "Yearly return of your assets during the payout. Usually set lower than while saving, because investments are more cautious in retirement.",
+      inflationRate:
+        "How much prices rise per year. Future amounts are converted into today's purchasing power with it. The European Central Bank aims for 2%.",
+      capitalGainsTax:
+        "Tax on interest, dividends and capital gains: 25% flat tax plus solidarity surcharge make 26.375%; about 28% with church tax.",
+      incomeIntervalSavings:
+        "Whether you enter the income while saving per year (as in the income tax assessment) or per month. The calculation uses the yearly amount, i.e. the monthly amount times 12.",
+      incomeIntervalRetirement:
+        "Whether you enter the income in retirement per month (as the pension insurer states it) or per year. The calculation uses the yearly amount, i.e. the monthly amount times 12.",
+      zveSavingsPhase:
+        "Your taxable income while you save: gross income minus income-related expenses, pension contributions and allowances. It is stated in your income tax assessment and determines how much tax the deposits into the AV-Depot save you.",
+      zveRetirement:
+        "Your taxable income in retirement without the payouts from the AV-Depot, mainly the taxable part of your pensions. It determines the tax rate on the payouts.",
+      exemptionOrder:
+        "Investment income up to this amount stays tax-free per year: €1,000 for single persons, €2,000 for couples assessed jointly. Enter what is still available for this investment.",
+      considerInflation:
+        "Applies to the pension gap calculator. Checked, it uses the return after deducting the inflation rate; the results are then in today's purchasing power. Unchecked, they are nominal, i.e. in future euros. The overall plan always uses today's purchasing power, the withdrawal plan has a switch of its own, the other calculators are always nominal.",
+    },
+    "av-depot": {
+      avDepotCosts:
+        "Running costs of the Altersvorsorgedepot per year, on top of the fund costs – such as custody or administration fees. They reduce the return.",
+      baseRate:
+        "The base rate set yearly by the German Federal Ministry of Finance. It yields the Vorabpauschale, the yearly minimum taxation of accumulating funds in a regular portfolio.",
+      oneTimePayout:
+        "Share of the capital you have paid out at once at retirement, before taxes. Up to 30% is allowed; the rest is paid as a monthly pension.",
+      taxSavingsMode:
+        "What happens with the tax refund from the deposits: pay it into the AV-Depot as well, invest it in a regular portfolio or spend it. This affects the comparison with the ETF savings plan.",
+    },
+    "pension-gap": {
+      statePension:
+        "Your expected monthly state pension, gross. It is stated in the yearly pension information of the Deutsche Rentenversicherung.",
+      companyPension:
+        "Expected monthly pension from a company pension scheme, gross.",
+      privatePension:
+        "Expected monthly pension from private pension or life insurance, gross.",
+      riesterPension:
+        "Expected monthly pension from Riester or Rürup contracts, gross.",
+      taxPrediction:
+        "Flat tax rate on your pensions above the basic allowance and on interest in retirement. An estimate; the actual rate depends on your total income.",
+      yearlyTaxFreeAmount:
+        "Income up to this amount stays tax-free per year. The basic allowance is adjusted every year.",
+      desiredPension:
+        "The amount you want to have available per month in retirement, net. A rule of thumb is about 80% of your last net income.",
+    },
+    savings: {
+      durationYears:
+        "How many years you save.",
+      endValue:
+        "The capital that should be there at the end of the duration – deposits and interest together.",
+      partialExemption:
+        "The part of the fund income that stays tax-free: 30% for equity funds, 15% for mixed funds.",
+      untilRetirement:
+        "Checked, the duration is retirement age minus age and follows the shared values. Unchecked, you enter the duration freely, e.g. for a savings goal before retirement.",
+      considerTax:
+        "Deducts capital gains tax from the interest. Without this option all results are before taxes.",
+      considerPartialExemption:
+        "For funds, part of the income stays tax-free. Switch this on if you save in funds or ETFs.",
+      output:
+        "The figure the calculator derives from the other entries. Its input field disappears.",
+      saveInterval:
+        "How often you deposit. With “yearly”, twelve times the monthly savings rate is deposited at once.",
+      interestInterval:
+        "How often returns are credited and then grow themselves (compound interest). The rate is per year and is broken down to the interval; the more often, the more you end up with. For ETFs and funds, distributing and accumulating alike, “monthly” fits, because their value grows continuously. For a savings account the interval of your bank applies, for fixed-term deposits and passbooks usually “yearly”.",
+      distributionType:
+        "Distributing: income is paid out and taxed every year. Accumulating: income stays in the fund, the tax is only due at the end.",
+    },
+    "withdrawal-plan": {
+      capitalAssets:
+        "The assets you withdraw from, at the start of the withdrawals.",
+      withdrawalAmount:
+        "The amount you withdraw in every interval.",
+      periodYears:
+        "How many years the withdrawals should run.",
+      capitalConsumption:
+        "Checked, the assets are used up completely over the period. Unchecked, only the interest is withdrawn, the capital is preserved.",
+      considerTax:
+        "Checked, the estimated tax deduction of the pension gap profile is deducted from the interest rate, as in the overall plan. Unchecked, it is calculated without taxes, as at Finanzfluss.",
+      realTerms:
+        "Checked, the inflation rate (field below) is deducted from the return in retirement, before the tax deduction, as in the overall plan; capital and withdrawals are then in today's purchasing power. Unchecked, all amounts are nominal, i.e. in future euros, as at Finanzfluss.",
+      output:
+        "The figure the calculator derives from the other entries. Its input field disappears.",
+      interval:
+        "How often you withdraw money.",
+    },
   },
 
   children: {
+    info: "Birth years of the children you receive child benefit for. The Altersvorsorgedepot grants an allowance for each child as long as child benefit is paid.",
     label: "Children",
     none: "No children entered.",
     birthYear: (n) => `Birth year of child ${n}`,
@@ -242,12 +366,12 @@ export const en: Dictionary = {
       zveSavingsPhase: {
         label: "Income while saving",
         unit: "€ / year",
-        hint: "Taxable income per year.",
+        hint: "Taxable income.",
       },
       zveRetirement: {
         label: "Income in retirement",
         unit: "€ / year",
-        hint: "Taxable income per year, without the payouts.",
+        hint: "Taxable income, without the payouts.",
       },
       exemptionOrder: {
         label: "Saver's allowance (Sparerpauschbetrag)",
@@ -316,11 +440,13 @@ export const en: Dictionary = {
   },
 
   toggles: {
-    plan: {},
+    plan: {
+      nominalView: { label: "Show amounts in future euros" },
+    },
     shared: {
       considerInflation: {
         label: "Account for inflation",
-        hint: "Calculates with returns after deducting the inflation rate.",
+        hint: "The pension gap calculator then uses returns after deducting the inflation rate.",
       },
     },
     "av-depot": {},
@@ -335,14 +461,31 @@ export const en: Dictionary = {
     "withdrawal-plan": {
       capitalConsumption: {
         label: "Use up the capital",
-        hint: "Off: only the interest is withdrawn, the capital is preserved.",
+        hint: "Unchecked, only the interest is withdrawn, the capital is preserved.",
+      },
+      considerTax: {
+        label: "Account for tax on the returns",
+        hint: "Deducts the estimated tax deduction of the pension gap profile from the return.",
+      },
+      realTerms: {
+        label: "Account for inflation (today's purchasing power)",
+        hint: "Deducts the inflation rate from the return; all amounts in today's euros.",
       },
     },
   },
 
   selects: {
     plan: {},
-    shared: {},
+    shared: {
+      incomeIntervalSavings: {
+        label: "Enter income while saving",
+        options: { yearly: "per year", monthly: "per month" },
+      },
+      incomeIntervalRetirement: {
+        label: "Enter income in retirement",
+        options: { monthly: "per month", yearly: "per year" },
+      },
+    },
     "av-depot": {
       taxSavingsMode: {
         label: "Use of the tax savings",
@@ -402,24 +545,26 @@ export const en: Dictionary = {
   calcErrors: {
     ageBeforeRetirement: "The age must be below the retirement age.",
     payoutAfterRetirement: "The payout must end after retirement.",
-    avAgeRange: "The age must be between 18 and 67.",
-    avRetirementRange: "Retirement must be between age 65 and 70.",
+    avAgeRange: "For the Altersvorsorgedepot the age must be between 18 and 67.",
+    avRetirementRange:
+      "For the Altersvorsorgedepot retirement must be between age 65 and 70.",
     avPayoutMin85:
       "In the Altersvorsorgedepot the payout must run at least until age 85.",
     avSavingsRateRange:
-      "The savings rate must be between €120 and €13,680 per year (€10 to €1,140 per month).",
-    avReturnsPositive: "The returns must be greater than 0%.",
+      "At least €120 per year (€10 per month) must go into the Altersvorsorgedepot, at most €13,680.",
+    avReturnsPositive:
+      "For the Altersvorsorgedepot the returns must be greater than 0%.",
     avCostsBelowReturns: "The costs of the AV-Depot must be below the returns.",
     taxBelow100: "The tax rates must be below 100%.",
     durationPositive: "The duration must be greater than 0.",
     unreachableStartValue:
-      "The final capital is already reached or exceeded without starting capital.",
+      "The final capital cannot be reached with these values.",
     unreachableSavingRate:
-      "The final capital is already reached or exceeded without a savings rate.",
+      "The final capital cannot be reached with these values.",
     unreachableYearlyInterest:
-      "With these deposits no interest rate from 0% up reaches the final capital exactly.",
+      "Without starting capital and savings rate no interest rate reaches the final capital.",
     unreachableDuration:
-      "The final capital cannot be reached with these values, or it is already reached.",
+      "The final capital can never be reached with these values: without savings rate and interest the capital does not grow.",
     interestAboveMinus100: "The interest rate must be above −100%.",
     capitalPositive: "The portfolio must be greater than 0.",
     amountPositive: "The withdrawal amount must be greater than 0.",
@@ -445,11 +590,49 @@ export const en: Dictionary = {
       volatility: "Fluctuation",
       confidence: "Confidence",
       time: "Period",
+      pension: "Pension",
+      balances: "Today's balance",
+      payout: "Payout",
+    },
+    payoutNote:
+      "Belongs to the profile of the withdrawal plan and applies there too.",
+    breakdown: {
+      title: "Pension from all sources",
+      subtitle: "In the middle course, in today's purchasing power and after taxes.",
+      subtitleNominal: (prices) =>
+        `In the middle course, in euros at retirement (prices then ${prices} above today's) and after taxes.`,
+      wealthTitle: "Wealth at retirement",
+      avDepot: "Altersvorsorgedepot",
+      free: "Free assets (ETF account and savings account)",
+      pensionTitle: "Pension per month",
+      statePension: "State and other pensions (net)",
+      avPension: "Altersvorsorgedepot (net)",
+      freePension: "Withdrawal from the free assets (after taxes)",
+      freeTax: (before, tax) =>
+        `Before taxes ${before}; the tax on the returns costs ${tax}.`,
+      total: "Together",
+      desired: "Desired pension",
+      surplus: (amount) => `${amount} more than desired`,
+      shortfall: (amount) => `${amount} less than desired`,
+      consumes: (age) => `The free assets are used up by age ${age}.`,
+      keeps: "Only the returns of the free assets are withdrawn; they are kept.",
+      taxNote: (rate) =>
+        `Tax on the returns in the payout phase: estimated tax deduction of ${rate} (from the pension gap profile). The Altersvorsorgedepot is taxed by its own rules.`,
     },
     splitSummary: (av, depot, cash) =>
       `Per month: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
     sourcesNote:
-      "Pension entitlements and the desired pension come from the pension gap calculator, the details of the AV-Depot from its calculator, today's balances from the history.",
+      "The details of the AV-Depot (costs, taxes, children) come from its calculator.",
+    capitalHint:
+      "Counts as the balance of the ETF account until you record an actual balance in the history.",
+    balancesFrom: (date, av, depot, cash) =>
+      `Actual balance of ${date}: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
+    changeInHistory: "Change in the history",
+    avErrorHint:
+      "Or set the share of the Altersvorsorgedepot to 0%; the plan then calculates without it.",
+    alsoUses: "The plan also uses",
+    pensionNote:
+      "These values belong to the profile of the pension gap calculator and apply there too.",
     status: {
       increase: "Save more",
       onTrack: "On plan – change nothing",
@@ -458,7 +641,7 @@ export const en: Dictionary = {
     statusNote: {
       increase: (amount) =>
         `Raise the savings rate by ${amount} per month to reach your confidence level.`,
-      onTrack: "The probability lies between your guardrails.",
+      onTrack: "Your savings rate fits your confidence level.",
       room: (amount) =>
         `You could save ${amount} less per month and stay at your confidence level.`,
     },
@@ -467,12 +650,11 @@ export const en: Dictionary = {
       `Guardrails ${lower} and ${upper}, target ${target}`,
     currentRate: "Your savings rate",
     requiredRate: "Required savings rate",
-    requiredRateNote: (target) => `for ${target} confidence`,
+    requiredRateNote: (target) => `for ${target} confidence, with the same split`,
     alternativesTitle: "Other ways back on track",
     lowerPension: (amount) => `Lower the desired pension by ${amount} per month`,
     retireLater: (years) => `Retire ${years} later`,
-    retireLaterNotEnough:
-      "Retiring later alone is not enough, not even five years.",
+    retireLaterNotEnough: "Retiring later alone is not enough.",
     corridorTitle: "Wealth until retirement",
     corridorSubtitle:
       "In today's purchasing power. The band shows the middle 80% of possible courses, the line the middle one.",
@@ -499,11 +681,10 @@ export const en: Dictionary = {
     noComparison: "No comparison",
     delete: "Delete",
     saveFailed: "That did not work. Please try again.",
-    noSnapshot:
-      "No actual balance recorded yet – the plan starts at €0 in all pots.",
+    noSnapshot: (capital) =>
+      `No actual balance recorded yet – the plan starts with your existing capital of ${capital} in the ETF account.`,
     staleSnapshot: (date) =>
       `Last actual balance of ${date}. Time for the yearly check.`,
-    balancesFrom: (date) => `Balances of ${date}.`,
     recordSnapshot: "Record balance",
     openPlan: "Open plan",
     openHistory: "Open history",
@@ -558,8 +739,8 @@ export const en: Dictionary = {
       "All amounts in today's purchasing power; the inflation rate is always deducted, regardless of the switch in the settings.",
       "The corridor comes from 2,000 random courses of the return with constant fluctuation; AV-Depot and ETF account move together. Extreme events beyond this assumption are not covered.",
       "Savings rates rise with inflation; the contributions to the AV-Depot stay nominally the same and follow its calculator.",
-      "The required savings rate only changes the share of the ETF account; AV-Depot and savings account stay as set.",
-      "From retirement on, the fixed return in retirement applies and the capital is used up by the end of the payout.",
+      "The required savings rate is your total savings rate with the same split over the pots. At most €1,140 per month go into the AV-Depot; what exceeds that goes into the ETF account.",
+      "From retirement on, the fixed return in retirement after the estimated tax deduction applies. The free assets are used up by the end of the payout or, if the withdrawal plan profile says so, only their returns are withdrawn.",
       "The corridor is a model, not a guarantee. Not tax or investment advice.",
     ],
   },
@@ -615,24 +796,11 @@ export const en: Dictionary = {
     title: "Cockpit",
     profilesHint:
       "The selection also applies in the calculators. You can create and change profiles there and in the settings.",
-    retirementHeading: "Retirement at a glance",
-    remainingGap: "Remaining pension gap per month",
-    gapCovered: "Pension and Altersvorsorgedepot cover your desired pension.",
-    gapAfter: "After the expected pension and the Altersvorsorgedepot.",
-    shareBarLabel: "Desired pension per month",
-    netPension: "Net pension",
-    avDepot: "Altersvorsorgedepot",
-    remaining: "Remaining gap",
     desiredPension: "Desired pension",
-    capitalForGap: "Capital needed for the gap",
-    extraSavingsRate: "Additional savings rate per month",
-    noteWithAvDepot: (savingsRate, untilAge) =>
-      `The additional savings rate comes on top of the ${savingsRate} per month that go into the Altersvorsorgedepot in this calculation. Its pension runs until age ${untilAge}; the capital for the gap is calculated as being used up.`,
-    noteWithoutAvDepot:
-      "The Altersvorsorgedepot cannot be calculated with the selected profiles and is not included here.",
-    nominal: "All amounts nominal.",
     notCalculable: "Cannot be calculated with the selected profiles:",
     resultsHeading: "Results of the calculators",
+    resultsNote:
+      "Each calculator works on its own, without fluctuation and in future euros; only the pension gap uses today's purchasing power when “Account for inflation” is on. The overall plan above always uses today's purchasing power and your confidence level – its figures are therefore more cautious.",
     openCalculator: "Open calculator",
     searched: "Calculated",
     searchedFor: (what) => `Calculated: ${what}`,
@@ -648,6 +816,22 @@ export const en: Dictionary = {
     totalDeposits: "Total deposits",
     withdrawalAmount: (perInterval) => `Withdrawal amount ${perInterval}`,
     withdrawalPeriod: "Withdrawal period",
+    taxNote: {
+      avDepot: "Final wealth before taxes, pensions after taxes.",
+      pensionGap:
+        "Net pension after the estimated tax deduction; capital and savings rate calculated with returns after taxes.",
+      savingsBefore: "All amounts before taxes.",
+      savingsDistributing:
+        "All amounts after taxes: distributing, the tax reduces the interest as it is paid.",
+      savingsAccumulating:
+        "All amounts after taxes: accumulating, the tax on the gain is due at the end.",
+      withdrawal: "Calculated without taxes.",
+      withdrawalTaxed: "Returns calculated after the estimated tax deduction.",
+    },
+    currencyNote: {
+      nominal: "Amounts nominal, in future euros.",
+      real: "Amounts in today's purchasing power.",
+    },
     capitalAssets: "Portfolio",
   },
 
@@ -663,6 +847,8 @@ export const en: Dictionary = {
     retirementAgeHint: "Between 65 and 70.",
     savingsRateHint: (perYear) =>
       `${perYear}. Subsidised up to €150 per month, possible up to €1,140.`,
+    savingsRateCapped: (max) =>
+      `At most ${max} per month go into the AV-Depot; that is what is calculated here.`,
     payoutUntilHint: "In the Altersvorsorgedepot at least until 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF savings plan",
@@ -771,8 +957,25 @@ export const en: Dictionary = {
     duration: "Duration",
     savingRate: (perInterval) => `Savings rate ${perInterval}`,
     durationMonths: (months) => `That is ${months} months.`,
-    durationUntilRetirement: (duration, retirementAge, age) =>
-      `Duration: ${duration} (retirement at ${retirementAge} − age ${age}).`,
+    endValueMinimum: {
+      startValue: (amount) => `Even without starting capital you reach ${amount}.`,
+      savingRate: (amount) => `Even without a savings rate you reach ${amount}.`,
+      yearlyInterest: (amount) =>
+        `Even without interest you get to ${amount}: that is what you deposit in total.`,
+      duration: (amount) => `${amount} is already there as starting capital.`,
+    },
+    alreadyReached: {
+      startValue: (target, reached) =>
+        `You reach your goal of ${target} even without starting capital: savings rate and interest take you to ${reached}.`,
+      savingRate: (target, reached) =>
+        `You reach your goal of ${target} even without a savings rate: your starting capital grows to ${reached}.`,
+      yearlyInterest: (target, reached) =>
+        `You reach your goal of ${target} even without interest: your deposits alone add up to ${reached}.`,
+      duration: (target, reached) =>
+        `Your goal of ${target} is already reached: your starting capital is ${reached}.`,
+    },
+    durationUntilRetirement: (retirementAge, age) =>
+      `Retirement at ${retirementAge} − age ${age}, from the shared values.`,
     chartTitle: "Capital per year",
     chartSubtitle: "Deposits including starting capital and the interest earned on them",
     afterTax: " after taxes",
@@ -780,7 +983,7 @@ export const en: Dictionary = {
     totalDeposits: "Total deposits",
     assumptions: [
       "Deposits are made at the beginning of the saving interval; interest is credited in the chosen interest interval and compounds.",
-      "Distributing: the tax reduces the interest continuously. Accumulating: the tax on the whole gain is due at the end.",
+      "Distributing: the tax reduces the interest continuously. Accumulating: the tax on the whole gain is due at the end; the chart shows the balance after taxes, as if you sold at the end of each year.",
       "The partial exemption makes the chosen share of the returns tax-free; a saver's allowance is not included.",
       "Calculation follows the Finanzfluss savings calculator. Not tax or investment advice.",
     ],
@@ -796,6 +999,16 @@ export const en: Dictionary = {
       "The field you are looking for is removed from the inputs and appears as the result.",
     interestRate: "Interest rate p.a.",
     interestRateHint: "Your return in retirement from the shared values.",
+    interestAdjusted: (rate, inflation, tax) =>
+      `Calculated with ${rate} p. a.: return in retirement${inflation ? ", minus inflation" : ""}${tax ? ", after the estimated tax deduction" : ""}.`,
+    realNote: "All amounts in today's purchasing power.",
+    fromPlan: {
+      button: "From overall plan",
+      hint: "Takes over the free assets at retirement (ETF account and savings account, middle course, in today's purchasing power) and the payout period and switches taxes and purchasing power on. The values only apply here until you save them.",
+      done: (capital, years) => `Taken over: ${capital} over ${years}.`,
+      unavailable:
+        "The overall plan cannot be calculated with the selected profiles.",
+    },
     amount: (perInterval) => `Withdrawal amount ${perInterval}`,
     period: "Withdrawal period",
     capital: "Portfolio",
@@ -810,7 +1023,7 @@ export const en: Dictionary = {
     chartAria: "Column chart: remaining capital at the end of each year",
     assumptions: [
       "Withdrawals are made at the end of each interval; the yearly rate is converted to the interval so that one year yields exactly the interest rate.",
-      "Taxes and inflation are not included; enter a correspondingly lower interest rate for them.",
+      "By default taxes and inflation are not included, as at Finanzfluss. With the switches “Account for tax on the returns” and “Account for inflation” the calculator works like the overall plan, with small deviations from the calculation conventions (withdrawal at the end of the interval, rate converted to the interval).",
       "Formulas derived from the results of the Finanzfluss calculator. Not tax or investment advice.",
     ],
   },

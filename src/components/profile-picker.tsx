@@ -178,11 +178,18 @@ export function ProfilePicker({
 }
 
 /**
- * The two pickers every calculator shows. The shared profiles can only be
- * switched here; they are managed on the settings page, and new ones can be
- * created when saving a draft.
+ * The pickers every calculator shows: the shared profiles, which can only be
+ * switched here (they are managed on the settings page, and new ones can be
+ * created when saving a draft), and its own. `uses` adds the pickers of
+ * other scopes the page reads; they are managed in their own calculators.
  */
-export function CalculatorProfiles({ scope }: { scope: SettingsScope }) {
+export function CalculatorProfiles({
+  scope,
+  uses = [],
+}: {
+  scope: SettingsScope;
+  uses?: SettingsScope[];
+}) {
   const { t } = useLocale();
   return (
     <section className="space-y-4 rounded-xl border border-line bg-surface p-5">
@@ -200,6 +207,14 @@ export function CalculatorProfiles({ scope }: { scope: SettingsScope }) {
         </p>
       </div>
       <ProfilePicker scope={scope} label={t.profiles.ownValues} manage />
+      {uses.length > 0 && (
+        <div className="space-y-3 border-t border-line pt-4">
+          <p className="text-xs text-ink-2">{t.plan.alsoUses}</p>
+          {uses.map((used) => (
+            <ProfilePicker key={used} scope={used} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -29,6 +29,13 @@
       "when": 1791727973787,
       "tag": "0003_plan_records",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1791748251371,
+      "tag": "0004_savings_defaults",
+      "breakpoints": true
     }
   ]
 }

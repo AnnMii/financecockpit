@@ -65,8 +65,11 @@ export const numberFields = {
     desiredPension: euro(2_200, 1_000_000),
   },
   savings: {
-    durationYears: { min: 1, max: 100, default: 7, integer: true },
-    endValue: euro(20_000, 1_000_000_000),
+    // Used when the duration does not follow the retirement age.
+    durationYears: { min: 1, max: 100, default: 30, integer: true },
+    // Above what the default plan reaches anyway, so every searched figure
+    // has a meaningful answer.
+    endValue: euro(250_000, 1_000_000_000),
     partialExemption: percent(30),
   },
   "withdrawal-plan": {
@@ -99,13 +102,23 @@ export const toggleFields = {
     considerTax: false,
     considerPartialExemption: false,
   },
-  "withdrawal-plan": { capitalConsumption: true },
-  plan: {},
+  "withdrawal-plan": {
+    capitalConsumption: true,
+    considerTax: false,
+    /** Deduct the inflation from the return; all amounts in today's money. */
+    realTerms: false,
+  },
+  /** Show the plan's amounts at retirement in future euros. */
+  plan: { nominalView: false },
 } satisfies Record<SettingsScope, Record<string, boolean>>;
 
 /** Choice fields; the first option is the default. */
 export const selectFields = {
-  shared: {},
+  shared: {
+    /** How the incomes are entered; they are stored per year either way. */
+    incomeIntervalSavings: ["yearly", "monthly"],
+    incomeIntervalRetirement: ["monthly", "yearly"],
+  },
   "av-depot": {
     taxSavingsMode: ["avDepot", "secondaryDepot", "consume"],
   },

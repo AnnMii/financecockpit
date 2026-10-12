@@ -12,12 +12,14 @@ import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import { usePlan, usePlanRecords } from "@/components/plan/plan-records";
 import {
+  PlanBreakdown,
   PlanCorridor,
   PlanStatus,
   formatDate,
   useToday,
 } from "@/components/plan/plan-views";
 import { ProfilePicker } from "@/components/profile-picker";
+import { useSettingsEditor } from "@/components/settings-provider";
 import {
   usePensionGap,
   useSavings,
@@ -43,11 +45,14 @@ const CHART_HEIGHT = 190;
 function CalculatorCard({
   id,
   figures,
+  note,
   chart,
   errors,
 }: {
   id: CalculatorInfo["id"];
   figures: Figure[] | null;
+  /** Whether the amounts are before or after taxes. */
+  note: string;
   chart: React.ReactNode;
   errors: CalculationError[];
 }) {
@@ -75,6 +80,7 @@ function CalculatorCard({
               </div>
             ))}
           </dl>
+          <p className="mt-2 text-xs text-ink-2">{note}</p>
           <div className="mt-4">{chart}</div>
         </>
       ) : (
@@ -88,7 +94,8 @@ function CalculatorCard({
 
 /** The Gesamtplan at a glance: status, corridor and a reminder to record balances. */
 function PlanSection() {
-  const { locale, t } = useLocale();
+  const { locale, t, f } = useLocale();
+  const { settings } = useSettingsEditor();
   const text = t.plan;
   const today = useToday();
   const { input, errors, result, snapshot } = usePlan();
@@ -116,7 +123,7 @@ function PlanSection() {
         <p className="rounded-xl border border-line bg-surface p-4 text-sm text-ink-2">
           {snapshot
             ? text.staleSnapshot(formatDate(locale, snapshot.date))
-            : text.noSnapshot}{" "}
+            : text.noSnapshot(f.euro(settings.shared.currentCapital))}{" "}
           <Link href="/verlauf" className="font-medium text-accent">
             {text.recordSnapshot}
           </Link>
@@ -124,19 +131,22 @@ function PlanSection() {
       )}
 
       {result ? (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <PlanStatus input={input} result={result} />
-          <Card>
-            <h3 className="text-base font-semibold">{text.corridorTitle}</h3>
-            <p className="mb-4 text-sm text-ink-2">{text.corridorSubtitle}</p>
-            <PlanCorridor
-              result={result}
-              version={version}
-              snapshots={snapshots}
-              height={240}
-            />
-          </Card>
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+            <PlanStatus input={input} result={result} />
+            <Card>
+              <h3 className="text-base font-semibold">{text.corridorTitle}</h3>
+              <p className="mb-4 text-sm text-ink-2">{text.corridorSubtitle}</p>
+              <PlanCorridor
+                result={result}
+                version={version}
+                snapshots={snapshots}
+                height={240}
+              />
+            </Card>
+          </div>
+          <PlanBreakdown input={input} result={result} />
+        </>
       ) : (
         <Card>
           <p className="text-sm text-ink-2">
@@ -150,6 +160,7 @@ function PlanSection() {
 
 export function Dashboard() {
   const { t, f } = useLocale();
+  const { settings } = useSettingsEditor();
   const text = t.dashboard;
   const avDepot = useAvDepot();
   const pensionGap = usePensionGap();
@@ -173,12 +184,16 @@ export function Dashboard() {
       <PlanSection />
 
       <section aria-labelledby="calculators-heading" className="space-y-5">
-        <h2 id="calculators-heading" className="text-base font-semibold">
-          {text.resultsHeading}
-        </h2>
+        <div>
+          <h2 id="calculators-heading" className="text-base font-semibold">
+            {text.resultsHeading}
+          </h2>
+          <p className="mt-1 max-w-3xl text-sm text-ink-2">{text.resultsNote}</p>
+        </div>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <CalculatorCard
             id="av-depot"
+            note={`${text.taxNote.avDepot} ${text.currencyNote.nominal}`}
             errors={avDepot.errors}
             chart={
               avDepot.result && (
@@ -210,6 +225,11 @@ export function Dashboard() {
           />
           <CalculatorCard
             id="pension-gap"
+            note={`${text.taxNote.pensionGap} ${
+              settings.shared.considerInflation
+                ? text.currencyNote.real
+                : text.currencyNote.nominal
+            }`}
             errors={pensionGap.errors}
             chart={
               pensionGap.result && (
@@ -236,6 +256,13 @@ export function Dashboard() {
           />
           <CalculatorCard
             id="savings"
+            note={`${
+              !savings.input.considerTax
+                ? text.taxNote.savingsBefore
+                : savings.input.distributionType === "distributing"
+                  ? text.taxNote.savingsDistributing
+                  : text.taxNote.savingsAccumulating
+            } ${text.currencyNote.nominal}`}
             errors={savings.errors}
             chart={
               savings.result && (
@@ -275,6 +302,15 @@ export function Dashboard() {
           />
           <CalculatorCard
             id="withdrawal-plan"
+            note={`${
+              settings["withdrawal-plan"].considerTax
+                ? text.taxNote.withdrawalTaxed
+                : text.taxNote.withdrawal
+            } ${
+              settings["withdrawal-plan"].realTerms
+                ? text.currencyNote.real
+                : text.currencyNote.nominal
+            }`}
             errors={withdrawal.errors}
             chart={
               withdrawal.result && (

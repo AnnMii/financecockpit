@@ -4,6 +4,8 @@ import { useState } from "react";
 import { type Corridor, CorridorChart } from "@/components/charts/corridor-chart";
 import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
+import { ToggleSetting } from "@/components/setting-fields";
+import { useSettingsEditor } from "@/components/settings-provider";
 import type { Locale } from "@/lib/i18n";
 import type { PlanInput, PlanResult, PlanYear } from "@/lib/plan/plan";
 import {
@@ -12,9 +14,13 @@ import {
   analyseDeviation,
 } from "@/lib/plan/tracking";
 
-/** Today as ISO date; stable for the lifetime of the component. */
+/** Today's date here (not in Greenwich) as ISO date; stable for the lifetime of the component. */
 export function useToday(): string {
-  const [today] = useState(() => new Date().toISOString().slice(0, 10));
+  const [today] = useState(() => {
+    const now = new Date();
+    const two = (value: number) => String(value).padStart(2, "0");
+    return `${now.getFullYear()}-${two(now.getMonth() + 1)}-${two(now.getDate())}`;
+  });
   return today;
 }
 
@@ -180,6 +186,99 @@ export function PlanCorridor({
       ariaLabel={text.corridorAria}
       height={height}
     />
+  );
+}
+
+/**
+ * Where the pension comes from in the typical course: the entitlements, the
+ * AV-Depot and the free assets, next to the wealth they start from.
+ */
+export function PlanBreakdown({
+  input,
+  result,
+}: {
+  input: PlanInput;
+  result: PlanResult;
+}) {
+  const { t, f } = useLocale();
+  const { settings } = useSettingsEditor();
+  const text = t.plan.breakdown;
+  // The plan works in today's money; the nominal view raises it with the
+  // inflation until retirement, to sit next to the nominal calculators.
+  const nominal = settings.plan.nominalView;
+  const factor = nominal ? result.retirementPriceFactor : 1;
+  const euro = (value: number) => f.euro(value * factor);
+  const { typical } = result;
+  const total = typical.statePension + typical.avPension + typical.freePension;
+  const difference = total - result.desiredPension;
+  const tax = typical.freePensionBeforeTax - typical.freePension;
+  const consumes = input.capitalConsumption !== false;
+
+  const row = (label: string, value: string, note?: string, strong = false) => (
+    <div key={label} className="py-2">
+      <div className="flex justify-between gap-4">
+        <dt className={strong ? "font-medium" : "text-ink-2"}>{label}</dt>
+        <dd className={`text-right tabular-nums ${strong ? "font-semibold" : ""}`}>
+          {value}
+        </dd>
+      </div>
+      {note && <p className="mt-0.5 text-xs text-ink-2">{note}</p>}
+    </div>
+  );
+
+  return (
+    <Card>
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold">{text.title}</h2>
+          <p className="text-sm text-ink-2">
+            {nominal
+              ? text.subtitleNominal(f.percent((factor - 1) * 100))
+              : text.subtitle}
+          </p>
+        </div>
+        <div className="relative shrink-0">
+          <ToggleSetting scope="plan" name="nominalView" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-2">
+            {text.wealthTitle}
+          </h3>
+          <dl className="divide-y divide-line text-sm">
+            {row(text.avDepot, euro(typical.avCapital))}
+            {row(text.free, euro(typical.freeCapital))}
+          </dl>
+        </div>
+        <div>
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-2">
+            {text.pensionTitle}
+          </h3>
+          <dl className="divide-y divide-line text-sm">
+            {row(text.statePension, euro(typical.statePension))}
+            {row(text.avPension, euro(typical.avPension))}
+            {row(
+              text.freePension,
+              euro(typical.freePension),
+              text.freeTax(euro(typical.freePensionBeforeTax), euro(tax)),
+            )}
+            {row(text.total, euro(total), undefined, true)}
+            {row(
+              text.desired,
+              euro(result.desiredPension),
+              difference >= 0
+                ? text.surplus(euro(difference))
+                : text.shortfall(euro(-difference)),
+            )}
+          </dl>
+        </div>
+      </div>
+      <p className="mt-4 text-xs text-ink-2">
+        {consumes ? text.consumes(input.payoutUntilAge) : text.keeps}{" "}
+        {text.taxNote(f.percent(input.pension.taxPrediction))}
+      </p>
+    </Card>
   );
 }
 

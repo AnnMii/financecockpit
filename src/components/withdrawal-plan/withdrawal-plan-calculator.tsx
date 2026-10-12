@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Assumptions,
   CalculatorShell,
@@ -14,6 +15,7 @@ import {
   SelectSetting,
   ToggleSetting,
 } from "@/components/setting-fields";
+import { usePlanRecords } from "@/components/plan/plan-records";
 import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
 import { useWithdrawalPlan } from "@/components/use-calculators";
@@ -22,7 +24,10 @@ import type {
   WithdrawalPlanInput,
   WithdrawalPlanResult,
 } from "@/lib/calculators/withdrawal-plan";
+import { toPlanInput } from "@/lib/calculators/registry";
 import type { Dictionary } from "@/lib/i18n";
+import { calculatePlan, validatePlanInput } from "@/lib/plan/plan";
+import { latestSnapshot } from "@/lib/plan/tracking";
 
 /** "pro Monat" / "per month" for a withdrawal interval. */
 export function perIntervalText(
@@ -45,12 +50,66 @@ export function WithdrawalPlanCalculator() {
   );
 }
 
+/**
+ * Small button that copies what the overall plan has at retirement into the
+ * calculator: the free assets (ETF-Depot and Tagesgeld) and the payout
+ * period. The copy is made once; the calculator stays independent of the
+ * plan afterwards.
+ */
+function FromPlanButton({
+  onTakenOver,
+}: {
+  onTakenOver: (capital: number, message: string) => void;
+}) {
+  const { t, f } = useLocale();
+  const text = t.withdrawal.fromPlan;
+  const { settings, update } = useSettingsEditor();
+  const { snapshots } = usePlanRecords();
+
+  const input = toPlanInput(settings, latestSnapshot(snapshots)?.values);
+  const possible = validatePlanInput(input).length === 0;
+
+  const takeOver = () => {
+    // In today's money, like the plan; the calculator is switched to match.
+    const capital = Math.round(calculatePlan(input).typical.freeCapital);
+    const period = Math.min(
+      100,
+      Math.max(1, input.payoutUntilAge - input.retirementAge),
+    );
+    update("withdrawal-plan", {
+      output: "amount",
+      capitalAssets: capital,
+      periodYears: period,
+      considerTax: true,
+      realTerms: true,
+    });
+    onTakenOver(capital, text.done(f.euro(capital), f.years(period)));
+  };
+
+  return (
+    <button
+      type="button"
+      disabled={!possible}
+      onClick={takeOver}
+      title={possible ? text.hint : text.unavailable}
+      className="rounded-md border border-axis px-2 py-0.5 text-xs font-medium text-ink hover:bg-accent-wash disabled:opacity-50"
+    >
+      {text.button}
+    </button>
+  );
+}
+
 function Workspace() {
-  const { t } = useLocale();
+  const { t, f } = useLocale();
   const text = t.withdrawal;
   const { input, errors, result } = useWithdrawalPlan();
   const { settings } = useSettingsEditor();
-  const { output, interval } = settings["withdrawal-plan"];
+  const { output, interval, considerTax, realTerms, capitalAssets } =
+    settings["withdrawal-plan"];
+  // What the button took over, shown under the field while it still applies.
+  const [taken, setTaken] = useState<{ capital: number; message: string } | null>(
+    null,
+  );
 
   return (
     <CalculatorShell
@@ -65,7 +124,16 @@ function Workspace() {
 
           <Section title={text.sections.withdrawal}>
             {output !== "capital" && (
-              <NumberSetting scope="withdrawal-plan" name="capitalAssets" />
+              <NumberSetting
+                scope="withdrawal-plan"
+                name="capitalAssets"
+                hint={taken?.capital === capitalAssets ? taken.message : undefined}
+                action={
+                  <FromPlanButton
+                    onTakenOver={(capital, message) => setTaken({ capital, message })}
+                  />
+                }
+              />
             )}
             {output !== "amount" && (
               <NumberSetting
@@ -88,13 +156,29 @@ function Workspace() {
               scope="shared"
               name="retirementReturn"
               label={text.interestRate}
-              hint={text.interestRateHint}
+              hint={
+                considerTax || realTerms
+                  ? text.interestAdjusted(
+                      f.percent(input.interestRate),
+                      realTerms,
+                      considerTax,
+                    )
+                  : text.interestRateHint
+              }
             />
+            <ToggleSetting scope="withdrawal-plan" name="considerTax" />
+            <ToggleSetting scope="withdrawal-plan" name="realTerms" />
+            {realTerms && <NumberSetting scope="shared" name="inflationRate" />}
           </Section>
         </>
       }
     >
-      {result && <Results input={input} result={result} />}
+      {result && (
+        <>
+          {realTerms && <p className="text-sm text-ink-2">{text.realNote}</p>}
+          <Results input={input} result={result} />
+        </>
+      )}
     </CalculatorShell>
   );
 }

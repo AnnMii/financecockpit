@@ -2,10 +2,18 @@
 
 import { getCurrentUser } from "@/lib/auth/session";
 import {
+  type PlanRecords,
   createPlanRecord,
   deletePlanRecord,
   isPlanRecordKind,
+  loadPlanRecords,
 } from "@/lib/plan/store";
+
+/** All plan versions and snapshots of the signed-in user, for tabs that catch up. */
+export async function loadPlanRecordsAction(): Promise<PlanRecords | null> {
+  const user = await getCurrentUser();
+  return user ? loadPlanRecords(user.id) : null;
+}
 
 /** Stores a plan version or snapshot; returns its id, or null when refused. */
 export async function createPlanRecordAction(

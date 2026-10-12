@@ -17,7 +17,11 @@ import {
 import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
 import { useSavings } from "@/components/use-calculators";
-import type { SavingsInput, SavingsResult } from "@/lib/calculators/savings";
+import {
+  type SavingsInput,
+  type SavingsResult,
+  minimumEndValue,
+} from "@/lib/calculators/savings";
 
 export function SavingsCalculator() {
   return (
@@ -40,6 +44,8 @@ function Workspace() {
     saveInterval,
   } = settings.savings;
   const { age, retirementAge } = settings.shared;
+  // Targets at or below this are already reached without the searched figure.
+  const minimum = minimumEndValue(input);
   const perYear = t.common.perYearEquals(
     f.euro(settings.shared.savingsRateMonthly * 12),
   );
@@ -79,25 +85,28 @@ function Workspace() {
             {output !== "duration" && (
               <>
                 <ToggleSetting scope="savings" name="untilRetirement" />
-                {untilRetirement ? (
-                  <>
-                    <NumberSetting scope="shared" name="age" />
-                    <NumberSetting scope="shared" name="retirementAge" />
-                    <p className="text-xs text-ink-2">
-                      {text.durationUntilRetirement(
-                        f.years(Math.max(0, retirementAge - age)),
-                        retirementAge,
-                        age,
-                      )}
-                    </p>
-                  </>
-                ) : (
-                  <NumberSetting scope="savings" name="durationYears" />
-                )}
+                <NumberSetting
+                  scope="savings"
+                  name="durationYears"
+                  derived={untilRetirement ? retirementAge - age : undefined}
+                  hint={
+                    untilRetirement
+                      ? text.durationUntilRetirement(retirementAge, age)
+                      : undefined
+                  }
+                />
               </>
             )}
             {output !== "endValue" && (
-              <NumberSetting scope="savings" name="endValue" />
+              <NumberSetting
+                scope="savings"
+                name="endValue"
+                hint={
+                  minimum !== null && minimum > 0
+                    ? text.endValueMinimum[output](f.euro(minimum))
+                    : undefined
+                }
+              />
             )}
           </Section>
 
@@ -178,9 +187,14 @@ function Results({
         label={searched.label}
         value={searched.value}
         note={
-          input.output === "duration"
-            ? text.durationMonths(Math.ceil(result.durationYears * 12))
-            : undefined
+          result.alreadyReached && input.output !== "endValue"
+            ? text.alreadyReached[input.output](
+                f.euro(input.endValue),
+                f.euro(result.endValue),
+              )
+            : input.output === "duration"
+              ? text.durationMonths(Math.ceil(result.durationYears * 12))
+              : undefined
         }
       />
 

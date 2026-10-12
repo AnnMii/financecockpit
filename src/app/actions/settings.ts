@@ -5,14 +5,22 @@ import { isSettingsScope } from "@/lib/settings/schema";
 import {
   type Profile,
   type ProfileResult,
+  type ProfileState,
   createProfile,
   deleteProfile,
+  loadProfiles,
   renameProfile,
   saveProfileData,
   setActiveProfile,
 } from "@/lib/settings/store";
 
 const SIGNED_OUT = { ok: false, error: "signedOut" } as const;
+
+/** All profiles of the signed-in user, for tabs that catch up with a change. */
+export async function loadProfilesAction(): Promise<ProfileState | null> {
+  const user = await getCurrentUser();
+  return user ? loadProfiles(user.id) : null;
+}
 
 export async function saveProfileDataAction(
   profileId: string,

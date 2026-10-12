@@ -38,6 +38,14 @@ export type SelectTexts = {
   };
 };
 
+/** One explanation per field, shown in the "i" panel next to its label. */
+export type FieldInfoTexts = {
+  [S in SettingsScope]: Record<
+    NumberFieldName<S> | ToggleFieldName<S> | SelectFieldName<S>,
+    string
+  >;
+};
+
 /** Why a profile action was refused; texts are in the dictionaries. */
 export type ProfileError =
   | "signedOut"

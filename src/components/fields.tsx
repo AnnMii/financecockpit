@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useId, useState } from "react";
 import type { NumberFieldSpec } from "@/lib/settings/schema";
+import { InfoPopover } from "./info-popover";
 import { useLocale } from "./locale-provider";
 
 const HideSharedBadges = createContext(false);
@@ -40,6 +41,16 @@ export function ChangedBadge() {
   );
 }
 
+/** "i" after a label that opens a short explanation of the field. */
+export function FieldInfo({ label, children }: { label: string; children: string }) {
+  const { t } = useLocale();
+  return (
+    <InfoPopover label={t.common.infoAbout(label)} narrow>
+      <p className="text-xs font-normal text-ink">{children}</p>
+    </InfoPopover>
+  );
+}
+
 export interface SliderSpec {
   min: number;
   max: number;
@@ -69,6 +80,10 @@ interface NumberFieldProps {
   slider?: SliderSpec;
   /** Extra element after the label, e.g. an <InfoPopover>. */
   info?: React.ReactNode;
+  /** For a value that follows from other inputs: shown, but not editable. */
+  readOnly?: boolean;
+  /** A small control at the right end of the label row, e.g. a button. */
+  action?: React.ReactNode;
 }
 
 /**
@@ -87,6 +102,8 @@ export function NumberField({
   changed,
   slider,
   info,
+  readOnly = false,
+  action,
 }: NumberFieldProps) {
   const id = useId();
   const { locale, t, f } = useLocale();
@@ -101,7 +118,8 @@ export function NumberField({
     if (languageChanged || f.parse(text) !== value) setText(f.number(value));
   }
 
-  const invalid = !isValid(f.parse(text), spec);
+  // A derived value is whatever it is; its range is checked where it comes from.
+  const invalid = !readOnly && !isValid(f.parse(text), spec);
 
   return (
     <div>
@@ -112,11 +130,12 @@ export function NumberField({
         {shared && <SharedBadge />}
         {changed && <ChangedBadge />}
         {info}
+        {action && <span className="ml-auto">{action}</span>}
       </div>
       <div
-        className={`flex items-center rounded-md border bg-surface focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent ${
-          invalid ? "border-critical" : "border-axis"
-        }`}
+        className={`flex items-center rounded-md border focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent ${
+          invalid ? "border-critical" : readOnly ? "border-line" : "border-axis"
+        } ${readOnly ? "bg-plane" : "bg-surface"}`}
       >
         <input
           id={id}
@@ -124,6 +143,7 @@ export function NumberField({
           inputMode={spec.integer ? "numeric" : "decimal"}
           autoComplete="off"
           value={text}
+          readOnly={readOnly}
           aria-invalid={invalid}
           aria-describedby={`${id}-hint`}
           onChange={(event) => {
@@ -132,7 +152,9 @@ export function NumberField({
             if (isValid(parsed, spec) && parsed !== value) onChange(parsed);
           }}
           onBlur={() => setText(f.number(value))}
-          className="w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums text-ink outline-none"
+          className={`w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums outline-none ${
+            readOnly ? "text-ink-2" : "text-ink"
+          }`}
         />
         {unit && (
           <span className="shrink-0 pr-3 text-sm text-muted">{unit}</span>
@@ -225,6 +247,7 @@ export function ToggleField({
   hint,
   shared,
   changed,
+  info,
 }: {
   label: string;
   checked: boolean;
@@ -232,9 +255,11 @@ export function ToggleField({
   hint?: React.ReactNode;
   shared?: boolean;
   changed?: boolean;
+  info?: React.ReactNode;
 }) {
   return (
     <div>
+      <div className="relative flex items-start gap-2">
       <label className="flex items-start gap-2">
         <input
           type="checkbox"
@@ -244,6 +269,8 @@ export function ToggleField({
         />
         <FieldLabel label={label} shared={shared} changed={changed} />
       </label>
+      {info}
+      </div>
       {hint && <p className="mt-1 text-xs text-ink-2">{hint}</p>}
     </div>
   );
@@ -257,6 +284,7 @@ export function SelectField<T extends string>({
   hint,
   shared,
   changed,
+  info,
 }: {
   label: string;
   value: T;
@@ -265,13 +293,21 @@ export function SelectField<T extends string>({
   hint?: React.ReactNode;
   shared?: boolean;
   changed?: boolean;
+  info?: React.ReactNode;
 }) {
+  const id = useId();
   return (
-    <label className="block">
-      <span className="mb-1 block">
-        <FieldLabel label={label} shared={shared} changed={changed} />
-      </span>
+    <div>
+      <div className="relative mb-1 flex flex-wrap items-center gap-2">
+        <label htmlFor={id} className="text-sm font-medium text-ink">
+          {label}
+        </label>
+        {shared && <SharedBadge />}
+        {changed && <ChangedBadge />}
+        {info}
+      </div>
       <select
+        id={id}
         value={value}
         onChange={(event) => onChange(event.target.value as T)}
         className="w-full rounded-md border border-axis bg-surface px-3 py-2 text-sm text-ink"
@@ -282,7 +318,7 @@ export function SelectField<T extends string>({
           </option>
         ))}
       </select>
-      {hint && <span className="mt-1 block text-xs text-ink-2">{hint}</span>}
-    </label>
+      {hint && <p className="mt-1 text-xs text-ink-2">{hint}</p>}
+    </div>
   );
 }

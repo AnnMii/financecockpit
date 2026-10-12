@@ -15,13 +15,19 @@ import { CalculatorProfiles } from "./profile-picker";
  */
 export function CalculatorShell({
   scope,
+  uses,
   form,
   errors,
+  errorHint,
   children,
 }: {
   scope: Exclude<SettingsScope, "shared">;
+  /** Other scopes whose profiles the page reads; their pickers are shown too. */
+  uses?: SettingsScope[];
   form: React.ReactNode;
   errors: CalculationError[];
+  /** A way out that is not obvious from the errors themselves. */
+  errorHint?: string | null;
   /** The results; shown when there are no errors. */
   children: React.ReactNode;
 }) {
@@ -29,7 +35,7 @@ export function CalculatorShell({
   return (
     <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
       <div className="space-y-4">
-        <CalculatorProfiles scope={scope} />
+        <CalculatorProfiles scope={scope} uses={uses} />
         <Card className="space-y-7">{form}</Card>
       </div>
 
@@ -47,6 +53,7 @@ export function CalculatorShell({
               <li key={error}>{t.calcErrors[error]}</li>
             ))}
           </ul>
+          {errorHint && <p className="mt-3 text-sm text-ink-2">{errorHint}</p>}
         </Card>
       )}
     </div>

@@ -52,7 +52,9 @@ src/
     settings/          Felder, Wertebereiche und Standardwerte der Einstellungen
     i18n/              Wörterbücher (Deutsch, Englisch) und Sprachwahl
     plan/              Gesamtplan: Simulation, Leitplanken, Verlauf
-drizzle/               SQL-Migrationen (werden beim Start angewendet)
+drizzle/               SQL-Migrationen (werden beim Start angewendet); neben
+                       Schema-Änderungen auch von Hand geschriebene für
+                       gespeicherte Werte, z. B. 0004
 test/upstream/         Vergleichstests gegen das Finanzfluss-Original
 test/fixtures/         Aufgezeichnete Ergebnisse der Finanzfluss-Seite
 vendor/                Finanzfluss-Original als Git-Submodul (nur für Tests)
@@ -69,8 +71,8 @@ für das, was nur er braucht. Felder, Wertebereiche und Standardwerte stehen in
 
 | Globaler Wert | AV-Depot | Rentenlücke | Sparrechner | Entnahmeplan |
 | --- | --- | --- | --- | --- |
-| Alter, Renteneintritt | ✓ | ✓ | | |
-| Sparrate pro Monat | ✓ | | ✓ | |
+| Alter, Renteneintritt | ✓ | ✓ | ✓ Laufzeit (abschaltbar) | |
+| Sparrate pro Monat | ✓ (höchstens 1.140 €) | | ✓ | |
 | Erwartete Rendite | ✓ | ✓ bis zur Rente | ✓ Zinssatz | |
 | Rendite im Ruhestand | ✓ | ✓ | | ✓ Zinssatz |
 | Auszahlung bis Alter | ✓ (mind. 85) | ✓ | | |
@@ -79,6 +81,18 @@ für das, was nur er braucht. Felder, Wertebereiche und Standardwerte stehen in
 | Kapitalertragsteuer | | ✓ | ✓ | |
 | Einkommen, Sparerpauschbetrag, Kinder | ✓ | | | |
 
+Der Gesamtplan nutzt alle globalen Werte außer dem Schalter „Inflation
+berücksichtigen": Er rechnet immer in heutiger Kaufkraft. Der Schalter wirkt nur
+auf den Rentenlücke-Rechner; der Entnahmeplan hat einen eigenen Schalter („In
+heutiger Kaufkraft rechnen“) und zeigt dafür die globale Inflationsrate, die
+übrigen Rechner rechnen immer nominal.
+
+Jedes Feld hat neben dem Label ein „i" mit einer kurzen Erklärung (Texte unter
+`fieldInfo` in den Wörterbüchern). Bei „Auszahlung bis Alter" zeigt es in den
+Einstellungen die Verteilung der Sterbealter in Deutschland
+(`src/lib/data/life-table.ts`, Sterbetafel 2023/2025 des Statistischen
+Bundesamts; bei einer neuen Sterbetafel von Hand zu ersetzen).
+
 ### Profile
 
 Jeder Bereich hat eine eigene Liste benannter Profile; je Bereich ist eines
@@ -86,9 +100,8 @@ aktiv. So lässt sich etwa das globale Profil „Basis“ mit dem AV-Depot-Profi
 „Mit Einmalauszahlung“ kombinieren. Die Auswahl gilt überall: im Cockpit, in den
 Rechnern und in den Einstellungen.
 
-- **Einstellungen-Seite:** Änderungen an den globalen Werten werden nach kurzer
-  Pause automatisch im aktiven Profil gespeichert.
-- **Rechner:** Änderungen gelten zunächst nur lokal in der Ansicht
+- **Einstellungen-Seite, Rechner und Gesamtplan:** Änderungen gelten zunächst
+  nur lokal in der Ansicht
   (`DraftSettings` in `src/components/draft-settings.tsx`). „Zurücksetzen“ oder
   ein Neuladen stellt die gespeicherten Werte wieder her. „Speichern“ im Fenster
   unten rechts schreibt Rechner-Werte ins aktive Profil des Rechners. Für
@@ -110,6 +123,14 @@ Die Startseite zeigt für die gewählte Profil-Kombination oben den Gesamtplan
 (dieselben Diagramm-Komponenten wie auf den Rechner-Seiten,
 `src/components/charts/calculator-charts.tsx`).
 
+**Mehrere Tabs:** Speicherst du ein Profil oder erfasst einen Ist-Stand, holen die
+anderen offenen Tabs derselben App die gespeicherten Daten neu
+(`src/components/tab-sync.ts`, `BroadcastChannel`); ein Tab holt sie außerdem,
+wenn er wieder sichtbar wird oder den Fokus bekommt, das deckt auch Änderungen
+aus einem anderen Browser oder Gerät ab. So lässt sich in einem Tab ein Rechner
+bearbeiten und im anderen das Cockpit beobachten. Ungespeicherte lokale
+Änderungen eines Tabs bleiben dabei unberührt.
+
 ### Gesamtplan und Verlauf
 
 Der Gesamtplan (`/plan`, Rechenkern in `src/lib/plan/`) beantwortet „spare ich
@@ -124,11 +145,25 @@ heutiger Kaufkraft.
   95 %). Liegt die Wahrscheinlichkeit, die Wunschrente zu erreichen, unter der
   unteren Leitplanke, lautet der Status „Mehr sparen" mit Betrag; über der
   oberen „Spielraum"; dazwischen „Im Plan".
-- **Nötige Sparrate:** die Sparrate, mit der das Sicherheitsniveau erreicht
-  wird. Sie verändert nur den Anteil des ETF-Depots.
-- **Woher die Werte kommen:** Rentenansprüche und Wunschrente aus dem aktiven
-  Profil des Rentenlücke-Rechners, Details des AV-Depots aus dessen Profil,
-  die heutigen Stände aus dem letzten Ist-Stand.
+- **Nötige Sparrate:** die gesamte Sparrate, mit der das Sicherheitsniveau
+  erreicht wird, bei gleicher Aufteilung auf die Töpfe. Wer sie als Sparrate
+  einträgt, landet genau beim Sicherheitsniveau.
+- **Aufteilung:** Ins AV-Depot fließen mindestens 10 € und höchstens 1.140 €
+  pro Monat; was der Anteil darüber hinaus ergibt, geht ins ETF-Depot, darunter
+  alles (`splitSavingsRate` in `src/lib/plan/plan.ts`).
+- **Auszahlung:** Die Karte „Rente aus allen Quellen" (Plan-Seite und Cockpit)
+  zerlegt den mittleren Verlauf in Vermögen bei Renteneintritt und Rente pro
+  Monat: gesetzliche Rente, AV-Depot, Entnahme aus dem freien Vermögen (ETF-Depot
+  und Tagesgeld) nach Steuern. Ob das freie Vermögen aufgebraucht wird oder nur
+  seine Erträge entnommen werden, steht im Profil des Entnahmeplans
+  (`capitalConsumption`), das der Plan mitliest. Steuern auf die Erträge zieht
+  der geschätzte Steuerabzug des Rentenlücke-Profils ab.
+- **Woher die Werte kommen:** Rentenansprüche und Wunschrente stehen auf der
+  Plan-Seite, gehören aber zum aktiven Profil des Rentenlücke-Rechners und
+  gelten auch dort. Die Einzelheiten des AV-Depots kommen aus dessen Profil.
+- **Heutiger Stand:** der letzte Ist-Stand aus dem Verlauf. Solange keiner
+  erfasst ist, gilt das „Vorhandene Kapital" der globalen Werte als Stand im
+  ETF-Depot.
 
 Verfolgen über die Zeit (`/verlauf`):
 
@@ -147,6 +182,38 @@ liegen in der Tabelle `plan_records`.
 
 Grenzen des Modells stehen auf der Plan-Seite unter „Annahmen" und im
 Kopfkommentar von `src/lib/plan/plan.ts`.
+
+### Entnahmeplan und Gesamtplan
+
+Der Entnahmeplan bleibt ein eigenständiger Rechner und rechnet standardmäßig wie
+Finanzfluss: nominal, ohne Steuern. Zwei Schalter lassen ihn wie den Gesamtplan
+rechnen: „Steuern auf die Erträge berücksichtigen“ (geschätzter Steuerabzug des
+Rentenlücke-Profils) und „Inflation berücksichtigen (heutige Kaufkraft)“ (Inflationsrate der
+globalen Werte). Der Zinssatz ist dann (Rendite − Inflation) × (1 − Steuerabzug),
+in derselben Reihenfolge wie im Gesamtplan.
+
+Der kleine Knopf „Aus Gesamtplan“ neben dem Anlagevermögen kopiert einmalig das freie Vermögen bei
+Renteneintritt (mittlerer Verlauf, in heutiger Kaufkraft) und den
+Auszahlungszeitraum und schaltet beide Schalter ein; danach ist der Rechner
+wieder unabhängig. Die Monatsrente weicht dann kaum vom Gesamtplan ab (im
+Beispiel 0,03 %; ein Test erlaubt höchstens 3 % für Renditen von 2 bis 6 %), weil
+die Konventionen leicht verschieden sind: Der Gesamtplan zahlt zu Monatsbeginn
+mit Jahreszins ÷ 12, der Entnahmeplan am Ende des Intervalls mit dem
+äquivalenten Monatszins.
+
+Umgekehrt zeigt die Karte „Rente aus allen Quellen“ auf Wunsch die Beträge in
+künftigen Euro („Beträge in künftigen Euro anzeigen“), um sie neben die
+nominalen Ergebnisse von AV-Depot-Rechner und Sparrechner zu legen. Gerechnet
+wird weiter in heutiger Kaufkraft. Die Cockpit-Karten nennen in einer Zeile, ob
+sie nominal oder in heutiger Kaufkraft rechnen.
+
+### Sparrechner
+
+Die Laufzeit folgt standardmäßig den globalen Werten (Renteneintritt minus
+Alter); der Schalter „Laufzeit bis Renteneintritt" gibt sie frei. Ist das
+gewünschte Endkapital schon erreicht, ohne dass es die gesuchte Größe braucht
+(z. B. Anfangskapital gesucht, aber Sparrate und Zinsen führen allein über das
+Ziel), lautet das Ergebnis 0 mit einem Hinweis, was ohnehin erreicht wird.
 
 ### Sprachen
 

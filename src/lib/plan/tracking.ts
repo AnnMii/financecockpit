@@ -190,6 +190,7 @@ export function withAssumptionsOf(
     retirementReturn: frozen.retirementReturn,
     cashReturn: frozen.cashReturn,
     capitalGainsTax: frozen.capitalGainsTax,
+    capitalConsumption: frozen.capitalConsumption !== false,
     depotVolatility: frozen.depotVolatility,
     cashVolatility: frozen.cashVolatility,
     avDepot:

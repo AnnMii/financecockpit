@@ -1,16 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Assumptions, CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
-import { NumberSetting } from "@/components/setting-fields";
-import { StatTile } from "@/components/stat-tile";
+import { NumberSetting, ToggleSetting } from "@/components/setting-fields";
 import type { Percentiles, PlanInput, PlanResult } from "@/lib/plan/plan";
 import type { PlanVersion } from "@/lib/plan/tracking";
 import { usePlan, usePlanRecords } from "./plan-records";
 import {
+  PlanBreakdown,
   PlanCorridor,
   PlanStatus,
   VersionSelect,
@@ -35,9 +36,46 @@ function Workspace() {
   return (
     <CalculatorShell
       scope="plan"
+      uses={["pension-gap", "av-depot", "withdrawal-plan"]}
       errors={errors}
+      errorHint={
+        errors.some((error) => error.startsWith("av")) ? text.avErrorHint : null
+      }
       form={
         <>
+          <Section title={text.sections.pension}>
+            <NumberSetting scope="pension-gap" name="desiredPension" />
+            <NumberSetting scope="pension-gap" name="statePension" />
+            <NumberSetting scope="pension-gap" name="companyPension" />
+            <NumberSetting scope="pension-gap" name="privatePension" />
+            <NumberSetting scope="pension-gap" name="riesterPension" />
+            <NumberSetting scope="pension-gap" name="taxPrediction" />
+            <NumberSetting scope="pension-gap" name="yearlyTaxFreeAmount" />
+            <p className="text-xs text-ink-2">{text.pensionNote}</p>
+          </Section>
+
+          <Section title={text.sections.balances}>
+            {snapshot ? (
+              <p className="text-sm text-ink">
+                {text.balancesFrom(
+                  formatDate(locale, snapshot.date),
+                  f.euro(snapshot.values.av),
+                  f.euro(snapshot.values.depot),
+                  f.euro(snapshot.values.cash),
+                )}{" "}
+                <Link href="/verlauf" className="font-medium text-accent">
+                  {text.changeInHistory}
+                </Link>
+              </p>
+            ) : (
+              <NumberSetting
+                scope="shared"
+                name="currentCapital"
+                hint={text.capitalHint}
+              />
+            )}
+          </Section>
+
           <Section title={text.sections.split}>
             <NumberSetting scope="shared" name="savingsRateMonthly" />
             <NumberSetting scope="plan" name="avDepotShare" />
@@ -49,6 +87,11 @@ function Workspace() {
                 f.euro(input.rates.cash),
               )}
             </p>
+          </Section>
+
+          <Section title={text.sections.payout}>
+            <ToggleSetting scope="withdrawal-plan" name="capitalConsumption" />
+            <p className="text-xs text-ink-2">{text.payoutNote}</p>
           </Section>
 
           <Section title={text.sections.confidence}>
@@ -76,12 +119,7 @@ function Workspace() {
             <NumberSetting scope="shared" name="payoutUntilAge" />
           </Section>
 
-          <p className="text-xs text-ink-2">
-            {text.sourcesNote}{" "}
-            {snapshot
-              ? text.balancesFrom(formatDate(locale, snapshot.date))
-              : text.noSnapshot}
-          </p>
+          <p className="text-xs text-ink-2">{text.sourcesNote}</p>
         </>
       }
     >
@@ -314,11 +352,7 @@ function Results({ input, result }: { input: PlanInput; result: PlanResult }) {
         <ThenAndNow version={compared.version} result={result} />
       )}
 
-      <StatTile
-        label={t.pensionGap.netPension}
-        value={f.euro(result.netPension)}
-        note={`${t.dashboard.desiredPension}: ${f.euro(result.desiredPension)}`}
-      />
+      <PlanBreakdown input={input} result={result} />
 
       <FreezeCard input={input} result={result} />
 

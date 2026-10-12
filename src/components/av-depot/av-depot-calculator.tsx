@@ -6,16 +6,18 @@ import { Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import {
   ChildrenField,
+  IncomeSetting,
   NumberSetting,
   SelectSetting,
 } from "@/components/setting-fields";
+import { useSettingsEditor } from "@/components/settings-provider";
+import { AV_DEPOT_MAX_MONTHLY } from "@/lib/calculators/registry";
 import { AvDepotResults } from "./av-depot-results";
 import { useAvDepot } from "./use-av-depot";
 
 // Slider ranges follow the Finanzfluss calculator; the inputs accept more.
 const sliders = {
   age: { min: 18, max: 66, step: 1 },
-  income: { min: 0, max: 130_000, step: 1_000 },
   // 120 € to 6.840 € per year, the limit of a single contract
   savingsRateMonthly: { min: 10, max: 570, step: 5 },
   oneTimePayout: { min: 0, max: 30, step: 1 },
@@ -32,7 +34,9 @@ export function AvDepotCalculator() {
 function AvDepotWorkspace() {
   const { t, f } = useLocale();
   const { input, errors, result } = useAvDepot();
+  const { settings } = useSettingsEditor();
   const text = t.avDepot;
+  const capped = settings.shared.savingsRateMonthly > AV_DEPOT_MAX_MONTHLY;
 
   return (
     <CalculatorShell
@@ -50,16 +54,8 @@ function AvDepotWorkspace() {
           </Section>
 
           <Section title={text.sections.income}>
-            <NumberSetting
-              scope="shared"
-              name="zveSavingsPhase"
-              slider={sliders.income}
-            />
-            <NumberSetting
-              scope="shared"
-              name="zveRetirement"
-              slider={sliders.income}
-            />
+            <IncomeSetting name="zveSavingsPhase" slider />
+            <IncomeSetting name="zveRetirement" slider />
           </Section>
 
           <Section title={text.sections.saving}>
@@ -67,9 +63,13 @@ function AvDepotWorkspace() {
               scope="shared"
               name="savingsRateMonthly"
               slider={sliders.savingsRateMonthly}
-              hint={text.savingsRateHint(
-                t.common.perYearEquals(f.euro(input.savingsRate)),
-              )}
+              hint={
+                capped
+                  ? text.savingsRateCapped(f.euro(AV_DEPOT_MAX_MONTHLY))
+                  : text.savingsRateHint(
+                      t.common.perYearEquals(f.euro(input.savingsRate)),
+                    )
+              }
             />
             <NumberSetting scope="shared" name="expectedReturn" />
           </Section>

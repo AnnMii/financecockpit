@@ -15,6 +15,7 @@ import {
 } from "@/lib/settings/schema";
 import {
   ChangedBadge,
+  FieldInfo,
   NumberField,
   SelectField,
   SharedBadge,
@@ -38,6 +39,9 @@ export function NumberSetting<S extends SettingsScope>({
   hint,
   slider,
   info,
+  derived,
+  scale = 1,
+  action,
 }: {
   scope: S;
   name: NumberFieldName<S>;
@@ -46,28 +50,97 @@ export function NumberSetting<S extends SettingsScope>({
   unit?: string;
   hint?: React.ReactNode;
   slider?: SliderSpec;
-  /** Extra element after the label, e.g. an <InfoPopover>. */
+  /** Replaces the explanation of the field, e.g. by a panel with a chart. */
   info?: React.ReactNode;
+  /**
+   * A value that follows from other inputs. The field then shows it instead
+   * of the setting and cannot be edited.
+   */
+  derived?: number;
+  /**
+   * The field shows the stored value divided by this and stores what is
+   * entered times it, e.g. 12 to enter a yearly amount per month.
+   */
+  scale?: number;
+  /** A small control at the right end of the label row, e.g. a button. */
+  action?: React.ReactNode;
 }) {
   const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
   const text = (t.numbers[scope] as Record<string, FieldText>)[name];
-  const spec = (numberFields[scope] as Record<string, NumberFieldSpec>)[name];
+  const stored = (numberFields[scope] as Record<string, NumberFieldSpec>)[name];
+  const spec = scale === 1 ? stored : { ...stored, max: stored.max / scale };
+  // Cents are enough; the division must not show 4.166,6667.
+  const shown = (value: number) =>
+    scale === 1 ? value : Math.round((value / scale) * 100) / 100;
   return (
     <NumberField
       label={label ?? text.label}
       unit={unit ?? text.unit}
       hint={hint ?? text.hint}
       spec={spec}
-      value={(settings[scope] as Record<string, number>)[name]}
+      value={shown(derived ?? (settings[scope] as Record<string, number>)[name])}
       onChange={(value) =>
-        update(scope, { [name]: value } as Partial<AllSettings[S]>)
+        update(scope, { [name]: value * scale } as Partial<AllSettings[S]>)
       }
       shared={scope === "shared"}
-      changed={isChanged(scope, name)}
-      slider={slider}
-      info={info}
+      changed={derived === undefined && isChanged(scope, name)}
+      slider={derived === undefined ? slider : undefined}
+      readOnly={derived !== undefined}
+      action={action}
+      info={
+        info ?? (
+          <FieldInfo label={label ?? text.label}>
+            {(t.fieldInfo[scope] as Record<string, string>)[name]}
+          </FieldInfo>
+        )
+      }
     />
+  );
+}
+
+const INCOME_SLIDERS = {
+  yearly: { min: 0, max: 130_000, step: 1_000 },
+  monthly: { min: 0, max: 10_000, step: 100 },
+};
+
+const INCOME_SWITCH = {
+  zveSavingsPhase: "incomeIntervalSavings",
+  zveRetirement: "incomeIntervalRetirement",
+} as const;
+
+/**
+ * An income the tax is calculated from, with the choice of entering it per
+ * month (as the pension statement gives it) or per year. The settings hold
+ * the yearly amount either way.
+ */
+export function IncomeSetting({
+  name,
+  slider = false,
+}: {
+  name: keyof typeof INCOME_SWITCH;
+  slider?: boolean;
+}) {
+  const { t, f } = useLocale();
+  const { settings } = useSettingsEditor();
+  const monthly = settings.shared[INCOME_SWITCH[name]] === "monthly";
+  const hint = t.numbers.shared[name].hint;
+  return (
+    <>
+      <SelectSetting scope="shared" name={INCOME_SWITCH[name]} />
+      <NumberSetting
+        scope="shared"
+        name={name}
+        scale={monthly ? 12 : 1}
+        unit={monthly ? t.common.eurosPerMonth : t.common.eurosPerYear}
+        slider={slider ? INCOME_SLIDERS[monthly ? "monthly" : "yearly"] : undefined}
+        hint={
+          monthly
+            ? `${hint} ${t.common.perYearEquals(f.euro(settings.shared[name]))}`
+            : hint
+        }
+      />
+    </>
   );
 }
 
@@ -85,6 +158,11 @@ export function ToggleSetting<S extends SettingsScope>({
     <ToggleField
       label={text.label}
       hint={text.hint}
+      info={
+        <FieldInfo label={text.label}>
+          {(t.fieldInfo[scope] as Record<string, string>)[name]}
+        </FieldInfo>
+      }
       checked={(settings[scope] as Record<string, boolean>)[name]}
       onChange={(checked) =>
         update(scope, { [name]: checked } as Partial<AllSettings[S]>)
@@ -115,6 +193,11 @@ export function SelectSetting<S extends SettingsScope>({
     <SelectField
       label={text.label}
       hint={text.hint}
+      info={
+        <FieldInfo label={text.label}>
+          {(t.fieldInfo[scope] as Record<string, string>)[name]}
+        </FieldInfo>
+      }
       value={(settings[scope] as Record<string, string>)[name]}
       options={values.map((value) => ({ value, label: text.options[value] }))}
       onChange={(value) =>
@@ -135,10 +218,11 @@ export function ChildrenField() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
+      <div className="relative flex items-center gap-2">
         <span className="text-sm font-medium text-ink">{t.children.label}</span>
         <SharedBadge />
         {isChanged("shared", "childBirthYears") && <ChangedBadge />}
+        <FieldInfo label={t.children.label}>{t.children.info}</FieldInfo>
       </div>
       {years.length === 0 && (
         <p className="text-xs text-ink-2">{t.children.none}</p>

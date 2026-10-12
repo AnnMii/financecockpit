@@ -57,6 +57,11 @@ export interface SavingsResult {
   interest: number;
   /** Stand am Ende jedes Jahres; das letzte Jahr kann angebrochen sein. */
   years: { year: number; deposits: number; interest: number }[];
+  /**
+   * Das gewünschte Endkapital wird schon erreicht, wenn die gesuchte Größe 0
+   * ist. Das Ergebnis ist dann dieser Plan, und `endValue`, was er erreicht.
+   */
+  alreadyReached: boolean;
 }
 
 type Plan = Omit<SavingsInput, "output" | "endValue">;
@@ -125,15 +130,18 @@ function solve(
   upper: number,
 ): number | null {
   if (endValueFor(lower) > target) return null;
-  for (let expansion = 0; endValueFor(upper) < target; expansion++) {
+  // "Not reached" also covers what is no number at all: without any capital
+  // an ever higher interest rate ends in 0 × ∞.
+  const reaches = (value: number) => endValueFor(value) >= target;
+  for (let expansion = 0; !reaches(upper); expansion++) {
     if (expansion === 12) return null;
     lower = upper;
     upper *= 2;
   }
   for (let i = 0; i < 200 && upper - lower > 1e-10 * Math.max(1, upper); i++) {
     const middle = (lower + upper) / 2;
-    if (endValueFor(middle) < target) lower = middle;
-    else upper = middle;
+    if (reaches(middle)) upper = middle;
+    else lower = middle;
   }
   return (lower + upper) / 2;
 }
@@ -144,6 +152,18 @@ const UNREACHABLE: Record<Exclude<SavingsOutput, "endValue">, CalculationError> 
   yearlyInterest: "unreachableYearlyInterest",
   duration: "unreachableDuration",
 };
+
+/**
+ * The end value that is reached even when the searched figure is zero; a
+ * target below it needs nothing of that figure. Null when the end value
+ * itself is searched.
+ */
+export function minimumEndValue(input: SavingsInput): number | null {
+  const { output } = input;
+  if (output === "endValue") return null;
+  const key = output === "duration" ? "durationYears" : output;
+  return endValueOf({ ...input, [key]: 0 });
+}
 
 export function calculateSavings(input: SavingsInput): {
   result: SavingsResult | null;
@@ -156,35 +176,39 @@ export function calculateSavings(input: SavingsInput): {
     return { result: null, errors: ["durationPositive"] };
   }
 
+  let alreadyReached = false;
   if (output !== "endValue") {
     const key = output === "duration" ? "durationYears" : output;
-    const range = {
-      startValue: [0, Math.max(1, target)],
-      savingRate: [0, Math.max(1, target)],
-      yearlyInterest: [0, 100],
-      durationYears: [0, 100],
-    }[key];
-    const solution = solve(
-      target,
-      (value) => endValueOf({ ...plan, [key]: value }),
-      range[0],
-      range[1],
-    );
-    if (solution === null) return { result: null, errors: [UNREACHABLE[output]] };
-    plan[key] = solution;
+    const endValueFor = (value: number) => endValueOf({ ...plan, [key]: value });
+    if (endValueFor(0) > target) {
+      // Nothing of the searched figure is needed: the answer is zero.
+      alreadyReached = true;
+      plan[key] = 0;
+    } else {
+      const range = {
+        startValue: [0, Math.max(1, target)],
+        savingRate: [0, Math.max(1, target)],
+        yearlyInterest: [0, 100],
+        durationYears: [0, 100],
+      }[key];
+      const solution = solve(target, endValueFor, range[0], range[1]);
+      if (solution === null) {
+        return { result: null, errors: [UNREACHABLE[output]] };
+      }
+      plan[key] = solution;
+    }
   }
 
-  const endValue = output === "endValue" ? endValueOf(plan) : target;
+  const endValue =
+    output === "endValue" || alreadyReached ? endValueOf(plan) : target;
   const deposits = depositsOf(plan);
 
   const years: SavingsResult["years"] = [];
   for (let year = 1; year < plan.durationYears; year++) {
-    // The tax of an accumulating fund is only due at the end.
-    const atYear: Plan = {
-      ...plan,
-      durationYears: year,
-      considerTax: plan.considerTax && plan.distributionType === "distributing",
-    };
+    // After taxes, as if sold at the end of that year. Without this the last
+    // column, the only one that bears the tax of an accumulating fund, would
+    // drop below the one before it.
+    const atYear: Plan = { ...plan, durationYears: year };
     years.push({
       year,
       deposits: depositsOf(atYear),
@@ -207,6 +231,7 @@ export function calculateSavings(input: SavingsInput): {
       deposits,
       interest: endValue - deposits,
       years,
+      alreadyReached,
     },
     errors: [],
   };

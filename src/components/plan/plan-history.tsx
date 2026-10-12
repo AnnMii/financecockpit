@@ -67,7 +67,10 @@ function SnapshotForm() {
   const previous = snapshots.at(-1);
 
   const [date, setDate] = useState(today);
-  const [values, setValues] = useState<Pots>(previous?.values ?? NO_BALANCES);
+  // The first snapshot starts from what the plan assumed so far.
+  const [values, setValues] = useState<Pots>(
+    () => previous?.values ?? toPlanInput(settings).values,
+  );
   const [contributions, setContributions] = useState<Pots>(NO_BALANCES);
   const [inflation, setInflation] = useState("");
   const [note, setNote] = useState("");

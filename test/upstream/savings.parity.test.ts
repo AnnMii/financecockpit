@@ -108,6 +108,9 @@ function expectParity(input: SavingsInput): boolean {
   const slack = input.output === "duration" ? depositsPerYear * 0.0001 : 0;
   close("deposits", result!.deposits, theirs.deposits, 0.05 + slack);
   close("interest", result!.interest, theirs.interestAfterTax, 0.07 + slack);
+  // The chart ends where the original ends: its last column is the end value.
+  const last = result!.years.at(-1)!;
+  close("last chart column", last.deposits + last.interest, theirs.endValue, 0.05 + slack);
   return true;
 }
 

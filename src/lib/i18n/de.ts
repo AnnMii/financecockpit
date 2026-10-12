@@ -2,6 +2,7 @@ import type { AuthError } from "@/lib/auth/config";
 import type { CalculationError } from "@/lib/calculators/errors";
 import type { CalculatorInfo } from "@/lib/calculators/registry";
 import type {
+  FieldInfoTexts,
   NumberTexts,
   ProfileError,
   ScopeLabels,
@@ -133,12 +134,12 @@ const numbers: NumberTexts = {
     zveSavingsPhase: {
       label: "Einkommen in der Ansparphase",
       unit: "€ / Jahr",
-      hint: "Zu versteuerndes Einkommen pro Jahr.",
+      hint: "Zu versteuerndes Einkommen.",
     },
     zveRetirement: {
       label: "Einkommen im Ruhestand",
       unit: "€ / Jahr",
-      hint: "Zu versteuerndes Einkommen pro Jahr, ohne die Auszahlungen.",
+      hint: "Zu versteuerndes Einkommen, ohne die Auszahlungen.",
     },
     exemptionOrder: {
       label: "Sparerpauschbetrag",
@@ -207,11 +208,13 @@ const numbers: NumberTexts = {
 };
 
 const toggles: ToggleTexts = {
-  plan: {},
+  plan: {
+    nominalView: { label: "Beträge in künftigen Euro anzeigen" },
+  },
   shared: {
     considerInflation: {
       label: "Inflation berücksichtigen",
-      hint: "Rechnet mit Renditen nach Abzug der Inflationsrate.",
+      hint: "Der Rentenlücke-Rechner rechnet dann mit Renditen nach Abzug der Inflationsrate.",
     },
   },
   "av-depot": {},
@@ -226,14 +229,31 @@ const toggles: ToggleTexts = {
   "withdrawal-plan": {
     capitalConsumption: {
       label: "Kapitalverzehr",
-      hint: "Aus: Es werden nur die Zinsen entnommen, das Kapital bleibt erhalten.",
+      hint: "Ohne Haken werden nur die Zinsen entnommen, das Kapital bleibt erhalten.",
+    },
+    considerTax: {
+      label: "Steuern auf die Erträge berücksichtigen",
+      hint: "Zieht den geschätzten Steuerabzug aus dem Rentenlücke-Profil von der Rendite ab.",
+    },
+    realTerms: {
+      label: "Inflation berücksichtigen (heutige Kaufkraft)",
+      hint: "Zieht die Inflationsrate von der Rendite ab; alle Beträge in heutigen Euro.",
     },
   },
 };
 
 const selects: SelectTexts = {
   plan: {},
-  shared: {},
+  shared: {
+    incomeIntervalSavings: {
+      label: "Einkommen in der Ansparphase eingeben",
+      options: { yearly: "jährlich", monthly: "monatlich" },
+    },
+    incomeIntervalRetirement: {
+      label: "Einkommen im Ruhestand eingeben",
+      options: { monthly: "monatlich", yearly: "jährlich" },
+    },
+  },
   "av-depot": {
     taxSavingsMode: {
       label: "Verwendung der Steuerersparnis",
@@ -294,27 +314,151 @@ const selects: SelectTexts = {
   },
 };
 
+const fieldInfo: FieldInfoTexts = {
+  plan: {
+    nominalView:
+      "Der Gesamtplan rechnet in heutiger Kaufkraft. Mit Haken zeigt die Karte „Rente aus allen Quellen“ die Beträge in Euro des Renteneintrittsjahres, mit der Inflationsrate hochgerechnet; so passen sie zu den nominalen Ergebnissen von AV-Depot-Rechner und Sparrechner. Ohne Haken bleibt sie bei heutiger Kaufkraft.",
+    avDepotShare:
+      "Welcher Teil deiner monatlichen Sparrate ins Altersvorsorgedepot fließt, höchstens 1.140 € pro Monat. Was nach AV-Depot und Tagesgeld übrig bleibt, geht ins normale ETF-Depot.",
+    cashShare:
+      "Welcher Teil deiner Sparrate aufs Tagesgeld geht. Tagesgeld schwankt kaum, bringt aber weniger Rendite.",
+    cashReturn:
+      "Der Zins, den du langfristig aufs Tagesgeld erwartest, pro Jahr.",
+    depotVolatility:
+      "Wie stark die Jahresrendite des Depots um den erwarteten Wert schwankt (Standardabweichung). Je höher, desto breiter der Korridor möglicher Verläufe. Ein weltweiter Aktien-ETF liegt bei rund 15 %.",
+    cashVolatility:
+      "Wie stark der Tagesgeldzins von Jahr zu Jahr schwankt. Üblich ist ein kleiner Wert um 1 %.",
+    confidenceTarget:
+      "Mit welcher Wahrscheinlichkeit dein Plan aufgehen soll. 85 % heißt: In 85 von 100 simulierten Verläufen wird die Wunschrente erreicht. Ein höherer Wert verlangt eine höhere Sparrate.",
+    lowerGuardrail:
+      "Fällt die Erfolgswahrscheinlichkeit unter diesen Wert, empfiehlt der Plan, mehr zu sparen. Zwischen den Leitplanken ändert sich nichts, auch wenn das Depot schwankt.",
+    upperGuardrail:
+      "Steigt die Erfolgswahrscheinlichkeit über diesen Wert, hast du Spielraum und könntest die Sparrate senken.",
+  },
+  shared: {
+    age:
+      "Dein heutiges Alter. Zusammen mit dem Renteneintritt bestimmt es, wie viele Jahre du noch sparst.",
+    retirementAge:
+      "Das Alter, in dem du aufhörst zu sparen und mit der Entnahme beginnst. Die Regelaltersgrenze liegt für Jahrgänge ab 1964 bei 67.",
+    payoutUntilAge:
+      "Bis zu diesem Alter soll dein Vermögen reichen; danach ist es rechnerisch aufgebraucht. Wähle es eher hoch: Viele werden älter als der Durchschnitt.",
+    savingsRateMonthly:
+      "Der Betrag, den du jeden Monat insgesamt anlegst.",
+    currentCapital:
+      "Vermögen, das du heute schon angelegt hast und das mit der erwarteten Rendite weiterwächst. Im Gesamtplan gilt es als Stand im ETF-Depot, bis du im Verlauf einen Ist-Stand erfasst.",
+    expectedReturn:
+      "Jährliche Rendite, mit der das angelegte Geld in der Sparphase wächst – nach Fondskosten, vor Steuern. Ein weltweiter Aktien-ETF lag langfristig nominal bei etwa 6 bis 7 % pro Jahr; das ist keine Garantie.",
+    retirementReturn:
+      "Jährliche Rendite deines Vermögens während der Auszahlung. Meist niedriger angesetzt als in der Sparphase, weil im Ruhestand vorsichtiger angelegt wird.",
+    inflationRate:
+      "Wie stark die Preise pro Jahr steigen. Damit werden künftige Beträge in heutige Kaufkraft umgerechnet. Die Europäische Zentralbank strebt 2 % an.",
+    capitalGainsTax:
+      "Steuer auf Zinsen, Dividenden und Kursgewinne: 25 % Abgeltungsteuer plus Solidaritätszuschlag ergeben 26,375 %; mit Kirchensteuer rund 28 %.",
+    incomeIntervalSavings:
+      "Ob du das Einkommen in der Ansparphase pro Jahr (wie im Einkommensteuerbescheid) oder pro Monat eingibst. Gerechnet wird mit dem Jahreswert, also Monatsbetrag mal 12.",
+    incomeIntervalRetirement:
+      "Ob du das Einkommen im Ruhestand pro Monat (wie die Rentenversicherung es nennt) oder pro Jahr eingibst. Gerechnet wird mit dem Jahreswert, also Monatsbetrag mal 12.",
+    zveSavingsPhase:
+      "Dein zu versteuerndes Einkommen, solange du sparst: Brutto abzüglich Werbungskosten, Vorsorgeaufwendungen und Freibeträgen. Es steht im Einkommensteuerbescheid und bestimmt, wie viel Steuer dir die Einzahlungen ins AV-Depot sparen.",
+    zveRetirement:
+      "Dein zu versteuerndes Einkommen im Ruhestand ohne die Auszahlungen aus dem AV-Depot, vor allem der steuerpflichtige Teil deiner Renten. Es bestimmt den Steuersatz auf die Auszahlungen.",
+    exemptionOrder:
+      "Kapitalerträge bis zu diesem Betrag bleiben pro Jahr steuerfrei: 1.000 € für Einzelpersonen, 2.000 € für zusammen Veranlagte. Trage ein, was davon für diese Geldanlage noch frei ist.",
+    considerInflation:
+      "Gilt für den Rentenlücke-Rechner. Mit Haken rechnet er mit der Rendite nach Abzug der Inflationsrate; die Ergebnisse stehen dann in heutiger Kaufkraft. Ohne Haken sind sie nominal, also in künftigen Euro. Der Gesamtplan rechnet immer in heutiger Kaufkraft, der Entnahmeplan hat dafür einen eigenen Schalter, die übrigen Rechner rechnen immer nominal.",
+  },
+  "av-depot": {
+    avDepotCosts:
+      "Laufende Kosten des Altersvorsorgedepots pro Jahr, zusätzlich zu den Fondskosten – etwa Depot- oder Verwaltungsgebühr. Sie mindern die Rendite.",
+    baseRate:
+      "Der Basiszins, den das Bundesfinanzministerium jährlich festlegt. Aus ihm ergibt sich die Vorabpauschale, also die jährliche Mindestbesteuerung thesaurierender Fonds im normalen Depot.",
+    oneTimePayout:
+      "Anteil des Kapitals, den du dir zum Renteneintritt auf einmal auszahlen lässt, vor Steuern. Erlaubt sind bis zu 30 %; der Rest wird als monatliche Rente ausgezahlt.",
+    taxSavingsMode:
+      "Was mit der Steuererstattung aus den Einzahlungen passiert: zusätzlich ins AV-Depot einzahlen, in einem normalen Depot anlegen oder ausgeben. Das beeinflusst den Vergleich mit dem ETF-Sparplan.",
+  },
+  "pension-gap": {
+    statePension:
+      "Deine erwartete gesetzliche Monatsrente, brutto. Sie steht in der jährlichen Renteninformation der Deutschen Rentenversicherung.",
+    companyPension:
+      "Erwartete Monatsrente aus betrieblicher Altersvorsorge, brutto – etwa Direktversicherung oder Pensionskasse.",
+    privatePension:
+      "Erwartete Monatsrente aus privaten Renten- oder Lebensversicherungen, brutto.",
+    riesterPension:
+      "Erwartete Monatsrente aus Riester- oder Rürup-Verträgen, brutto.",
+    taxPrediction:
+      "Pauschaler Steuersatz auf deine Renten oberhalb des Grundfreibetrags und auf die Zinsen im Ruhestand. Eine Schätzung; der tatsächliche Satz hängt von deinem gesamten Einkommen ab.",
+    yearlyTaxFreeAmount:
+      "Einkommen bis zu diesem Betrag bleibt pro Jahr steuerfrei. Der Grundfreibetrag wird jedes Jahr angepasst.",
+    desiredPension:
+      "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
+  },
+  savings: {
+    durationYears:
+      "Wie viele Jahre du sparst.",
+    endValue:
+      "Das Kapital, das am Ende der Laufzeit vorhanden sein soll – Einzahlungen und Zinsen zusammen.",
+    partialExemption:
+      "Der Teil der Fondserträge, der steuerfrei bleibt: 30 % bei Aktienfonds, 15 % bei Mischfonds.",
+    untilRetirement:
+      "Mit Haken ist die Laufzeit Renteneintritt minus Alter und folgt den globalen Werten. Ohne Haken gibst du die Laufzeit frei ein, etwa für ein Sparziel vor der Rente.",
+    considerTax:
+      "Zieht die Kapitalertragsteuer von den Zinsen ab. Ohne diese Option sind alle Ergebnisse vor Steuern.",
+    considerPartialExemption:
+      "Bei Fonds bleibt ein Teil der Erträge steuerfrei. Schalte das an, wenn du in Fonds oder ETFs sparst.",
+    output:
+      "Die Größe, die der Rechner aus den übrigen Angaben ermittelt. Ihr Eingabefeld entfällt.",
+    saveInterval:
+      "Wie oft du einzahlst. Bei „jährlich“ wird das Zwölffache der monatlichen Sparrate auf einmal eingezahlt.",
+    interestInterval:
+      "Wie oft Erträge gutgeschrieben werden und danach selbst mitwachsen (Zinseszins). Der Zinssatz gilt pro Jahr und wird auf das Intervall heruntergerechnet; je häufiger, desto mehr kommt am Ende heraus. Für ETFs und Fonds, ausschüttend wie thesaurierend, passt „monatlich“, weil ihr Wert laufend wächst. Bei Tagesgeld gilt das Intervall deiner Bank, bei Festgeld und Sparbuch meist „jährlich“.",
+    distributionType:
+      "Ausschüttend: Erträge werden jedes Jahr ausgezahlt und versteuert. Thesaurierend: Erträge bleiben im Fonds, die Steuer fällt erst am Ende an.",
+  },
+  "withdrawal-plan": {
+    capitalAssets:
+      "Das Vermögen, aus dem du entnimmst, zu Beginn der Entnahme.",
+    withdrawalAmount:
+      "Der Betrag, den du in jedem Intervall entnimmst.",
+    periodYears:
+      "Wie viele Jahre die Entnahme laufen soll.",
+    capitalConsumption:
+      "Mit Haken wird das Vermögen über den Zeitraum vollständig aufgebraucht. Ohne Haken werden nur die Zinsen entnommen, das Kapital bleibt erhalten.",
+    considerTax:
+      "Mit Haken wird vom Zinssatz der geschätzte Steuerabzug des Rentenlücke-Profils abgezogen, wie im Gesamtplan. Ohne Haken wird ohne Steuern gerechnet, wie bei Finanzfluss.",
+    realTerms:
+      "Mit Haken wird die Inflationsrate (Feld darunter) von der Rendite im Ruhestand abgezogen, vor dem Steuerabzug, wie im Gesamtplan; Kapital und Entnahmen stehen dann in heutiger Kaufkraft. Ohne Haken sind alle Beträge nominal, also in künftigen Euro, wie bei Finanzfluss.",
+    output:
+      "Die Größe, die der Rechner aus den übrigen Angaben ermittelt. Ihr Eingabefeld entfällt.",
+    interval:
+      "Wie oft du Geld entnimmst.",
+  },
+};
+
 const calcErrors: Record<CalculationError, string> = {
   ageBeforeRetirement: "Das Alter muss unter dem Renteneintrittsalter liegen.",
   payoutAfterRetirement: "Die Auszahlung muss nach dem Renteneintritt enden.",
-  avAgeRange: "Das Alter muss zwischen 18 und 67 Jahren liegen.",
-  avRetirementRange: "Der Renteneintritt muss zwischen 65 und 70 Jahren liegen.",
+  avAgeRange:
+    "Für das Altersvorsorgedepot muss das Alter zwischen 18 und 67 Jahren liegen.",
+  avRetirementRange:
+    "Für das Altersvorsorgedepot muss der Renteneintritt zwischen 65 und 70 Jahren liegen.",
   avPayoutMin85:
     "Im Altersvorsorgedepot muss die Auszahlung mindestens bis zum Alter 85 laufen.",
   avSavingsRateRange:
-    "Die Sparrate muss zwischen 120 € und 13.680 € pro Jahr liegen (10 € bis 1.140 € pro Monat).",
-  avReturnsPositive: "Die Renditen müssen größer als 0 % sein.",
+    "Ins Altersvorsorgedepot müssen mindestens 120 € pro Jahr fließen (10 € pro Monat), höchstens 13.680 €.",
+  avReturnsPositive:
+    "Für das Altersvorsorgedepot müssen die Renditen größer als 0 % sein.",
   avCostsBelowReturns: "Die Kosten des AV-Depots müssen unter den Renditen liegen.",
   taxBelow100: "Die Steuersätze müssen unter 100 % liegen.",
   durationPositive: "Die Laufzeit muss größer als 0 sein.",
   unreachableStartValue:
-    "Das Endkapital wird schon ohne Anfangskapital erreicht oder übertroffen.",
+    "Das Endkapital lässt sich mit diesen Werten nicht erreichen.",
   unreachableSavingRate:
-    "Das Endkapital wird schon ohne Sparrate erreicht oder übertroffen.",
+    "Das Endkapital lässt sich mit diesen Werten nicht erreichen.",
   unreachableYearlyInterest:
-    "Mit diesen Einzahlungen lässt sich das Endkapital mit keinem Zinssatz ab 0 % genau erreichen.",
+    "Ohne Anfangskapital und Sparrate lässt sich das Endkapital mit keinem Zinssatz erreichen.",
   unreachableDuration:
-    "Das Endkapital lässt sich mit diesen Werten nicht erreichen, oder es ist schon erreicht.",
+    "Das Endkapital lässt sich mit diesen Werten nie erreichen: Ohne Sparrate und Zinsen wächst das Kapital nicht.",
   interestAboveMinus100: "Der Zinssatz muss über −100 % liegen.",
   capitalPositive: "Das Anlagevermögen muss größer als 0 sein.",
   amountPositive: "Der Entnahmebetrag muss größer als 0 sein.",
@@ -388,6 +532,7 @@ export const de = {
 
   common: {
     shared: "geteilt",
+    infoAbout: (label: string) => `Erklärung zu „${label}“`,
     sharedTitle: "Geteilte Einstellung – gilt für alle Rechner",
     changed: "geändert",
     changedTitle: "Lokal geändert – noch nicht gespeichert",
@@ -413,11 +558,13 @@ export const de = {
     perQuarter: "pro Quartal",
     perHalfYear: "pro Halbjahr",
     perYear: "pro Jahr",
+    eurosPerMonth: "€ / Monat",
+    eurosPerYear: "€ / Jahr",
     endless: "endlos",
-    noAdvice: "Keine Steuer- oder Anlageberatung.",
   },
 
   children: {
+    info: "Geburtsjahre deiner Kinder, für die du Kindergeld bekommst. Im Altersvorsorgedepot gibt es für jedes Kind eine Zulage, solange Kindergeld gezahlt wird.",
     label: "Kinder",
     none: "Keine Kinder eingetragen.",
     birthYear: (n: number) => `Geburtsjahr Kind ${n}`,
@@ -464,6 +611,7 @@ export const de = {
   numbers,
   toggles,
   selects,
+  fieldInfo,
   calcErrors,
 
   plan: {
@@ -480,11 +628,50 @@ export const de = {
       volatility: "Schwankung",
       confidence: "Sicherheit",
       time: "Zeitraum",
+      pension: "Rente",
+      balances: "Heutiger Stand",
+      payout: "Auszahlung",
+    },
+    payoutNote:
+      "Gehört zum Profil des Entnahmeplans und gilt auch dort.",
+    breakdown: {
+      title: "Rente aus allen Quellen",
+      subtitle: "Im mittleren Verlauf, in heutiger Kaufkraft und nach Steuern.",
+      subtitleNominal: (prices: string) =>
+        `Im mittleren Verlauf, in Euro zum Renteneintritt (Preise dann ${prices} über heute) und nach Steuern.`,
+      wealthTitle: "Vermögen bei Renteneintritt",
+      avDepot: "Altersvorsorgedepot",
+      free: "Freies Vermögen (ETF-Depot und Tagesgeld)",
+      pensionTitle: "Rente pro Monat",
+      statePension: "Gesetzliche und weitere Renten (netto)",
+      avPension: "Altersvorsorgedepot (netto)",
+      freePension: "Entnahme aus dem freien Vermögen (nach Steuern)",
+      freeTax: (before: string, tax: string) =>
+        `Vor Steuern ${before}; die Steuer auf die Erträge kostet ${tax}.`,
+      total: "Zusammen",
+      desired: "Wunschrente",
+      surplus: (amount: string) => `${amount} mehr als gewünscht`,
+      shortfall: (amount: string) => `${amount} weniger als gewünscht`,
+      consumes: (age: number) =>
+        `Das freie Vermögen wird bis Alter ${age} aufgebraucht.`,
+      keeps: "Vom freien Vermögen werden nur die Erträge entnommen; es bleibt erhalten.",
+      taxNote: (rate: string) =>
+        `Steuern auf die Erträge in der Auszahlphase: geschätzter Steuerabzug von ${rate} (aus dem Rentenlücke-Profil). Das Altersvorsorgedepot versteuert nach seinen eigenen Regeln.`,
     },
     splitSummary: (av: string, depot: string, cash: string) =>
       `Pro Monat: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
     sourcesNote:
-      "Rentenansprüche und Wunschrente kommen aus dem Rentenlücke-Rechner, die Details des AV-Depots aus dessen Rechner, die heutigen Stände aus dem Verlauf.",
+      "Die Einzelheiten des AV-Depots (Kosten, Steuern, Kinder) kommen aus dessen Rechner.",
+    capitalHint:
+      "Gilt als Stand im ETF-Depot, bis du im Verlauf einen Ist-Stand erfasst.",
+    balancesFrom: (date: string, av: string, depot: string, cash: string) =>
+      `Ist-Stand vom ${date}: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
+    changeInHistory: "Im Verlauf ändern",
+    avErrorHint:
+      "Oder setze den Anteil des Altersvorsorgedepots auf 0 %; dann rechnet der Plan ohne es.",
+    alsoUses: "Der Plan nutzt außerdem",
+    pensionNote:
+      "Diese Werte gehören zum Profil des Rentenlücke-Rechners und gelten auch dort.",
     status: {
       increase: "Mehr sparen",
       onTrack: "Im Plan – nichts ändern",
@@ -493,7 +680,7 @@ export const de = {
     statusNote: {
       increase: (amount: string) =>
         `Erhöhe die Sparrate um ${amount} pro Monat, um dein Sicherheitsniveau zu erreichen.`,
-      onTrack: "Die Wahrscheinlichkeit liegt zwischen deinen Leitplanken.",
+      onTrack: "Deine Sparrate passt zu deinem Sicherheitsniveau.",
       room: (amount: string) =>
         `Du könntest ${amount} pro Monat weniger sparen und bliebest auf deinem Sicherheitsniveau.`,
     },
@@ -502,13 +689,13 @@ export const de = {
       `Leitplanken ${lower} und ${upper}, Ziel ${target}`,
     currentRate: "Deine Sparrate",
     requiredRate: "Nötige Sparrate",
-    requiredRateNote: (target: string) => `für ${target} Sicherheit`,
+    requiredRateNote: (target: string) =>
+      `für ${target} Sicherheit, bei gleicher Aufteilung`,
     alternativesTitle: "Andere Wege zurück auf Kurs",
     lowerPension: (amount: string) =>
       `Wunschrente um ${amount} pro Monat senken`,
     retireLater: (years: string) => `${years} später in Rente gehen`,
-    retireLaterNotEnough:
-      "Später in Rente gehen reicht allein nicht, auch nicht fünf Jahre.",
+    retireLaterNotEnough: "Später in Rente gehen reicht allein nicht.",
     corridorTitle: "Vermögen bis zum Renteneintritt",
     corridorSubtitle:
       "In heutiger Kaufkraft. Der Bereich zeigt die mittleren 80 % der möglichen Verläufe, die Linie den mittleren.",
@@ -536,11 +723,10 @@ export const de = {
     noComparison: "Kein Vergleich",
     delete: "Löschen",
     saveFailed: "Das hat nicht geklappt. Bitte noch einmal versuchen.",
-    noSnapshot:
-      "Noch kein Ist-Stand erfasst – der Plan startet bei 0 € in allen Töpfen.",
+    noSnapshot: (capital: string) =>
+      `Noch kein Ist-Stand erfasst – der Plan startet mit deinem vorhandenen Kapital von ${capital} im ETF-Depot.`,
     staleSnapshot: (date: string) =>
       `Letzter Ist-Stand vom ${date}. Zeit für den jährlichen Abgleich.`,
-    balancesFrom: (date: string) => `Stände vom ${date}.`,
     recordSnapshot: "Stand erfassen",
     openPlan: "Zum Plan",
     openHistory: "Zum Verlauf",
@@ -597,8 +783,8 @@ export const de = {
       "Alle Beträge in heutiger Kaufkraft; die Inflationsrate wird immer abgezogen, unabhängig vom Schalter in den Einstellungen.",
       "Der Korridor entsteht aus 2.000 zufälligen Verläufen der Rendite mit gleichbleibender Schwankung; AV-Depot und ETF-Depot bewegen sich gemeinsam. Extremereignisse jenseits dieser Annahme sind nicht abgebildet.",
       "Sparraten steigen mit der Inflation; die Einzahlungen ins AV-Depot bleiben nominal gleich und folgen dessen Rechner.",
-      "Die nötige Sparrate verändert nur den Anteil des ETF-Depots; AV-Depot und Tagesgeld bleiben wie eingestellt.",
-      "Ab Renteneintritt wird mit der festen Rendite im Ruhestand gerechnet und das Kapital bis zum Ende der Auszahlung aufgebraucht.",
+      "Die nötige Sparrate ist deine gesamte Sparrate bei gleicher Aufteilung auf die Töpfe. Ins AV-Depot fließen höchstens 1.140 € pro Monat; was darüber liegt, geht ins ETF-Depot.",
+      "Ab Renteneintritt wird mit der festen Rendite im Ruhestand nach dem geschätzten Steuerabzug gerechnet. Das freie Vermögen wird bis zum Ende der Auszahlung aufgebraucht oder, wenn das im Entnahmeplan-Profil so steht, nur auf seine Erträge hin entnommen.",
       "Der Korridor ist ein Modell, keine Garantie. Keine Steuer- oder Anlageberatung.",
     ],
   },
@@ -655,24 +841,11 @@ export const de = {
     title: "Cockpit",
     profilesHint:
       "Die Auswahl gilt auch in den Rechnern. Profile anlegen und ändern kannst du dort und in den Einstellungen.",
-    retirementHeading: "Ruhestand im Gesamtbild",
-    remainingGap: "Verbleibende Rentenlücke pro Monat",
-    gapCovered: "Rente und Altersvorsorgedepot decken deine Wunschrente.",
-    gapAfter: "Nach erwarteter Rente und Altersvorsorgedepot.",
-    shareBarLabel: "Wunschrente pro Monat",
-    netPension: "Nettorente",
-    avDepot: "Altersvorsorgedepot",
-    remaining: "Verbleibende Lücke",
     desiredPension: "Wunschrente",
-    capitalForGap: "Nötiges Kapital für die Lücke",
-    extraSavingsRate: "Zusätzliche Sparrate pro Monat",
-    noteWithAvDepot: (savingsRate: string, untilAge: number) =>
-      `Die zusätzliche Sparrate kommt zu den ${savingsRate} pro Monat hinzu, die in dieser Rechnung ins Altersvorsorgedepot fließen. Dessen Rente läuft bis Alter ${untilAge}; das Kapital für die Lücke ist mit Kapitalverzehr gerechnet.`,
-    noteWithoutAvDepot:
-      "Das Altersvorsorgedepot ist mit den gewählten Profilen nicht berechenbar und hier nicht eingerechnet.",
-    nominal: "Alle Beträge nominal.",
     notCalculable: "Mit den gewählten Profilen nicht berechenbar:",
     resultsHeading: "Ergebnisse der Rechner",
+    resultsNote:
+      "Jeder Rechner rechnet für sich, ohne Schwankung und in künftigen Euro; nur die Rentenlücke rechnet mit „Inflation berücksichtigen“ in heutiger Kaufkraft. Der Gesamtplan oben rechnet immer in heutiger Kaufkraft und mit deinem Sicherheitsniveau – seine Zahlen fallen deshalb vorsichtiger aus.",
     openCalculator: "Zum Rechner",
     searched: "Gesucht",
     searchedFor: (what: string) => `Gesucht: ${what}`,
@@ -688,6 +861,22 @@ export const de = {
     totalDeposits: "Einzahlungen gesamt",
     withdrawalAmount: (perInterval: string) => `Entnahmebetrag ${perInterval}`,
     withdrawalPeriod: "Entnahmezeitraum",
+    taxNote: {
+      avDepot: "Endvermögen vor Steuern, Renten nach Steuern.",
+      pensionGap:
+        "Nettorente nach geschätztem Steuerabzug; Kapital und Sparrate mit Renditen nach Steuern gerechnet.",
+      savingsBefore: "Alle Beträge vor Steuern.",
+      savingsDistributing:
+        "Alle Beträge nach Steuern: ausschüttend, die Steuer mindert die Zinsen laufend.",
+      savingsAccumulating:
+        "Alle Beträge nach Steuern: thesaurierend, die Steuer auf den Gewinn fällt am Ende an.",
+      withdrawal: "Ohne Steuern gerechnet.",
+      withdrawalTaxed: "Erträge nach geschätztem Steuerabzug gerechnet.",
+    },
+    currencyNote: {
+      nominal: "Beträge nominal, in künftigen Euro.",
+      real: "Beträge in heutiger Kaufkraft.",
+    },
     capitalAssets: "Anlagevermögen",
   },
 
@@ -703,6 +892,8 @@ export const de = {
     retirementAgeHint: "Zwischen 65 und 70 Jahren.",
     savingsRateHint: (perYear: string) =>
       `${perYear}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`,
+    savingsRateCapped: (max: string) =>
+      `Ins AV-Depot fließen höchstens ${max} pro Monat; damit ist hier gerechnet.`,
     payoutUntilHint: "Im Altersvorsorgedepot mindestens bis 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF-Sparplan",
@@ -816,8 +1007,28 @@ export const de = {
     duration: "Laufzeit",
     savingRate: (perInterval: string) => `Sparrate ${perInterval}`,
     durationMonths: (months: number) => `Das sind ${months} Monate.`,
-    durationUntilRetirement: (duration: string, retirementAge: number, age: number) =>
-      `Laufzeit: ${duration} (Renteneintritt ${retirementAge} − Alter ${age}).`,
+    endValueMinimum: {
+      startValue: (amount: string) =>
+        `Schon ohne Anfangskapital erreichst du ${amount}.`,
+      savingRate: (amount: string) =>
+        `Schon ohne Sparrate erreichst du ${amount}.`,
+      yearlyInterest: (amount: string) =>
+        `Schon ohne Zinsen kommst du auf ${amount}: So viel zahlst du insgesamt ein.`,
+      duration: (amount: string) =>
+        `${amount} sind schon als Anfangskapital vorhanden.`,
+    },
+    alreadyReached: {
+      startValue: (target: string, reached: string) =>
+        `Dein Ziel von ${target} erreichst du schon ohne Anfangskapital: Mit Sparrate und Zinsen kommst du auf ${reached}.`,
+      savingRate: (target: string, reached: string) =>
+        `Dein Ziel von ${target} erreichst du schon ohne Sparrate: Dein Anfangskapital wächst auf ${reached}.`,
+      yearlyInterest: (target: string, reached: string) =>
+        `Dein Ziel von ${target} erreichst du schon ohne Zinsen: Allein deine Einzahlungen ergeben ${reached}.`,
+      duration: (target: string, reached: string) =>
+        `Dein Ziel von ${target} ist schon erreicht: Dein Anfangskapital beträgt ${reached}.`,
+    },
+    durationUntilRetirement: (retirementAge: number, age: number) =>
+      `Renteneintritt ${retirementAge} − Alter ${age}, aus den globalen Werten.`,
     chartTitle: "Kapital pro Jahr",
     chartSubtitle:
       "Einzahlungen inklusive Anfangskapital und die darauf aufgelaufenen Zinsen",
@@ -827,7 +1038,7 @@ export const de = {
     totalDeposits: "Einzahlungen gesamt",
     assumptions: [
       "Einzahlungen erfolgen zu Beginn des Sparintervalls; Zinsen werden im gewählten Zinsintervall gutgeschrieben und mitverzinst.",
-      "Ausschüttend: Die Steuer mindert die Zinsen laufend. Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an.",
+      "Ausschüttend: Die Steuer mindert die Zinsen laufend. Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an; das Diagramm zeigt den Stand nach Steuern, als würdest du am Ende des jeweiligen Jahres verkaufen.",
       "Die Teilfreistellung stellt den gewählten Anteil der Erträge steuerfrei; ein Sparerpauschbetrag ist nicht berücksichtigt.",
       "Rechenweg nach dem Finanzfluss-Sparrechner. Keine Steuer- oder Anlageberatung.",
     ],
@@ -843,6 +1054,17 @@ export const de = {
       "Das gesuchte Feld entfällt bei den Eingaben und erscheint als Ergebnis.",
     interestRate: "Zinssatz p. a.",
     interestRateHint: "Deine Rendite im Ruhestand aus den globalen Werten.",
+    interestAdjusted: (rate: string, inflation: boolean, tax: boolean) =>
+      `Gerechnet wird mit ${rate} p. a.: Rendite im Ruhestand${inflation ? ", abzüglich Inflation" : ""}${tax ? ", nach geschätztem Steuerabzug" : ""}.`,
+    realNote: "Alle Beträge in heutiger Kaufkraft.",
+    fromPlan: {
+      button: "Aus Gesamtplan",
+      hint: "Übernimmt das freie Vermögen bei Renteneintritt (ETF-Depot und Tagesgeld, mittlerer Verlauf, in heutiger Kaufkraft) und den Auszahlungszeitraum und schaltet Steuern und Kaufkraft ein. Die Werte gelten zunächst nur hier, bis du sie speicherst.",
+      done: (capital: string, years: string) =>
+        `Übernommen: ${capital} über ${years}.`,
+      unavailable:
+        "Der Gesamtplan lässt sich mit den gewählten Profilen nicht berechnen.",
+    },
     amount: (perInterval: string) => `Entnahmebetrag ${perInterval}`,
     period: "Entnahmezeitraum",
     capital: "Anlagevermögen",
@@ -858,7 +1080,7 @@ export const de = {
     chartAria: "Säulendiagramm: verbleibendes Kapital am Ende jedes Jahres",
     assumptions: [
       "Entnahmen erfolgen am Ende jedes Intervalls; der Jahreszins wird auf das Intervall umgerechnet, sodass sich über ein Jahr genau der Zinssatz ergibt.",
-      "Steuern und Inflation sind nicht berücksichtigt; trage dafür einen entsprechend niedrigeren Zinssatz ein.",
+      "Standardmäßig sind Steuern und Inflation nicht berücksichtigt, wie bei Finanzfluss. Mit den Schaltern „Steuern auf die Erträge berücksichtigen“ und „Inflation berücksichtigen“ rechnet der Rechner wie der Gesamtplan, mit kleinen Abweichungen durch die Rechenkonventionen (Entnahme am Ende des Intervalls, Zins auf das Intervall umgerechnet).",
       "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet. Keine Steuer- oder Anlageberatung.",
     ],
   },

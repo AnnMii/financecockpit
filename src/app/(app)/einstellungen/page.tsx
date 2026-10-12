@@ -5,6 +5,7 @@ import { LifeExpectancyInfo } from "@/components/life-expectancy-info";
 import { ProfilePicker } from "@/components/profile-picker";
 import {
   ChildrenField,
+  IncomeSetting,
   NumberSetting,
   ToggleSetting,
 } from "@/components/setting-fields";
@@ -54,8 +55,8 @@ export default async function SettingsPage() {
             </Section>
             <Section title={text.incomeAndTax}>
               <div className="grid gap-4 sm:grid-cols-2">
-                <NumberSetting scope="shared" name="zveSavingsPhase" />
-                <NumberSetting scope="shared" name="zveRetirement" />
+                <IncomeSetting name="zveSavingsPhase" />
+                <IncomeSetting name="zveRetirement" />
                 <NumberSetting scope="shared" name="exemptionOrder" />
                 <NumberSetting scope="shared" name="capitalGainsTax" />
               </div>

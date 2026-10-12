@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { type AvDepotInput, calculateAvDepot } from "@/lib/calculators/av-depot";
 import { calculatePensionGap } from "@/lib/calculators/pension-gap";
-import { type PlanInput, calculatePlan, validatePlanInput } from "./plan";
+import {
+  type PlanInput,
+  calculatePlan,
+  splitSavingsRate,
+  validatePlanInput,
+  withSavingsRate,
+} from "./plan";
 import {
   type PlanVersion,
   type Snapshot,
@@ -224,6 +230,186 @@ describe("calculatePlan with fluctuation", () => {
   });
 });
 
+describe("splitSavingsRate", () => {
+  it("gives the depot what the shares leave", () => {
+    expect(splitSavingsRate(1_000, { av: 30, cash: 20 })).toEqual({
+      av: 300,
+      depot: 500,
+      cash: 200,
+    });
+  });
+
+  it("moves what the AV-Depot cannot take to the depot", () => {
+    // more than 13.680 € per year
+    expect(splitSavingsRate(2_000, { av: 100, cash: 0 })).toEqual({
+      av: 1_140,
+      depot: 860,
+      cash: 0,
+    });
+    // less than 120 € per year
+    expect(splitSavingsRate(5, { av: 100, cash: 0 })).toEqual({
+      av: 0,
+      depot: 5,
+      cash: 0,
+    });
+    expect(splitSavingsRate(600, { av: 50, cash: 0 }, false)).toEqual({
+      av: 0,
+      depot: 600,
+      cash: 0,
+    });
+  });
+
+  it("accepts shares of exactly 100 % whatever the rounding", () => {
+    for (let total = 0.01; total < 3_000; total += 7.77) {
+      for (const shares of [
+        { av: 100, cash: 0 },
+        { av: 70, cash: 30 },
+        { av: 33.3, cash: 66.7 },
+      ]) {
+        const rates = splitSavingsRate(total, shares);
+        expect(rates.depot).toBeGreaterThanOrEqual(0);
+        expect(rates.av + rates.depot + rates.cash).toBeCloseTo(total, 8);
+      }
+    }
+  });
+
+  it("leaves the depot negative above 100 %", () => {
+    expect(splitSavingsRate(1_000, { av: 80, cash: 30 }).depot).toBeCloseTo(-100, 8);
+  });
+});
+
+describe("the required savings rate", () => {
+  const mixed = withSavingsRate(
+    depotPlan({
+      shares: { av: 40, cash: 10 },
+      avDepot: avInput,
+      values: { av: 5_000, depot: 20_000, cash: 3_000 },
+    }),
+    400,
+  );
+
+  it("splits another savings rate like the plan", () => {
+    expect(mixed.rates).toEqual({ av: 160, depot: 200, cash: 40 });
+    expect(mixed.avDepot!.savingsRate).toBe(160 * 12);
+    // A plan frozen before the shares were stored keeps its proportions.
+    const old = depotPlan({ rates: { av: 150, depot: 100, cash: 50 }, avDepot: avInput });
+    const doubled = withSavingsRate(old, 600).rates;
+    expect(doubled.av).toBeCloseTo(300, 8);
+    expect(doubled.depot).toBeCloseTo(200, 8);
+    expect(doubled.cash).toBeCloseTo(100, 8);
+  });
+
+  it("reaches the confidence target when it is saved, whatever the split", () => {
+    const first = calculatePlan(mixed);
+    expect(first.status).toBe("increase");
+    const plan = calculatePlan(withSavingsRate(mixed, first.requiredRate));
+    expect(plan.probability).toBeCloseTo(0.85, 2);
+    expect(plan.requiredRate).toBeCloseTo(first.requiredRate, 4);
+    expect(plan.status).toBe("onTrack");
+  });
+
+  it("finds room when everything goes to the AV-Depot", () => {
+    const generous = withSavingsRate(
+      depotPlan({
+        shares: { av: 100, cash: 0 },
+        avDepot: avInput,
+        pension: { ...pension, desiredPension: 1_300 },
+      }),
+      1_000,
+    );
+    expect(generous.rates.depot).toBe(0);
+    const plan = calculatePlan(generous);
+    expect(plan.status).toBe("room");
+    expect(plan.amount).toBeCloseTo(1_000 - plan.requiredRate, 6);
+    expect(plan.amount).toBeGreaterThan(100);
+    const leaner = calculatePlan(withSavingsRate(generous, plan.requiredRate));
+    expect(leaner.probability).toBeCloseTo(0.85, 2);
+  });
+
+  it("is zero when the wish is covered without saving", () => {
+    const plan = calculatePlan(
+      depotPlan({ pension: { ...pension, desiredPension: 900 } }),
+    );
+    expect(plan.requiredRate).toBe(0);
+    expect(plan.probability).toBe(1);
+    expect(plan.status).toBe("room");
+  });
+});
+
+describe("the payout of the free capital", () => {
+  const mixed = depotPlan({
+    rates: { av: 150, depot: 250, cash: 50 },
+    avDepot: avInput,
+    values: { av: 5_000, depot: 20_000, cash: 3_000 },
+  });
+
+  it("splits the typical course into its sources, adding up to its pension", () => {
+    const plan = calculatePlan(mixed);
+    const { typical } = plan;
+    expect(typical.statePension).toBeCloseTo(plan.netPension, 8);
+    expect(typical.avPension).toBeGreaterThan(0);
+    expect(typical.freePension).toBeGreaterThan(0);
+    expect(
+      typical.statePension + typical.avPension + typical.freePension,
+    ).toBeCloseTo(plan.pension.p50, 6);
+    expect(typical.avCapital).toBeGreaterThan(0);
+    expect(typical.freeCapital).toBeGreaterThan(0);
+  });
+
+  it("without the AV-Depot nothing comes from it", () => {
+    const { typical } = calculatePlan(depotPlan());
+    expect(typical.avCapital).toBe(0);
+    expect(typical.avPension).toBe(0);
+  });
+
+  it("takes tax off what the free capital pays", () => {
+    const { typical } = calculatePlan(mixed);
+    expect(typical.freePensionBeforeTax).toBeGreaterThan(typical.freePension);
+    const untaxed = calculatePlan({
+      ...mixed,
+      pension: { ...pension, taxPrediction: 0 },
+    });
+    expect(untaxed.typical.freePensionBeforeTax).toBeCloseTo(
+      untaxed.typical.freePension,
+      8,
+    );
+  });
+
+  it("pays only the returns when the capital is not used up", () => {
+    const kept = calculatePlan({ ...mixed, capitalConsumption: false });
+    // 3 % return in retirement, 2 % inflation, 15 % estimated tax deduction
+    const monthlyRate = ((3 - 2) * (1 - 15 / 100)) / 100 / 12;
+    expect(kept.typical.freePension).toBeCloseTo(
+      kept.typical.freeCapital * monthlyRate,
+      8,
+    );
+    // The same capital pays less per month when it has to stay.
+    const used = calculatePlan(mixed);
+    expect(kept.typical.freePension / kept.typical.freeCapital).toBeLessThan(
+      used.typical.freePension / used.typical.freeCapital,
+    );
+    // So more has to be saved for the same pension.
+    expect(kept.requiredRate).toBeGreaterThan(used.requiredRate);
+  });
+
+  it("needs a return to live from when the capital stays", () => {
+    expect(
+      validatePlanInput({ ...mixed, capitalConsumption: false, retirementReturn: 2 }),
+    ).toContain("needsInterest");
+    expect(
+      validatePlanInput({ ...mixed, retirementReturn: 2 }),
+    ).not.toContain("needsInterest");
+  });
+
+  it("treats plans frozen before the setting existed as using the capital up", () => {
+    const frozen = { ...mixed, capitalConsumption: undefined };
+    expect(calculatePlan(frozen).typical.freePension).toBeCloseTo(
+      calculatePlan(mixed).typical.freePension,
+      8,
+    );
+  });
+});
+
 describe("validatePlanInput", () => {
   it("accepts the sample plan", () => {
     expect(validatePlanInput(depotPlan())).toEqual([]);
@@ -240,8 +426,17 @@ describe("validatePlanInput", () => {
       validatePlanInput(depotPlan({ rates: { av: 200, depot: -50, cash: 0 } })),
     ).toContain("planSharesOver100");
     expect(
-      validatePlanInput(depotPlan({ avDepot: { ...avInput, payoutUntilAge: 80 } })),
+      validatePlanInput(
+        depotPlan({
+          rates: { av: 150, depot: 150, cash: 0 },
+          avDepot: { ...avInput, payoutUntilAge: 80 },
+        }),
+      ),
     ).toContain("avPayoutMin85");
+    // Nothing is paid into the AV-Depot: its inputs do not matter.
+    expect(
+      validatePlanInput(depotPlan({ avDepot: { ...avInput, payoutUntilAge: 80 } })),
+    ).toEqual([]);
   });
 });
 

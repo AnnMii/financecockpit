@@ -38,9 +38,11 @@ ist in beiden Fällen 1.153 € pro Monat.
 **Beispiel Entnahmeplan** (`/rechner/entnahmeplan`): 100.000 €, 10 Jahre,
 monatlich → hier 963,74 € pro Monat (3 %), bei Finanzfluss 1.055,24 € (5 %).
 
-**Beispiel Sparrechner** (`/rechner/sparrechner`): 150 € pro Monat, 7 Jahre →
-hier 15.689 € Endkapital (0 € Anfangskapital, 6 %), mit den
-Finanzfluss-Werten (5.000 €, 1,5 %) 18.846 €.
+**Beispiel Sparrechner** (`/rechner/sparrechner`): 150 € pro Monat bis zum
+Renteneintritt (32 Jahre) → 174.520 € Endkapital. Mit freier Laufzeit von
+7 Jahren (Schalter „Laufzeit bis Renteneintritt" aus) sind es 15.689 €
+(0 € Anfangskapital, 6 %), mit den Finanzfluss-Werten (5.000 €, 1,5 %)
+18.846 €.
 
 **So prüfst du es:** Die Werte der zweiten Tabellenzeile im Rechner eintragen
 (gilt nur lokal) und mit der Finanzfluss-Seite vergleichen, danach
@@ -82,7 +84,7 @@ einmal im Jahr zu Jahresbeginn eingezahlt.
 wird mit 1.800 € einmal pro Jahr. Unter dem Feld steht dann „= 1.800 € pro
 Jahr, einmal jährlich eingezahlt". Ist die Sparrate das gesuchte Ergebnis,
 zeigt der Rechner sie je Intervall: bei Ziel 20.000 €, 5.000 € Anfangskapital,
-1,5 %, 7 Jahren monatlich sind das 163,02 € pro Monat.
+1,5 %, 7 Jahren freier Laufzeit monatlich sind das 163,02 € pro Monat.
 
 **Zu entscheiden:** Reicht das, oder soll der Sparrechner eine eigene Sparrate
 bekommen, weil du dort andere Beträge durchspielen willst als deine
@@ -99,7 +101,7 @@ Sparrate. Das Cockpit zeigt beide Ergebnisse nebeneinander, als würde das Geld
 zweimal angelegt.
 
 **Beispiel:** Sparrate 150 € → AV-Depot-Karte: 228.547 € Endvermögen mit 67;
-Sparrechner-Karte: 15.689 € nach 7 Jahren. Beide Karten gehen von denselben
+Sparrechner-Karte: 174.520 € nach 32 Jahren. Beide Karten gehen von denselben
 150 € aus; die Ergebnisse dürfen nicht addiert werden.
 
 **Zu entscheiden:** Soll die Sparrate aufgeteilt werden können (z. B. 150 € ins
@@ -108,7 +110,8 @@ Verwendung.
 
 **Stand:** Der Gesamtplan (`/plan`) setzt die Sparrate einmal an und teilt sie
 auf Töpfe auf. Die einzelnen Rechner und ihre Karten im Cockpit rechnen
-weiterhin jeweils mit der vollen Sparrate.
+weiterhin jeweils mit der vollen Sparrate; der AV-Depot-Rechner nimmt davon
+höchstens 1.140 € pro Monat und sagt das unter dem Feld.
 
 ---
 
@@ -202,9 +205,11 @@ Zinssatz-Suche des Originals mit einem Fehler ab („Newton's method failed to
 converge"). Der Rechner hier liefert dort ein Ergebnis. Der Vergleichstest
 überspringt diese Fälle und erlaubt höchstens 20 davon bei 300 Vergleichen.
 
-**Nicht unterstützt:** Negative Zinssätze als Ergebnis. Ist das Ziel schon ohne
-Zinsen übertroffen (z. B. 5.000 € Anfangskapital, 150 € pro Monat, 7 Jahre,
-Ziel 10.000 €), erscheint eine Meldung statt eines negativen Zinssatzes.
+**Nicht unterstützt:** Negative Ergebnisse. Ist das Ziel schon übertroffen,
+ohne dass es die gesuchte Größe braucht (z. B. 5.000 € Anfangskapital, 150 €
+pro Monat, 7 Jahre, Ziel 10.000 €, Zinssatz gesucht), lautet das Ergebnis 0
+mit dem Hinweis, was ohnehin erreicht wird (hier 17.600 €), statt eines
+negativen Zinssatzes.
 
 ---
 
@@ -265,20 +270,26 @@ bestätigt hast (Liste in `PLANNED_FEATURES.md`, Feature 2, „So umgesetzt").
 
 **Beispiel mit den Standardwerten** (150 € Sparrate ganz ins AV-Depot, Alter
 35, Wunschrente 2.200 €): Der Plan zeigt rund 5 % Wahrscheinlichkeit und eine
-nötige Sparrate von rund 700 €. Der Rentenlücke-Rechner zeigt für dieselben
+nötige Sparrate von 813 €. Der Rentenlücke-Rechner zeigt für dieselben
 Werte ohne Inflation 237,50 €. Der Unterschied kommt aus drei Dingen: Der Plan
 zieht 2 % Inflation ab, verlangt 85 % Sicherheit statt des erwarteten Verlaufs
 und rechnet die AV-Depot-Rente in heutiger Kaufkraft.
 
-**So prüfst du es:** Auf `/plan` das Sicherheitsniveau auf 50 % und die
-Schwankung auf 0 stellen (Leitplanken z. B. 1 % und 99 %): Die nötige Sparrate
-fällt dann auf den Wert der Rechnung ohne Unsicherheit.
+**So prüfst du es:** Auf `/plan` die nötige Sparrate als „Sparrate pro Monat"
+eintragen: Die Wahrscheinlichkeit landet beim Sicherheitsniveau (85 %), der
+Status wird „Im Plan". Zum Abgleich mit dem Rentenlücke-Rechner den Anteil des
+AV-Depots auf 0 %, das Sicherheitsniveau auf 50 % und die Schwankung auf 0
+stellen (Leitplanken z. B. 1 % und 99 %) und dort „Inflation berücksichtigen"
+einschalten: Beide nennen dann dieselbe Sparrate.
 
 **Zu entscheiden:**
 
 - Passen 85 % / 75 % / 95 % und 15 % Schwankung zu dir?
 - Ist 2.200 € Wunschrente in **heutigen** Euro gemeint? Der Plan liest es so.
 - Reichen drei feste Töpfe?
+- Die nötige Sparrate behält deine Aufteilung bei. Mit 100 % AV-Depot heißt
+  „mehr sparen" also: mehr ins AV-Depot, bis zu dessen Höchstbetrag von 1.140 €
+  pro Monat, danach ins ETF-Depot. Ist das die Aufteilung, die du willst?
 
 ## 13. Gesamtplan: Alter jährlich mitführen
 
@@ -311,3 +322,26 @@ Inflation: Im Vergleich erscheinen 12.320 € / 1,02 = 12.078 €.
 **Folge:** Im Diagramm liegen eingefrorener Korridor und aktuelle Prognose
 nicht in exakt derselben Kaufkraft übereinander; über wenige Jahre ist der
 Unterschied klein, über lange Zeit wächst er.
+
+---
+
+## 15. Durchsicht vom 11.10.2026: geändertes Verhalten zum Prüfen
+
+- [ ] **Geprüft und für mich in Ordnung**
+
+**Gespeicherte Werte geändert:** Sparrechner-Profile, die noch die alten
+Vorgaben hatten (Endkapital 20.000 €, Laufzeit 7 Jahre) und die Laufzeit nicht
+ausdrücklich freigegeben haben, stehen nach dem nächsten Start auf 250.000 € und
+30 Jahren (Migration `drizzle/0004_savings_defaults.sql`). Eigene Werte bleiben.
+
+**Vorhandenes Kapital im Gesamtplan:** Solange kein Ist-Stand erfasst ist,
+startet der Plan mit dem „Vorhandenen Kapital" der globalen Werte im
+ETF-Depot, vorher mit 0 €.
+
+**Beispiel:** 50.000 € vorhandenes Kapital heben das Vermögen bei Renteneintritt
+im mittleren Verlauf von rund 99.000 € auf rund 192.000 € (Standardwerte).
+
+**Zu entscheiden:** Sobald du einen Ist-Stand erfasst, zählt nur noch dieser.
+Sparrechner und Rentenlücke rechnen weiter mit dem „Vorhandenen Kapital"; beide
+Angaben musst du selbst gleich halten. Soll das „Vorhandene Kapital" beim
+Erfassen eines Ist-Stands automatisch auf dessen Summe gesetzt werden?
