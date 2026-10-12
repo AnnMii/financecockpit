@@ -192,6 +192,37 @@ export function Dashboard() {
         </div>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <CalculatorCard
+            id="pension-gap"
+            note={`${text.taxNote.pensionGap} ${
+              settings.shared.considerInflation
+                ? text.currencyNote.real
+                : text.currencyNote.nominal
+            }`}
+            errors={pensionGap.errors}
+            chart={
+              pensionGap.result && (
+                <PensionGapChart result={pensionGap.result} height={CHART_HEIGHT} />
+              )
+            }
+            figures={
+              pensionGap.result && [
+                { label: text.gapPerMonth, value: f.euro(pensionGap.result.gap) },
+                {
+                  label: text.netPensionMonthly,
+                  value: f.euro(pensionGap.result.netPension),
+                },
+                {
+                  label: text.capitalWithConsumption,
+                  value: f.euro(pensionGap.result.withConsumption.capital),
+                },
+                {
+                  label: text.savingsRateNeeded,
+                  value: f.euroCents(pensionGap.result.withConsumption.savingsRate),
+                },
+              ]
+            }
+          />
+          <CalculatorCard
             id="av-depot"
             note={`${text.taxNote.avDepot} ${text.currencyNote.nominal}`}
             errors={avDepot.errors}
@@ -219,37 +250,6 @@ export function Dashboard() {
                   value: f.euro(
                     avDepot.result.av.allowances + avDepot.result.av.taxSavings,
                   ),
-                },
-              ]
-            }
-          />
-          <CalculatorCard
-            id="pension-gap"
-            note={`${text.taxNote.pensionGap} ${
-              settings.shared.considerInflation
-                ? text.currencyNote.real
-                : text.currencyNote.nominal
-            }`}
-            errors={pensionGap.errors}
-            chart={
-              pensionGap.result && (
-                <PensionGapChart result={pensionGap.result} height={CHART_HEIGHT} />
-              )
-            }
-            figures={
-              pensionGap.result && [
-                { label: text.gapPerMonth, value: f.euro(pensionGap.result.gap) },
-                {
-                  label: text.netPensionMonthly,
-                  value: f.euro(pensionGap.result.netPension),
-                },
-                {
-                  label: text.capitalWithConsumption,
-                  value: f.euro(pensionGap.result.withConsumption.capital),
-                },
-                {
-                  label: text.savingsRateNeeded,
-                  value: f.euroCents(pensionGap.result.withConsumption.savingsRate),
                 },
               ]
             }

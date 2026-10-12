@@ -9,8 +9,8 @@ Alle Werte liegen in Profilen und werden pro Benutzerkonto gespeichert.
 | Cockpit | `/` |
 | Gesamtplan | `/plan` |
 | Verlauf (Ist-Stände) | `/verlauf` |
-| Altersvorsorgedepot | `/rechner/altersvorsorgedepot` |
 | Rentenlücke | `/rechner/rentenluecke` |
+| Altersvorsorgedepot | `/rechner/altersvorsorgedepot` |
 | Sparrechner | `/rechner/sparrechner` |
 | Entnahmeplan | `/rechner/entnahmeplan` |
 

@@ -16,12 +16,15 @@ export interface CalculatorInfo {
 }
 
 /**
- * Every calculator of the cockpit; drives the navigation and the start page.
+ * Every calculator of the cockpit; drives the navigation and the profile
+ * pickers of the start page. The order is the one to fill them in: the pension
+ * gap sets the goal, then the Altersvorsorgedepot and the savings calculator
+ * (the ETF depot) build the capital, the withdrawal plan pays it out.
  * Titles and descriptions are in src/lib/i18n, under `calculators`.
  */
 export const calculators: CalculatorInfo[] = [
-  { id: "av-depot", href: "/rechner/altersvorsorgedepot" },
   { id: "pension-gap", href: "/rechner/rentenluecke" },
+  { id: "av-depot", href: "/rechner/altersvorsorgedepot" },
   { id: "savings", href: "/rechner/sparrechner" },
   { id: "withdrawal-plan", href: "/rechner/entnahmeplan" },
 ];

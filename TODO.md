@@ -233,7 +233,7 @@ identisch mit Finanzfluss.
 
 | Rechner | Slider |
 | --- | --- |
-| Altersvorsorgedepot | Alter, beide Einkommen, Sparrate, Einmalauszahlung (wie bei Finanzfluss) |
+| Altersvorsorgedepot | alle Regler wie bei Finanzfluss: Alter, Renteneintritt, beide Einkommen, Sparrate (monatlich statt jährlich), Rendite, Kosten, Sparerpauschbetrag, Basiszins, Einmalauszahlung, Auszahlung bis, Rendite im Ruhestand; die erweiterten Eingaben sind eingeklappt |
 | Rentenlücke | Alter, gesetzliche Rente (0–4.000 €), Wunschrente (0–6.000 €) |
 | Sparrechner | keine |
 | Entnahmeplan | keine |

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
 import { Section } from "@/components/fields";
@@ -15,12 +16,20 @@ import { AV_DEPOT_MAX_MONTHLY } from "@/lib/calculators/registry";
 import { AvDepotResults } from "./av-depot-results";
 import { useAvDepot } from "./use-av-depot";
 
-// Slider ranges follow the Finanzfluss calculator; the inputs accept more.
+// The sliders of the Finanzfluss calculator, with their ranges and steps; the
+// inputs accept more. The savings rate is yearly there (120 € to 6.840 €, the
+// limit of a single contract) and monthly here.
 const sliders = {
   age: { min: 18, max: 66, step: 1 },
-  // 120 € to 6.840 € per year, the limit of a single contract
-  savingsRateMonthly: { min: 10, max: 570, step: 5 },
+  retirementAge: { min: 65, max: 70, step: 1 },
+  savingsRateMonthly: { min: 10, max: 570, step: 1 },
+  expectedReturn: { min: 0, max: 20, step: 0.1 },
+  avDepotCosts: { min: 0, max: 5, step: 0.1 },
+  exemptionOrder: { min: 0, max: 1_000, step: 10 },
+  baseRate: { min: 0, max: 10, step: 0.01 },
   oneTimePayout: { min: 0, max: 30, step: 1 },
+  payoutUntilAge: { min: 85, max: 120, step: 1 },
+  retirementReturn: { min: 0, max: 20, step: 0.1 },
 };
 
 export function AvDepotCalculator() {
@@ -31,6 +40,41 @@ export function AvDepotCalculator() {
   );
 }
 
+/** Minimum, subsidy limit and maximum of the savings rate, as at Finanzfluss. */
+function SavingsPresets() {
+  const { t, f } = useLocale();
+  const { settings, update } = useSettingsEditor();
+  const current = settings.shared.savingsRateMonthly;
+  // 120 €, 1.800 € and 13.680 € per year
+  const presets = [
+    { value: 10, label: t.avDepot.presets.minimum },
+    { value: 150, label: t.avDepot.presets.subsidyLimit },
+    { value: AV_DEPOT_MAX_MONTHLY, label: t.avDepot.presets.maximum },
+  ];
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {presets.map((preset) => (
+        <button
+          key={preset.label}
+          type="button"
+          aria-pressed={current === preset.value}
+          onClick={() => update("shared", { savingsRateMonthly: preset.value })}
+          className={`rounded-md border px-2 py-1.5 text-center ${
+            current === preset.value
+              ? "border-accent bg-accent-wash"
+              : "border-axis hover:bg-accent-wash"
+          }`}
+        >
+          <span className="block text-sm font-medium text-ink">
+            {f.euro(preset.value)}
+          </span>
+          <span className="block text-xs text-ink-2">{preset.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function AvDepotWorkspace() {
   const { t, f } = useLocale();
   const { input, errors, result } = useAvDepot();
@@ -38,19 +82,44 @@ function AvDepotWorkspace() {
   const text = t.avDepot;
   const capped = settings.shared.savingsRateMonthly > AV_DEPOT_MAX_MONTHLY;
 
+  // The advanced inputs start hidden to keep the calculator simple. With an
+  // error they are shown anyway: it may be one of them that has to change.
+  const [advanced, setAdvanced] = useState(false);
+  const forced = errors.length > 0;
+  const showAdvanced = advanced || forced;
+
   return (
     <CalculatorShell
       scope="av-depot"
       errors={errors}
       form={
         <>
+          <div>
+            <label className="flex items-center justify-between gap-3 text-sm font-medium text-ink">
+              {text.advancedToggle}
+              <input
+                type="checkbox"
+                checked={showAdvanced}
+                disabled={forced}
+                onChange={(event) => setAdvanced(event.target.checked)}
+                className="size-4 accent-(--accent)"
+              />
+            </label>
+            {forced && (
+              <p className="mt-1 text-xs text-ink-2">{text.advancedForced}</p>
+            )}
+          </div>
+
           <Section title={text.sections.personal}>
             <NumberSetting scope="shared" name="age" slider={sliders.age} />
-            <NumberSetting
-              scope="shared"
-              name="retirementAge"
-              hint={text.retirementAgeHint}
-            />
+            {showAdvanced && (
+              <NumberSetting
+                scope="shared"
+                name="retirementAge"
+                slider={sliders.retirementAge}
+                hint={text.retirementAgeHint}
+              />
+            )}
           </Section>
 
           <Section title={text.sections.income}>
@@ -59,6 +128,7 @@ function AvDepotWorkspace() {
           </Section>
 
           <Section title={text.sections.saving}>
+            <SavingsPresets />
             <NumberSetting
               scope="shared"
               name="savingsRateMonthly"
@@ -71,11 +141,31 @@ function AvDepotWorkspace() {
                     )
               }
             />
-            <NumberSetting scope="shared" name="expectedReturn" />
-          </Section>
-
-          <Section title={text.sections.children}>
-            <ChildrenField />
+            {showAdvanced && (
+              <>
+                <NumberSetting
+                  scope="shared"
+                  name="expectedReturn"
+                  slider={sliders.expectedReturn}
+                />
+                <NumberSetting
+                  scope="av-depot"
+                  name="avDepotCosts"
+                  slider={sliders.avDepotCosts}
+                />
+                <NumberSetting
+                  scope="shared"
+                  name="exemptionOrder"
+                  slider={sliders.exemptionOrder}
+                />
+                <SelectSetting scope="av-depot" name="taxSavingsMode" />
+                <NumberSetting
+                  scope="av-depot"
+                  name="baseRate"
+                  slider={sliders.baseRate}
+                />
+              </>
+            )}
           </Section>
 
           <Section title={text.sections.payout}>
@@ -84,19 +174,25 @@ function AvDepotWorkspace() {
               name="oneTimePayout"
               slider={sliders.oneTimePayout}
             />
-            <NumberSetting
-              scope="shared"
-              name="payoutUntilAge"
-              hint={text.payoutUntilHint}
-            />
-            <NumberSetting scope="shared" name="retirementReturn" />
+            {showAdvanced && (
+              <>
+                <NumberSetting
+                  scope="shared"
+                  name="payoutUntilAge"
+                  slider={sliders.payoutUntilAge}
+                  hint={text.payoutUntilHint}
+                />
+                <NumberSetting
+                  scope="shared"
+                  name="retirementReturn"
+                  slider={sliders.retirementReturn}
+                />
+              </>
+            )}
           </Section>
 
-          <Section title={text.sections.advanced}>
-            <NumberSetting scope="av-depot" name="avDepotCosts" />
-            <SelectSetting scope="av-depot" name="taxSavingsMode" />
-            <NumberSetting scope="shared" name="exemptionOrder" />
-            <NumberSetting scope="av-depot" name="baseRate" />
+          <Section title={text.sections.children}>
+            <ChildrenField />
           </Section>
         </>
       }

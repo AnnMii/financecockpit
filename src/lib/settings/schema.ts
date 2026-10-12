@@ -37,10 +37,10 @@ export const numberFields = {
     payoutUntilAge: { min: 68, max: 120, default: 85, integer: true },
     savingsRateMonthly: euro(150, 100_000),
     currentCapital: euro(0),
-    /** Expected yearly return while saving (MSCI World after fund costs). */
+    /** Expected yearly return while saving (on the invested capital, after fund costs). */
     expectedReturn: percent(6, 20),
     /** Expected yearly return in retirement. */
-    retirementReturn: percent(3, 15),
+    retirementReturn: percent(3, 20),
     inflationRate: percent(2, 20),
     /** Kapitalertragsteuer including Solidaritätszuschlag. */
     capitalGainsTax: percent(26.375),

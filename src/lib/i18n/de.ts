@@ -116,9 +116,9 @@ const numbers: NumberTexts = {
       hint: "Heute bereits angelegtes Vermögen.",
     },
     expectedReturn: {
-      label: "Erwartete Rendite MSCI World",
+      label: "Erwartete Rendite in der Sparphase",
       unit: "% p. a.",
-      hint: "In der Sparphase, nach Fondskosten (TER), vor Steuern.",
+      hint: "Nach Fondskosten (TER), vor Steuern.",
     },
     retirementReturn: {
       label: "Rendite im Ruhestand",
@@ -874,8 +874,8 @@ export const de = {
       withdrawalTaxed: "Erträge nach geschätztem Steuerabzug gerechnet.",
     },
     currencyNote: {
-      nominal: "Beträge nominal, in künftigen Euro.",
-      real: "Beträge in heutiger Kaufkraft.",
+      nominal: "Ohne Berücksichtigung der Inflation (nominal, künftige Euro).",
+      real: "Unter Berücksichtigung der Inflation (heutige Kaufkraft).",
     },
     capitalAssets: "Anlagevermögen",
   },
@@ -887,7 +887,14 @@ export const de = {
       saving: "Ansparphase",
       children: "Kinder",
       payout: "Auszahlphase",
-      advanced: "Erweitert",
+    },
+    advancedToggle: "Erweiterte Eingaben",
+    advancedForced:
+      "Wegen der Fehlermeldung sind die erweiterten Eingaben eingeblendet.",
+    presets: {
+      minimum: "Minimum",
+      subsidyLimit: "Fördergrenze",
+      maximum: "Maximum",
     },
     retirementAgeHint: "Zwischen 65 und 70 Jahren.",
     savingsRateHint: (perYear: string) =>

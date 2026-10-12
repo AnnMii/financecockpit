@@ -348,9 +348,9 @@ export const en: Dictionary = {
         hint: "Wealth already invested today.",
       },
       expectedReturn: {
-        label: "Expected return MSCI World",
+        label: "Expected return while saving",
         unit: "% p.a.",
-        hint: "While saving, after fund costs (TER), before taxes.",
+        hint: "After fund costs (TER), before taxes.",
       },
       retirementReturn: {
         label: "Return in retirement",
@@ -829,8 +829,8 @@ export const en: Dictionary = {
       withdrawalTaxed: "Returns calculated after the estimated tax deduction.",
     },
     currencyNote: {
-      nominal: "Amounts nominal, in future euros.",
-      real: "Amounts in today's purchasing power.",
+      nominal: "Without taking inflation into account (nominal, future euros).",
+      real: "Taking inflation into account (today's purchasing power).",
     },
     capitalAssets: "Portfolio",
   },
@@ -842,7 +842,13 @@ export const en: Dictionary = {
       saving: "Saving phase",
       children: "Children",
       payout: "Payout phase",
-      advanced: "Advanced",
+    },
+    advancedToggle: "Advanced inputs",
+    advancedForced: "The advanced inputs are shown because of the error message.",
+    presets: {
+      minimum: "Minimum",
+      subsidyLimit: "Subsidy limit",
+      maximum: "Maximum",
     },
     retirementAgeHint: "Between 65 and 70.",
     savingsRateHint: (perYear) =>
