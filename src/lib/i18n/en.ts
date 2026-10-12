@@ -584,6 +584,9 @@ export const en: Dictionary = {
     free: (amount) => `Still free: ${amount}.`,
     over: (amount) => `${amount} more planned than available.`,
     exact: "The budget is planned exactly.",
+    freeHeadline: (amount) => `${amount} per month still free to invest`,
+    overHeadline: (amount) => `${amount} per month more planned than available`,
+    exactHeadline: "The budget is planned exactly",
     rest: "Rest",
     restTitle: "Enters what is still free of the budget",
     enough: (budget, left) =>

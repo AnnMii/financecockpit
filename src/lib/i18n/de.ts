@@ -623,6 +623,10 @@ export const de = {
     free: (amount: string) => `Noch frei: ${amount}.`,
     over: (amount: string) => `${amount} mehr verplant als verfügbar.`,
     exact: "Das Budget ist genau verplant.",
+    freeHeadline: (amount: string) => `Noch ${amount} pro Monat zum Investieren frei`,
+    overHeadline: (amount: string) =>
+      `${amount} pro Monat mehr verplant als verfügbar`,
+    exactHeadline: "Das Budget ist genau verplant",
     rest: "Rest",
     restTitle: "Setzt den noch freien Betrag des Budgets ein",
     enough: (budget: string, left: string) =>

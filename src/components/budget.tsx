@@ -13,12 +13,15 @@ export function BudgetHint() {
   const text = t.budget;
   const money = (value: number) =>
     Number.isInteger(value) ? f.euro(value) : f.euroCents(value);
+  // Money that is still free or planned twice stands out; the rest is quiet.
   const state =
-    use.free === 0
-      ? text.exact
-      : use.free > 0
-        ? text.free(money(use.free))
-        : text.over(money(-use.free));
+    use.free === 0 ? (
+      text.exact
+    ) : use.free > 0 ? (
+      <strong className="font-semibold text-accent">{text.free(money(use.free))}</strong>
+    ) : (
+      <strong className="font-semibold text-critical">{text.over(money(-use.free))}</strong>
+    );
   return (
     <>
       {text.hint(money(use.available), money(use.planned))} {state}

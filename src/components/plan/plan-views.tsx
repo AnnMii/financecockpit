@@ -54,6 +54,8 @@ export function PlanStatus({
   const percent = (value: number) => f.percent(value);
   const amount = f.euro(result.amount);
   const budget = input.budget;
+  const budgetFree =
+    budget === undefined ? 0 : Math.round((budget - result.currentRate) * 100) / 100;
 
   return (
     <Card>
@@ -93,17 +95,33 @@ export function PlanStatus({
       </dl>
 
       {budget !== undefined && (
-        <p className="mt-3 text-xs text-ink-2">
-          {t.budget.hint(f.euro(budget), f.euro(result.currentRate))}{" "}
-          {Math.round(budget - result.currentRate) === 0
-            ? t.budget.exact
-            : budget > result.currentRate
-              ? t.budget.free(f.euro(budget - result.currentRate))
-              : t.budget.over(f.euro(result.currentRate - budget))}{" "}
-          {budget >= result.requiredRate
-            ? t.budget.enough(f.euro(budget), f.euro(budget - result.requiredRate))
-            : t.budget.short(f.euro(budget), f.euro(result.requiredRate - budget))}
-        </p>
+        <div
+          className={`mt-3 rounded-md border p-3 ${
+            budgetFree > 0
+              ? "border-accent bg-accent-wash"
+              : budgetFree < 0
+                ? "border-critical"
+                : "border-line"
+          }`}
+        >
+          <p
+            className={`text-sm font-semibold ${
+              budgetFree < 0 ? "text-critical" : "text-ink"
+            }`}
+          >
+            {budgetFree > 0
+              ? t.budget.freeHeadline(f.euro(budgetFree))
+              : budgetFree < 0
+                ? t.budget.overHeadline(f.euro(-budgetFree))
+                : t.budget.exactHeadline}
+          </p>
+          <p className="mt-0.5 text-xs text-ink-2">
+            {t.budget.hint(f.euro(budget), f.euro(result.currentRate))}{" "}
+            {budget >= result.requiredRate
+              ? t.budget.enough(f.euro(budget), f.euro(budget - result.requiredRate))
+              : t.budget.short(f.euro(budget), f.euro(result.requiredRate - budget))}
+          </p>
+        </div>
       )}
 
       <p className="mt-4 text-sm text-ink">
