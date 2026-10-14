@@ -17,7 +17,7 @@ INSERT INTO `profiles` (`id`, `user_id`, `scope`, `name`, `data`, `is_active`, `
 SELECT lower(hex(randomblob(16))), `user_id`, `scope`, 'Standard', `data`, 1, `updated_at`, `updated_at`
 FROM `settings`;
 --> statement-breakpoint
--- "Rendite in der Auszahlphase" and "Auszahlung bis Alter" moved from the
+-- "return in the payout phase" and "payout until age" moved from the
 -- AV-Depot calculator to the shared values. Users without shared settings
 -- get a shared profile holding just these two.
 INSERT INTO `profiles` (`id`, `user_id`, `scope`, `name`, `data`, `is_active`, `created_at`, `updated_at`)

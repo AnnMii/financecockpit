@@ -109,8 +109,8 @@ const INCOME_SLIDERS = {
 };
 
 const INCOME_SWITCH = {
-  zveSavingsPhase: "incomeIntervalSavings",
-  zveRetirement: "incomeIntervalRetirement",
+  taxableIncomeSavingsPhase: "incomeIntervalSavings",
+  taxableIncomeRetirement: "incomeIntervalRetirement",
 } as const;
 
 /**

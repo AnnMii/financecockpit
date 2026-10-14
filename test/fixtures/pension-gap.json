@@ -2,7 +2,7 @@
   "source": "https://api.finanzfluss.de/calculator/pension-gap-calculator",
   "cases": [
     {
-      "name": "Standardwerte",
+      "name": "Default values",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -36,7 +36,7 @@
       }
     },
     {
-      "name": "ohne Steuerabzug",
+      "name": "Without tax deduction",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -70,7 +70,7 @@
       }
     },
     {
-      "name": "Rendite fast 0",
+      "name": "Return almost 0",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -104,7 +104,7 @@
       }
     },
     {
-      "name": "1 Jahr Auszahlung",
+      "name": "1 year of payout",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -138,7 +138,7 @@
       }
     },
     {
-      "name": "2 Jahre Auszahlung",
+      "name": "2 years of payout",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -172,7 +172,7 @@
       }
     },
     {
-      "name": "hohe Rendite, 1 Jahr",
+      "name": "High return, 1 year",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -206,7 +206,7 @@
       }
     },
     {
-      "name": "ohne Kapitalertragsteuer",
+      "name": "Without capital gains tax",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -240,7 +240,7 @@
       }
     },
     {
-      "name": "Sparrendite fast 0",
+      "name": "Saving return almost 0",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -274,7 +274,7 @@
       }
     },
     {
-      "name": "1 Jahr bis zur Rente",
+      "name": "1 year until retirement",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -308,7 +308,7 @@
       }
     },
     {
-      "name": "1 Jahr, hohe Sparrendite",
+      "name": "1 year, high saving return",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -342,7 +342,7 @@
       }
     },
     {
-      "name": "vorhandenes Kapital",
+      "name": "Existing capital",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -376,7 +376,7 @@
       }
     },
     {
-      "name": "Inflation ohne Steuern",
+      "name": "Inflation without taxes",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -410,7 +410,7 @@
       }
     },
     {
-      "name": "Inflation mit Steuern",
+      "name": "Inflation with taxes",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -444,7 +444,7 @@
       }
     },
     {
-      "name": "keine Lücke",
+      "name": "No gap",
       "params": {
         "inputStatePension": 1500,
         "inputCompanyPension": 1000,
@@ -478,7 +478,7 @@
       }
     },
     {
-      "name": "alle Rentenarten",
+      "name": "All kinds of pension",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,
@@ -512,7 +512,7 @@
       }
     },
     {
-      "name": "Kapital und Inflation",
+      "name": "Capital and inflation",
       "params": {
         "inputStatePension": 950,
         "inputCompanyPension": 100,

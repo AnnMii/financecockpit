@@ -81,7 +81,7 @@ function Workspace() {
                   f.euro(snapshot.values.depot),
                   f.euro(snapshot.values.cash),
                 )}{" "}
-                <Link href="/verlauf" className="font-medium text-accent">
+                <Link href="/history" className="font-medium text-accent">
                   {text.changeInHistory}
                 </Link>
               </p>

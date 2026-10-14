@@ -1,24 +1,24 @@
 /**
- * Gesamtplan: ein in sich stimmiger Vermögensplan über drei Töpfe
- * (Altersvorsorgedepot, ETF-Depot, Tagesgeld) bis zum Renteneintritt.
+ * Overall plan: a consistent wealth plan over three pots
+ * (Altersvorsorgedepot, ETF depot, savings account) until retirement.
  *
- * Statt einer Linie liefert er einen Korridor: Viele zufällige Verläufe der
- * Rendite zeigen, in welchem Bereich das Vermögen landen kann, mit welcher
- * Wahrscheinlichkeit die Wunschrente erreicht wird und welche Sparrate für ein
- * gewähltes Sicherheitsniveau nötig ist.
+ * Instead of a single line it delivers a corridor: many random courses of the
+ * return show the range the wealth can end up in, with what probability
+ * the desired pension is reached and which savings rate a chosen
+ * confidence level needs.
  *
- * Alle Beträge sind in heutiger Kaufkraft. Das Modell und seine Grenzen:
- * - Renditen sind je Jahr unabhängig und lognormal verteilt, mit gleich
- *   bleibender Schwankung; AV-Depot und ETF-Depot bewegen sich gemeinsam.
- * - Sparraten bleiben in heutiger Kaufkraft gleich, steigen also mit der
- *   Inflation. Die Einzahlungen ins AV-Depot folgen dem AV-Depot-Rechner und
+ * All amounts are in today's purchasing power. The model and its limits:
+ * - Returns are independent per year and lognormally distributed, with constant
+ *   fluctuation; the AV-Depot and the ETF depot move together.
+ * - Savings rates stay the same in today's purchasing power, so they rise with
+ *   inflation. The contributions to the AV-Depot follow the AV-Depot calculator and
  *   bleiben nominal gleich.
- * - Die Rente aus dem AV-Depot wächst im Verhältnis zu dessen Kapital.
- * - Ab Renteneintritt wird mit der festen Rendite im Ruhestand gerechnet, nach
- *   dem geschätzten Steuerabzug; das freie Vermögen wird entweder bis zum Ende
- *   der Auszahlung aufgebraucht oder es werden nur die Erträge entnommen.
- * - Die nötige Sparrate ist die gesamte Sparrate, die bei gleicher Aufteilung
- *   auf die Töpfe zum Sicherheitsniveau führt.
+ * - The pension from the AV-Depot grows in proportion to its capital.
+ * - From retirement on the fixed return in retirement applies, after
+ *   the estimated tax deduction; the free assets are either used up by the end
+ *   of the payout or only their returns are withdrawn.
+ * - The required savings rate is the total savings rate that, split over the
+ *   pots in the same way, reaches the confidence level.
  */
 import {
   AV_CONTRIBUTION_CAP,
@@ -66,7 +66,7 @@ export interface PlanInput {
   /** Yearly fluctuation (standard deviation) of the returns, in percent. */
   depotVolatility: number;
   cashVolatility: number;
-  /** Pension entitlements and wish, as in the Rentenlücke calculator. */
+  /** Pension entitlements and wish, as in the pension gap calculator. */
   pension: Pick<
     PensionGapInput,
     | "statePension"

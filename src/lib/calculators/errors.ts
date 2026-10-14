@@ -13,19 +13,19 @@ export type CalculationError =
   | "avSavingsRateRange"
   | "avReturnsPositive"
   | "avCostsBelowReturns"
-  // Rentenlücke
+  // Pension gap
   | "taxBelow100"
-  // Sparrechner
+  // Savings calculator
   | "durationPositive"
   | "unreachableStartValue"
   | "unreachableSavingRate"
   | "unreachableYearlyInterest"
   | "unreachableDuration"
-  // Entnahmeplan
+  // Withdrawal plan
   | "interestAboveMinus100"
   | "capitalPositive"
   | "amountPositive"
   | "needsInterest"
-  // Gesamtplan
+  // Overall plan
   | "planSharesOver100"
   | "planGuardrailOrder";

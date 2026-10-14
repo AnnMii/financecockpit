@@ -27,7 +27,7 @@ const pension = {
   desiredPension: 2_200,
 };
 
-/** Depot only, as the Rentenlücke calculator sees it with inflation switched on. */
+/** Depot only, as the pension gap calculator sees it with inflation switched on. */
 function depotPlan(overrides: Partial<PlanInput> = {}): PlanInput {
   return {
     age: 35,
@@ -55,8 +55,8 @@ const avInput: AvDepotInput = {
   currentYear: 2027,
   age: 35,
   retirementAge: 67,
-  zveSavingsPhase: 50_000,
-  zveRetirement: 20_000,
+  taxableIncomeSavingsPhase: 50_000,
+  taxableIncomeRetirement: 20_000,
   savingsRate: 1_800,
   etfReturnRate: 6,
   avDepotCosts: 0.2,
@@ -72,7 +72,7 @@ const avInput: AvDepotInput = {
 describe("calculatePlan without fluctuation", () => {
   const calm = { depotVolatility: 0, cashVolatility: 0 };
 
-  it("needs the savings rate the Rentenlücke calculator gives", () => {
+  it("needs the savings rate the pension gap calculator gives", () => {
     const gap = calculatePensionGap({
       ...pension,
       age: 35,

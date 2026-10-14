@@ -130,9 +130,9 @@ export const en: Dictionary = {
         "Whether you enter the income while saving per year (as in the income tax assessment) or per month. The calculation uses the yearly amount, i.e. the monthly amount times 12.",
       incomeIntervalRetirement:
         "Whether you enter the income in retirement per month (as the pension insurer states it) or per year. The calculation uses the yearly amount, i.e. the monthly amount times 12.",
-      zveSavingsPhase:
+      taxableIncomeSavingsPhase:
         "Your taxable income while you save: gross income minus income-related expenses, pension contributions and allowances. It is stated in your income tax assessment and determines how much tax the deposits into the AV-Depot save you.",
-      zveRetirement:
+      taxableIncomeRetirement:
         "Your taxable income in retirement without the payouts from the AV-Depot, mainly the taxable part of your pensions. It determines the tax rate on the payouts.",
       exemptionOrder:
         "Investment income up to this amount stays tax-free per year: €1,000 for single persons, €2,000 for couples assessed jointly. Enter what is still available for this investment.",
@@ -371,12 +371,12 @@ export const en: Dictionary = {
         unit: "%",
         hint: "25% plus solidarity surcharge; higher with church tax.",
       },
-      zveSavingsPhase: {
+      taxableIncomeSavingsPhase: {
         label: "Income while saving",
         unit: "€ / year",
         hint: "Taxable income.",
       },
-      zveRetirement: {
+      taxableIncomeRetirement: {
         label: "Income in retirement",
         unit: "€ / year",
         hint: "Taxable income, without the payouts.",

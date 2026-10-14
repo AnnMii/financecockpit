@@ -1,391 +1,396 @@
-# TODO – Punkte zum Prüfen
+# TODO – Items to review
 
-Entscheidungen und Vereinfachungen aus dem Bau der Profile, der drei neuen
-Rechner und des Cockpits (Stand 11.10.2026). Jeder Punkt beschreibt, was gilt,
-ein Beispiel zum Nachrechnen und die Frage, die du entscheiden solltest.
+Decisions and simplifications from building the profiles, the three new
+calculators and the cockpit (as of 2026-10-11). Each item describes what
+applies, an example you can recompute and the question you should decide.
 
-Die Beispielzahlen gelten für ein frisches Konto mit den Standardwerten
-(Profil „Standard" überall). Mit deinen eigenen Werten weichen sie ab.
+The example numbers are for a fresh account with the default values (profile
+"Standard" everywhere). With your own values they differ. UI labels are quoted
+in German as they appear in the app.
 
 ---
 
-## 1. Ergebnisse weichen von den Finanzfluss-Beispielen ab
+## 1. Results differ from the Finanzfluss examples
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [ ] **Checked and fine with me**
 
-**Was gilt:** Die Rechner nutzen die globalen Werte. Deren Standardwerte sind
-nicht die Standardwerte der einzelnen Finanzfluss-Seiten, deshalb zeigt derselbe
-Rechner hier andere Zahlen als dort.
+**What applies:** The calculators use the global values. Their defaults are not
+the defaults of the individual Finanzfluss pages, so the same calculator shows
+different numbers here than there.
 
-| Globaler Wert | Hier | Finanzfluss Rentenlücke | Finanzfluss Entnahmeplan | Finanzfluss Sparrechner |
+| Global value | Here | Finanzfluss pension gap | Finanzfluss withdrawal plan | Finanzfluss savings calculator |
 | --- | --- | --- | --- | --- |
-| Alter | 35 | 30 | – | – |
-| Auszahlung bis Alter | 85 | 100 | – | – |
-| Erwartete Rendite | 6 % | 5 % | – | 1,5 % |
-| Rendite im Ruhestand | 3 % | 3 % | 5 % | – |
-| Vorhandenes Kapital | 0 € | 0 € | – | 5.000 € |
+| Age | 35 | 30 | – | – |
+| Payout until age | 85 | 100 | – | – |
+| Expected return | 6 % | 5 % | – | 1.5 % |
+| Return in retirement | 3 % | 3 % | 5 % | – |
+| Existing capital | €0 | €0 | – | €5,000 |
 
-**Beispiel Rentenlücke** (`/rechner/rentenluecke`):
+**Example pension gap** (`/calculators/pension-gap`):
 
-| | Kapital mit Verzehr | Sparrate | Kapital ohne Verzehr | Sparrate |
+| | Capital with consumption | Savings rate | Capital without consumption | Savings rate |
 | --- | --- | --- | --- | --- |
-| Standardwerte hier | 200.002 € | 237,50 € | 542.659 € | 644,39 € |
-| Alter 30, Auszahlung bis 100, Rendite bis zur Rente 5 % | 309.185 € | 327,51 € | 542.659 € | 574,81 € |
+| Default values here | €200,002 | €237.50 | €542,659 | €644.39 |
+| Age 30, payout until 100, return until retirement 5 % | €309,185 | €327.51 | €542,659 | €574.81 |
 
-Die zweite Zeile ist das Ergebnis der Finanzfluss-Seite. Die Rentenlücke selbst
-ist in beiden Fällen 1.153 € pro Monat.
+The second row is the result of the Finanzfluss page. The pension gap itself is
+€1,153 per month in both cases.
 
-**Beispiel Entnahmeplan** (`/rechner/entnahmeplan`): 100.000 €, 10 Jahre,
-monatlich → hier 963,74 € pro Monat (3 %), bei Finanzfluss 1.055,24 € (5 %).
+**Example withdrawal plan** (`/calculators/withdrawal-plan`): €100,000, 10 years,
+monthly → here €963.74 per month (3 %), at Finanzfluss €1,055.24 (5 %).
 
-**Beispiel Sparrechner** (`/rechner/sparrechner`): 150 € pro Monat bis zum
-Renteneintritt (32 Jahre) → 174.520 € Endkapital. Mit freier Laufzeit von
-7 Jahren (Schalter „Laufzeit bis Renteneintritt" aus) sind es 15.689 €
-(0 € Anfangskapital, 6 %), mit den Finanzfluss-Werten (5.000 €, 1,5 %)
-18.846 €.
+**Example savings calculator** (`/calculators/savings`): €150 per month until
+retirement (32 years) → €174,520 final capital. With a free duration of 7 years
+(switch "Laufzeit bis Renteneintritt" off) it is €15,689 (€0 starting capital,
+6 %), with the Finanzfluss values (€5,000, 1.5 %) €18,846.
 
-**So prüfst du es:** Die Werte der zweiten Tabellenzeile im Rechner eintragen
-(gilt nur lokal) und mit der Finanzfluss-Seite vergleichen, danach
-„Zurücksetzen".
+**How to check:** Enter the values of the second table row in the calculator
+(applies locally only), compare with the Finanzfluss page, then press
+"Zurücksetzen".
 
-**Zu entscheiden:** Sollen die Standardwerte der globalen Werte anders sein,
-z. B. „Auszahlung bis Alter" 90 statt 85? Zu ändern in
-`src/lib/settings/schema.ts`; das betrifft nur neu angelegte Profile.
-
----
-
-## 2. „Auszahlung bis Alter" ist ein gemeinsamer Wert für zwei Rechner
-
-- [ ] **Geprüft und für mich in Ordnung**
-
-**Was gilt:** Der AV-Depot-Rechner („Auszahlung bis") und der
-Rentenlückenrechner („Lebenserwartung" bei Finanzfluss) teilen sich diesen Wert.
-Der AV-Depot-Rechner verlangt mindestens 85.
-
-**Beispiel:** Stellst du im Rentenlückenrechner „Auszahlung bis Alter" auf 80
-und speicherst, zeigt der AV-Depot-Rechner statt Ergebnissen die Meldung „Im
-Altersvorsorgedepot muss die Auszahlung mindestens bis zum Alter 85 laufen",
-und im Cockpit fehlt die AV-Depot-Rente im Gesamtbild.
-
-**Zu entscheiden:** Ist ein gemeinsamer Wert richtig, oder brauchst du zwei
-getrennte (Auszahlplan des AV-Depots und Lebenserwartung für die Rentenlücke)?
+**To decide:** Should the defaults of the global values be different, e.g.
+"Auszahlung bis Alter" 90 instead of 85? Change it in
+`src/lib/settings/schema.ts`; this only affects newly created profiles.
 
 ---
 
-## 3. Budget global, Sparraten lokal
+## 2. "Auszahlung bis Alter" is a shared value for two calculators
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [ ] **Checked and fine with me**
 
-**Was gilt:** Global ist nur „Zum Investieren verfügbar pro Monat" (Vorgabe
-300 €). Die Sparrate hat jeder Rechner selbst: Altersvorsorgedepot 150 € (die
-Fördergrenze), Sparrechner 150 € (dein ETF-Depot), Tagesgeld im Gesamtplan 0 €.
-Zusammen sind das die 300 € des Budgets. Unter jeder Rate steht, wie viel vom
-Budget verplant und frei ist; der Knopf „Rest" setzt den freien Betrag ein.
+**What applies:** The AV-Depot calculator ("Auszahlung bis") and the pension gap
+calculator ("Lebenserwartung" at Finanzfluss) share this value. The AV-Depot
+calculator requires at least 85.
 
-**Beispiel:** Budget 500 €, AV-Depot 150 €, Sparrechner 150 € → „Verfügbar
-500 €, verplant 300 €. Noch frei: 200 €." Ein Klick auf „Rest" beim Sparrechner
-macht daraus 350 €. Beim Sparintervall „jährlich" zahlt der Sparrechner das
-Zwölffache einmal im Jahr ein; sucht er die Sparrate, zeigt er sie je Intervall.
+**Example:** If you set "Auszahlung bis Alter" to 80 in the pension gap
+calculator and save, the AV-Depot calculator shows the message "Im
+Altersvorsorgedepot muss die Auszahlung mindestens bis zum Alter 85 laufen"
+instead of results, and the cockpit lacks the AV-Depot pension in the overall
+picture.
 
-**Gespeichert:** Die frühere globale „Sparrate pro Monat" gibt es nicht mehr.
-Bestehende Profile starten mit den Vorgaben; trage Budget und Raten einmal neu
-ein.
-
-**Zu entscheiden:** Ist 150 € ins AV-Depot (nur der geförderte Teil) die richtige
-Vorgabe? Mehr geht bis 1.140 €, ist aber ungefördert.
+**To decide:** Is one shared value right, or do you need two separate ones
+(payout plan of the AV-Depot and life expectancy for the pension gap)?
 
 ---
 
-## 4. Alle Sparraten zusammen gegen das Budget
+## 3. Budget global, savings rates local
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [ ] **Checked and fine with me**
 
-**Was gilt:** Der Gesamtplan addiert die Raten von Altersvorsorgedepot,
-Sparrechner und Tagesgeld und vergleicht sie mit dem Budget. Das Cockpit zeigt
-dieselbe Zeile in der Karte des Plans. Damit zählt dasselbe Geld nicht doppelt.
-Die Karten im Cockpit rechnen weiter jede für sich mit ihrer Rate.
+**What applies:** Only "Zum Investieren verfügbar pro Monat" is global (default
+€300). Each calculator has its own savings rate: Altersvorsorgedepot €150 (the
+subsidy limit), savings calculator €150 (your ETF depot), savings account in the
+overall plan €0. Together they make up the €300 budget. Below each rate it says
+how much of the budget is planned and how much is free; the button "Rest" enters
+the free amount.
 
-**Beispiel:** Budget 500 €, Raten 150 + 350 + 0 → „Das Budget ist genau
-verplant." Mit 20 € Tagesgeld: „520 € verplant, 20 € mehr verplant als
-verfügbar." Reicht das Budget nicht für die nötige Sparrate, steht z. B. „Dein
-Budget von 500 € reicht nicht für die nötige Sparrate: Es fehlen 199 €."
+**Example:** Budget €500, AV-Depot €150, savings calculator €150 → "Verfügbar
+500 €, verplant 300 €. Noch frei: 200 €." One click on "Rest" at the savings
+calculator makes it €350. With the saving interval "jährlich" the savings
+calculator pays in twelve times the amount once a year; when it searches for the
+savings rate, it shows it per interval.
 
-**Zu entscheiden:** Soll zu viel verplantes Geld nur warnen (wie jetzt) oder die
-Berechnung bremsen?
+**Stored:** The former global "Sparrate pro Monat" no longer exists. Existing
+profiles start with the defaults; enter budget and rates once anew.
 
----
-
-## 5. Die Kapitalertragsteuer ist global
-
-- [ ] **Geprüft und für mich in Ordnung**
-
-**Was gilt:** Rentenlücke und Sparrechner nutzen denselben Wert (Standard
-26,375 %). Das war nicht ausdrücklich abgestimmt, folgt aber der Regel „was
-mehrere Rechner nutzen, ist global".
-
-**Beispiel:** Im Sparrechner „Steuern mitberechnen" einschalten, die
-Kapitalertragsteuer auf 27,82 % (mit Kirchensteuer) ändern und im Profil
-speichern → im Rentenlückenrechner steht unter „Sparphase" ebenfalls 27,82 %,
-und dessen Sparraten steigen leicht.
-
-**Zu entscheiden:** Passt das, oder soll der Wert je Rechner getrennt sein?
+**To decide:** Is €150 into the AV-Depot (only the subsidised part) the right
+default? More is possible up to €1,140, but unsubsidised.
 
 ---
 
-## 6. Vereinfachungen im Gesamtbild „Ruhestand" des Cockpits
+## 4. All savings rates together against the budget
 
-- [x] **Erledigt:** Dieses Gesamtbild ist entfallen. Der Gesamtplan ersetzt es
-      und rechnet durchgehend in heutiger Kaufkraft. Der Rest dieses Punktes
-      beschreibt den alten Stand.
+- [ ] **Checked and fine with me**
 
-**Was gilt:** Verbleibende Lücke = Rentenlücke − Netto-Rente aus dem AV-Depot.
+**What applies:** The overall plan adds up the rates of the Altersvorsorgedepot,
+the savings calculator and the savings account and compares them with the
+budget. The cockpit shows the same line in the plan card. That way the same money
+is not counted twice. The cards in the cockpit still calculate each with its own
+rate.
 
-**Beispiel:** Rentenlücke 1.153 € − AV-Depot 989 € = 164 € verbleibende Lücke
-pro Monat. Nötiges Kapital und zusätzliche Sparrate für diese 164 € stehen
-daneben.
+**Example:** Budget €500, rates 150 + 350 + 0 → "Das Budget ist genau verplant."
+With €20 in the savings account: "520 € verplant, 20 € mehr verplant als
+verfügbar." If the budget does not suffice for the required savings rate, it
+says e.g. "Dein Budget von 500 € reicht nicht für die nötige Sparrate: Es fehlen
+199 €."
 
-Vier Vereinfachungen stecken darin:
-
-1. **Laufzeit:** Die AV-Depot-Rente läuft nur bis „Auszahlung bis Alter". Da
-   der Rentenlückenrechner denselben Wert nutzt, passen beide zusammen – wer
-   länger lebt, hat danach die volle Lücke von 1.153 €.
-2. **Zusätzliche Sparrate:** Sie kommt zu den 150 € hinzu, die in der Rechnung
-   ins AV-Depot fließen. Die Karte sagt das im Hinweistext.
-3. **Vorhandenes Kapital:** Es wird voll auf die verbleibende Lücke
-   angerechnet. Mit 12.345 € vorhandenem Kapital zeigt das Cockpit z. B.
-   28.519 € nötiges Kapital, aber 0,00 € zusätzliche Sparrate, weil das Kapital
-   bis zur Rente von allein so weit wächst.
-4. **Nominal:** Die AV-Depot-Rente ist ein Betrag in Euro des Rentenjahres, die
-   Wunschrente trägst du in heutigen Euro ein. Der Schalter „Inflation
-   berücksichtigen" wirkt nur auf den Rentenlückenrechner, nicht auf den
-   AV-Depot-Rechner.
-
-**Zu entscheiden:** Ist das Gesamtbild so aussagekräftig genug? Punkt 4 ist die
-größte Ungenauigkeit: 989 € in 32 Jahren sind weniger wert als 989 € heute. Eine
-Lösung wäre, die AV-Depot-Rente bei eingeschalteter Inflation auf heutige
-Kaufkraft umzurechnen.
+**To decide:** Should too much planned money only warn (as now) or slow the
+calculation down?
 
 ---
 
-## 7. Rentenlücke und Entnahmeplan lassen sich nicht automatisch abgleichen
+## 5. The capital gains tax is global
 
-- [ ] **Regelmäßigen Termin dafür eingerichtet**
+- [ ] **Checked and fine with me**
 
-**Was gilt:** Für diese beiden Rechner veröffentlicht Finanzfluss keinen
-Quellcode. Die Formeln sind aus 35 aufgezeichneten Ergebnissen der
-Finanzfluss-Seite hergeleitet (`test/fixtures/`). Ändert Finanzfluss die
-Berechnung, merkt `npm test` das nicht.
+**What applies:** Pension gap and savings calculator use the same value (default
+26.375 %). This was not explicitly agreed, but it follows the rule "what several
+calculators use is global".
 
-**So prüfst du es:**
+**Example:** In the savings calculator switch "Steuern mitberechnen" on, change
+the capital gains tax to 27.82 % (with church tax) and save in the profile → in
+the pension gap calculator under "Sparphase" it says 27.82 % as well, and its
+savings rates rise slightly.
+
+**To decide:** Is that fine, or should the value be separate per calculator?
+
+---
+
+## 6. Simplifications in the cockpit's "Ruhestand" overall picture
+
+- [x] **Done:** This overall picture is gone. The overall plan replaces it and
+      calculates throughout in today's purchasing power. The rest of this item
+      describes the old state.
+
+**What applied:** Remaining gap = pension gap − net pension from the AV-Depot.
+
+**Example:** Pension gap €1,153 − AV-Depot €989 = €164 remaining gap per month.
+Required capital and additional savings rate for these €164 were shown next to
+it.
+
+Four simplifications were in there:
+
+1. **Duration:** The AV-Depot pension runs only until "Auszahlung bis Alter".
+   Since the pension gap calculator uses the same value, both fit together – whoever
+   lives longer has the full gap of €1,153 afterwards.
+2. **Additional savings rate:** It came on top of the €150 that flow into the
+   AV-Depot in the calculation. The card said so in its hint text.
+3. **Existing capital:** It was fully credited against the remaining gap. With
+   €12,345 existing capital the cockpit showed e.g. €28,519 required capital but
+   €0.00 additional savings rate, because the capital grows that far by itself
+   until retirement.
+4. **Nominal:** The AV-Depot pension is an amount in euros of the retirement
+   year, the desired pension is entered in today's euros. The switch "Inflation
+   berücksichtigen" only affected the pension gap calculator, not the AV-Depot
+   calculator.
+
+**To decide (then):** Is the overall picture meaningful enough like this? Point 4
+was the biggest inaccuracy: €989 in 32 years is worth less than €989 today. One
+solution would have been to convert the AV-Depot pension to today's purchasing
+power when inflation is switched on.
+
+---
+
+## 7. Pension gap and withdrawal plan cannot be compared automatically
+
+- [ ] **Regular appointment set up for it**
+
+**What applies:** For these two calculators Finanzfluss does not publish source
+code. The formulas are derived from 35 recorded results of the Finanzfluss page
+(`test/fixtures/`). If Finanzfluss changes the calculation, `npm test` does not
+notice.
+
+**How to check:**
 
 ```bash
-npm run upstream:check-api    # Rentenlücke und Entnahmeplan
-npm run upstream:diff         # AV-Depot und Sparrechner
+npm run upstream:check-api    # pension gap and withdrawal plan
+npm run upstream:diff         # AV-Depot and savings calculator
 ```
 
-Erwartete Ausgabe ohne Änderungen: „The server still gives the answers stored
-in the fixtures." bzw. „No changes in the calculator files."
+Expected output without changes: "The server still gives the answers stored in
+the fixtures." and "No changes in the calculator files." respectively.
 
-**Zu entscheiden:** Wie oft willst du das ausführen (z. B. vierteljährlich und
-zum Jahreswechsel, wenn sich Steuerwerte ändern)? Automatisch ginge es erst mit
-einem geplanten Job, sobald das Repository auf GitHub liegt.
-
----
-
-## 8. Der Sparrechner rechnet anders als das Original, mit gleichem Ergebnis
-
-- [ ] **Zur Kenntnis genommen**
-
-**Was gilt:** Das Original hat je gesuchter Größe eine eigene Formel. Hier ist
-nur das Endkapital eine Formel; Anfangskapital, Zinssatz, Laufzeit und Sparrate
-werden durch Suche bestimmt. Der Vergleichstest bestätigt gleiche Ergebnisse.
-
-**Beispiel für eine Abweichung:** Bei einzelnen Eingaben bricht die
-Zinssatz-Suche des Originals mit einem Fehler ab („Newton's method failed to
-converge"). Der Rechner hier liefert dort ein Ergebnis. Der Vergleichstest
-überspringt diese Fälle und erlaubt höchstens 20 davon bei 300 Vergleichen.
-
-**Nicht unterstützt:** Negative Ergebnisse. Ist das Ziel schon übertroffen,
-ohne dass es die gesuchte Größe braucht (z. B. 5.000 € Anfangskapital, 150 €
-pro Monat, 7 Jahre, Ziel 10.000 €, Zinssatz gesucht), lautet das Ergebnis 0
-mit dem Hinweis, was ohnehin erreicht wird (hier 17.600 €), statt eines
-negativen Zinssatzes.
+**To decide:** How often do you want to run this (e.g. quarterly and at the turn
+of the year, when tax values change)? Automatically it would only work with a
+scheduled job once the repository is on GitHub.
 
 ---
 
-## 9. Das Entnahmeplan-Diagramm weicht bewusst vom Original ab
+## 8. The savings calculator calculates differently from the original, with the same result
 
-- [ ] **Zur Kenntnis genommen**
+- [ ] **Noted**
 
-**Was gilt:** Ohne Kapitalverzehr zeigt das Diagramm der Finanzfluss-Seite ein
-leicht sinkendes Kapital (100.000 € → 99.987,59 € nach 10 Jahren), weil es die
-Zinsen innerhalb des Jahres nur annähert. Hier bleibt das Kapital bei genau
-100.000 €. Die Ergebniszahlen (Entnahmebetrag, Zeitraum, Kapital) sind
-identisch mit Finanzfluss.
+**What applies:** The original has its own formula for each searched figure.
+Here only the final capital is a formula; starting capital, interest rate,
+duration and savings rate are determined by search. The comparison test confirms
+identical results.
+
+**Example of a deviation:** For some inputs the interest rate search of the
+original aborts with an error ("Newton's method failed to converge"). The
+calculator here returns a result there. The comparison test skips these cases and
+allows at most 20 of them in 300 comparisons.
+
+**Not supported:** Negative results. If the goal is already exceeded without the
+searched figure being needed (e.g. €5,000 starting capital, €150 per month, 7
+years, goal €10,000, interest rate searched), the result is 0 with a note on what
+is reached anyway (here €17,600) instead of a negative interest rate.
 
 ---
 
-## 10. Slider nur dort, wo sie sinnvoll schienen
+## 9. The withdrawal plan chart deviates from the original on purpose
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [ ] **Noted**
 
-**Was gilt:**
+**What applies:** Without capital consumption the chart of the Finanzfluss page
+shows a slightly falling capital (€100,000 → €99,987.59 after 10 years), because
+it only approximates the interest within the year. Here the capital stays at
+exactly €100,000. The result figures (withdrawal amount, period, capital) are
+identical to Finanzfluss.
 
-| Rechner | Slider |
+---
+
+## 10. Sliders only where they seemed useful
+
+- [ ] **Checked and fine with me**
+
+**What applies:**
+
+| Calculator | Sliders |
 | --- | --- |
-| Altersvorsorgedepot | alle Regler wie bei Finanzfluss: Alter, Renteneintritt, beide Einkommen, Sparrate (monatlich statt jährlich), Rendite, Kosten, Sparerpauschbetrag, Basiszins, Einmalauszahlung, Auszahlung bis, Rendite im Ruhestand; die erweiterten Eingaben sind eingeklappt |
-| Rentenlücke | Alter, gesetzliche Rente (0–4.000 €), Wunschrente (0–6.000 €) |
-| Sparrechner | keine |
-| Entnahmeplan | keine |
+| Altersvorsorgedepot | all sliders as at Finanzfluss: age, retirement age, both incomes, savings rate (monthly instead of yearly), return, costs, saver's allowance, base interest rate, one-time payout, payout until, return in retirement; the advanced inputs are collapsed |
+| Pension gap | age, statutory pension (0–4,000 €), desired pension (0–6,000 €) |
+| Savings calculator | none |
+| Withdrawal plan | none |
 
-Die Finanzfluss-Seiten haben für die letzten drei Rechner gar keine Slider; die
-drei im Rentenlückenrechner sind meine Ergänzung.
+The Finanzfluss pages have no sliders at all for the last three calculators; the
+three in the pension gap calculator are my addition.
 
-**Zu entscheiden:** Sollen weitere Felder Slider bekommen (z. B. Laufzeit und
-Zinssatz im Sparrechner, Entnahmebetrag im Entnahmeplan)?
-
----
-
-## 11. Offen aus früheren Schritten
-
-- [ ] **Dunkles Farbschema** ist angelegt, aber nie im Browser angesehen.
-- [ ] **Profil-Auswahl im Cockpit** erlaubt nur das Wechseln; Anlegen,
-      Umbenennen und Löschen gehen nur in den Rechnern und unter „Globale Werte".
-- [ ] **Vor einem öffentlichen Betrieb:** Begrenzung von Anmeldeversuchen und
-      „Passwort vergessen" fehlen; `ALLOW_REGISTRATION=false` setzen.
-- [ ] **Lizenz:** Bei Hosting für andere Nutzer den Quellcode unter AGPL
-      offenlegen (siehe README, Abschnitt „Abgleich mit dem
-      Finanzfluss-Original").
-- [ ] **Sicherung** `data/financecockpit.backup-2026-10-11.db` löschen, sobald
-      nach dem Neustart alles stimmt.
+**To decide:** Should more fields get sliders (e.g. duration and interest rate in
+the savings calculator, withdrawal amount in the withdrawal plan)?
 
 ---
 
-## 12. Gesamtplan: Annahmen und Vorgaben zum Prüfen
+## 11. Open from earlier steps
 
-- [ ] **Geprüft und für mich in Ordnung**
-
-**Was gilt:** Der Gesamtplan wurde mit Vorgaben umgesetzt, die du nicht einzeln
-bestätigt hast (Liste in `PLANNED_FEATURES.md`, Feature 2, „So umgesetzt").
-
-**Beispiel** (Alter 35, Wunschrente 2.200 €, 150 € ins AV-Depot, sonst nichts,
-Vorhandenes Kapital 0 €): Der Plan zeigt rund 5 % Wahrscheinlichkeit und eine
-nötige Sparrate von 813 €. Der Rentenlücke-Rechner zeigt für dieselben
-Werte ohne Inflation 237,50 €. Der Unterschied kommt aus drei Dingen: Der Plan
-zieht 2 % Inflation ab, verlangt 85 % Sicherheit statt des erwarteten Verlaufs
-und rechnet die AV-Depot-Rente in heutiger Kaufkraft.
-
-**So prüfst du es:** Auf `/plan` die nötige Sparrate als Sparrate des
-Altersvorsorgedepots eintragen (bis 1.140 €): Die Wahrscheinlichkeit landet beim
-Sicherheitsniveau (85 %), der Status wird „Im Plan". Zum Abgleich mit dem
-Rentenlücke-Rechner die Rate des AV-Depots auf 0 und die des Sparrechners auf die
-nötige Sparrate setzen, das Sicherheitsniveau auf 50 % und die Schwankung auf 0
-stellen (Leitplanken z. B. 1 % und 99 %) und dort „Inflation berücksichtigen"
-einschalten: Beide nennen dann dieselbe Sparrate.
-
-**Zu entscheiden:**
-
-- Passen 85 % / 75 % / 95 % und 15 % Schwankung zu dir?
-- Ist 2.200 € Wunschrente in **heutigen** Euro gemeint? Der Plan liest es so.
-- Reichen drei feste Töpfe?
-- Die nötige Sparrate behält das Verhältnis deiner Raten bei. Ist es 150 € ins
-  AV-Depot und 150 € ins ETF-Depot, steigt sie je zur Hälfte, das AV-Depot bis
-  zu dessen Höchstbetrag von 1.140 €. Ist das die Aufteilung, die du willst?
-
-## 13. Gesamtplan: Alter jährlich mitführen
-
-- [ ] **Zur Kenntnis genommen**
-
-**Was gilt:** Der Plan rechnet ab dem Alter in den globalen Werten. Die App
-zählt es nicht selbst hoch.
-
-**Beispiel:** Frierst du 2026 mit Alter 35 ein und erfasst 2027 einen
-Ist-Stand, ohne das Alter auf 36 zu ändern, rechnet die neue Prognose mit
-einem Jahr zu viel bis zur Rente und sieht zu günstig aus. Der Punkt im
-eingefrorenen Korridor sitzt trotzdem richtig, weil er aus den Stichtagen
-berechnet wird.
-
-**Zu entscheiden:** Soll statt des Alters das Geburtsjahr gespeichert werden,
-damit das Alter automatisch stimmt? Das beträfe alle Rechner.
-
-## 14. Gesamtplan: Kaufkraft beim Vergleich
-
-- [ ] **Zur Kenntnis genommen**
-
-**Was gilt:** Der eingefrorene Korridor steht in der Kaufkraft seines
-Stichtags, die aktuelle Prognose in heutiger Kaufkraft. Ist-Stände werden mit
-der eingetragenen Inflation (sonst der Annahme des Plans) auf die Kaufkraft des
-eingefrorenen Plans umgerechnet.
-
-**Beispiel:** Stand 12.320 € ein Jahr nach dem Einfrieren, ohne eingetragene
-Inflation: Im Vergleich erscheinen 12.320 € / 1,02 = 12.078 €.
-
-**Folge:** Im Diagramm liegen eingefrorener Korridor und aktuelle Prognose
-nicht in exakt derselben Kaufkraft übereinander; über wenige Jahre ist der
-Unterschied klein, über lange Zeit wächst er.
+- [ ] **Dark colour scheme** is set up but never looked at in the browser.
+- [ ] **Profile picker in the cockpit** only allows switching; creating, renaming
+      and deleting only work in the calculators and under "Globale Werte".
+- [ ] **Before public operation:** limiting sign-in attempts and "forgot
+      password" are missing; set `ALLOW_REGISTRATION=false`.
+- [ ] **License:** When hosting for other users, publish the source code under
+      the AGPL (see README, section "Syncing with the Finanzfluss original").
+- [ ] **Backup** `data/financecockpit.backup-2026-10-11.db`: delete it once
+      everything is right after the restart.
 
 ---
 
-## 15. Durchsicht vom 11.10.2026: geändertes Verhalten zum Prüfen
+## 12. Overall plan: assumptions and defaults to review
 
-- [ ] **Geprüft und für mich in Ordnung**
+- [ ] **Checked and fine with me**
 
-**Gespeicherte Werte geändert:** Sparrechner-Profile, die noch die alten
-Vorgaben hatten (Endkapital 20.000 €, Laufzeit 7 Jahre) und die Laufzeit nicht
-ausdrücklich freigegeben haben, stehen nach dem nächsten Start auf 250.000 € und
-30 Jahren (Migration `drizzle/0004_savings_defaults.sql`). Eigene Werte bleiben.
+**What applies:** The overall plan was implemented with defaults you did not
+confirm one by one (list in `PLANNED_FEATURES.md`, feature 2, "As implemented").
 
-**Vorhandenes Kapital im Gesamtplan:** Solange kein Ist-Stand erfasst ist,
-startet der Plan mit dem „Vorhandenen Kapital" der globalen Werte im
-ETF-Depot, vorher mit 0 €.
+**Example** (age 35, desired pension €2,200, €150 into the AV-Depot, nothing
+else, existing capital €0): The plan shows about 5 % probability and a required
+savings rate of €813. The pension gap calculator shows €237.50 for the same
+values without inflation. The difference comes from three things: the plan
+deducts 2 % inflation, demands 85 % confidence instead of the expected course and
+calculates the AV-Depot pension in today's purchasing power.
 
-**Beispiel:** 50.000 € vorhandenes Kapital heben das Vermögen bei Renteneintritt
-im mittleren Verlauf von rund 99.000 € auf rund 192.000 € (Standardwerte).
+**How to check:** On `/plan` enter the required savings rate as the savings rate
+of the Altersvorsorgedepot (up to €1,140): the probability lands at the
+confidence level (85 %), the status becomes "Im Plan". To compare with the
+pension gap calculator, set the AV-Depot rate to 0 and the savings calculator's
+rate to the required savings rate, set the confidence level to 50 % and the
+volatility to 0 (guardrails e.g. 1 % and 99 %) and switch "Inflation
+berücksichtigen" on there: both then name the same savings rate.
 
-**Zu entscheiden:** Sobald du einen Ist-Stand erfasst, zählt nur noch dieser.
-Sparrechner und Rentenlücke rechnen weiter mit dem „Vorhandenen Kapital"; beide
-Angaben musst du selbst gleich halten. Soll das „Vorhandene Kapital" beim
-Erfassen eines Ist-Stands automatisch auf dessen Summe gesetzt werden?
+**To decide:**
+
+- Do 85 % / 75 % / 95 % and 15 % volatility suit you?
+- Is the €2,200 desired pension meant in **today's** euros? The plan reads it so.
+- Are three fixed pots enough?
+- The required savings rate keeps the ratio of your rates. If it is €150 into the
+  AV-Depot and €150 into the ETF depot, it rises by half each, the AV-Depot up to
+  its maximum of €1,140. Is that the split you want?
+
+## 13. Overall plan: carrying the age forward every year
+
+- [ ] **Noted**
+
+**What applies:** The plan calculates from the age in the global values. The app
+does not count it up itself.
+
+**Example:** If you freeze in 2026 with age 35 and record a balance in 2027
+without changing the age to 36, the new forecast calculates with one year too
+many until retirement and looks too favourable. The point in the frozen corridor
+is still right, because it is calculated from the reference dates.
+
+**To decide:** Should the year of birth be stored instead of the age, so that the
+age is automatically right? That would affect all calculators.
+
+## 14. Overall plan: purchasing power in the comparison
+
+- [ ] **Noted**
+
+**What applies:** The frozen corridor is in the purchasing power of its reference
+date, the current forecast in today's purchasing power. Recorded balances are
+converted to the purchasing power of the frozen plan with the entered inflation
+(otherwise the plan's assumption).
+
+**Example:** Balance €12,320 one year after freezing, without entered inflation:
+the comparison shows €12,320 / 1.02 = €12,078.
+
+**Consequence:** In the chart the frozen corridor and the current forecast do not
+lie on top of each other in exactly the same purchasing power; over a few years
+the difference is small, over a long time it grows.
 
 ---
 
-## 16. Mehrere Sparrechner statt Tagesgeld
+## 15. Review of 2026-10-11: changed behaviour to check
 
-- [ ] **Entscheiden, ob und wie das gebaut wird** (noch nicht umgesetzt)
+- [ ] **Checked and fine with me**
 
-**Idee:** Der Gesamtplan hat heute drei feste Töpfe: Altersvorsorgedepot,
-ETF-Depot (Sparrechner) und Tagesgeld. Statt des Tagesgelds soll es beliebig
-viele Anlagen geben (ETF, Gold, Bitcoin, Bonds, Tagesgeld, …), jede mit eigener
-Sparrate, Rendite, Schwankung und Kosten. Der Plan berücksichtigt alle und
-vergleicht die Summe der Raten mit dem Budget.
+**Stored values changed:** Savings calculator profiles that still had the old
+defaults (final capital €20,000, duration 7 years) and did not explicitly release
+the duration are at €250,000 and 30 years after the next start (migration
+`drizzle/0004_savings_defaults.sql`). Your own values stay.
 
-**Was dafür nötig wäre:**
+**Existing capital in the overall plan:** As long as no balance is recorded, the
+plan starts with the "Vorhandenes Kapital" of the global values in the ETF depot,
+before that with €0.
 
-- **Rendite und Schwankung je Anlage:** Heute gilt für den Sparrechner die globale
-  „Erwartete Rendite", für den Plan zwei feste Schwankungen (Depot, Tagesgeld).
-- **Korrelation:** Die Verläufe der Anlagen sind nicht unabhängig. Der Plan
-  bräuchte eine Annahme dazu, sonst wird der Korridor zu eng oder zu breit.
-- **Ist-Stände und eingefrorene Pläne:** Sie speichern heute genau drei Töpfe und
-  müssten dynamisch werden; alte Einträge müssen lesbar bleiben.
-- **Profile:** Je Rechner ist nur ein Profil aktiv. Mehrere Sparrechner heißt
-  entweder mehrere aktive Profile („einbeziehen" je Profil) oder eine eigene
-  Liste von Anlagen im Plan (Name, Sparrate, Rendite, Schwankung, Kosten,
-  Startbetrag). Der Sparrechner bliebe das Werkzeug für eine Anlage zum
-  Durchspielen.
+**Example:** €50,000 existing capital raise the wealth at retirement in the
+middle course from about €99,000 to about €192,000 (default values).
 
-**Aufwand:** groß, etwa drei bis vier Runden samt Migration der gespeicherten
-Daten.
+**To decide:** As soon as you record a balance, only that counts. Savings
+calculator and pension gap continue to calculate with the "Vorhandenes Kapital";
+you have to keep both figures equal yourself. Should the "Vorhandenes Kapital"
+automatically be set to the sum of a balance when you record it?
 
-**Vorab zu entscheiden:**
+---
 
-- Reicht eine pauschale Annahme für die Korrelation (alle riskanten Anlagen laufen
-  weitgehend gemeinsam), oder soll sie je Paar einstellbar sein?
-- Ist-Stände je Anlage erfassen? Dann müssen alte Stände (AV, ETF, Tagesgeld)
-  auf die neuen Anlagen abgebildet werden.
-- Bleibt das Altersvorsorgedepot ein fester Topf, weil es eigene Förder- und
-  Steuerregeln hat?
+## 16. Several savings calculators instead of the savings account
 
-**Kleine Vorarbeiten, die offen geblieben sind:** „Sparrate ETF-Depot
-(Sparrechner)" auf der Plan-Seite zu „Sparrate ETF-Depot" kürzen; das Budget
-„Zum Investieren verfügbar pro Monat" auch im AV-Depot- und im Sparrechner
-editierbar machen (dort steht es bisher nur als Hinweis unter der Sparrate).
+- [ ] **Decide whether and how this gets built** (not implemented yet)
+
+**Idea:** Today the overall plan has three fixed pots: Altersvorsorgedepot, ETF
+depot (savings calculator) and savings account. Instead of the savings account
+there should be any number of investments (ETF, gold, bitcoin, bonds, savings
+account, …), each with its own savings rate, return, volatility and costs. The
+plan takes all of them into account and compares the sum of the rates with the
+budget.
+
+**What it would take:**
+
+- **Return and volatility per investment:** Today the savings calculator uses the
+  global "Erwartete Rendite" and the plan two fixed volatilities (depot, savings
+  account).
+- **Correlation:** The courses of the investments are not independent. The plan
+  would need an assumption for this, otherwise the corridor becomes too narrow or
+  too wide.
+- **Recorded balances and frozen plans:** They store exactly three pots today and
+  would have to become dynamic; old entries must stay readable.
+- **Profiles:** Only one profile per calculator is active. Several savings
+  calculators means either several active profiles ("include" per profile) or a
+  list of investments of its own in the plan (name, savings rate, return,
+  volatility, costs, starting amount). The savings calculator would remain the
+  tool for playing through one investment.
+
+**Effort:** large, about three to four rounds including migration of the stored
+data.
+
+**To decide beforehand:**
+
+- Is a flat assumption for the correlation enough (all risky investments run
+  largely together), or should it be adjustable per pair?
+- Record balances per investment? Then old balances (AV, ETF, savings account)
+  have to be mapped onto the new investments.
+- Does the Altersvorsorgedepot stay a fixed pot, because it has subsidy and tax
+  rules of its own?
+
+**Small preparations that remained open:** Shorten "Sparrate ETF-Depot
+(Sparrechner)" on the plan page to "Sparrate ETF-Depot"; make the budget "Zum
+Investieren verfügbar pro Monat" editable in the AV-Depot and savings calculator
+as well (there it is only a hint under the savings rate so far).

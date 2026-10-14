@@ -42,7 +42,7 @@ export function AppNav() {
       <NavLink href="/">{t.nav.cockpit}</NavLink>
       <GroupLabel>{t.nav.planning}</GroupLabel>
       <NavLink href="/plan">{t.nav.plan}</NavLink>
-      <NavLink href="/verlauf">{t.nav.history}</NavLink>
+      <NavLink href="/history">{t.nav.history}</NavLink>
       <GroupLabel>{t.nav.calculators}</GroupLabel>
       {calculators.map((calculator) => (
         <NavLink key={calculator.id} href={calculator.href}>
@@ -50,7 +50,7 @@ export function AppNav() {
         </NavLink>
       ))}
       <GroupLabel>{t.nav.account}</GroupLabel>
-      <NavLink href="/einstellungen">{t.nav.settings}</NavLink>
+      <NavLink href="/settings">{t.nav.settings}</NavLink>
     </nav>
   );
 }

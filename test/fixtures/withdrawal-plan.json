@@ -2,7 +2,7 @@
   "source": "https://api.finanzfluss.de/calculator/withdrawl-plan-calculator",
   "cases": [
     {
-      "name": "Betrag, Standardwerte",
+      "name": "Amount, default values",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -17,7 +17,7 @@
       }
     },
     {
-      "name": "Betrag, ohne Kapitalverzehr",
+      "name": "Amount, capital kept",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -32,7 +32,7 @@
       }
     },
     {
-      "name": "Betrag, vierteljährlich",
+      "name": "Amount, quarterly",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -47,7 +47,7 @@
       }
     },
     {
-      "name": "Betrag, halbjährlich",
+      "name": "Amount, biannual",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -62,7 +62,7 @@
       }
     },
     {
-      "name": "Betrag, jährlich",
+      "name": "Amount, yearly",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -77,7 +77,7 @@
       }
     },
     {
-      "name": "Betrag, jährlich, 1 Jahr",
+      "name": "Amount, yearly, 1 year",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -92,7 +92,7 @@
       }
     },
     {
-      "name": "Betrag, monatlich, 1 Jahr",
+      "name": "Amount, monthly, 1 year",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -107,7 +107,7 @@
       }
     },
     {
-      "name": "Betrag, jährlich, ohne Verzehr",
+      "name": "Amount, yearly, capital kept",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -122,7 +122,7 @@
       }
     },
     {
-      "name": "Betrag, 30 Jahre, 2,5 %",
+      "name": "Amount, 30 years, 2.5 %",
       "params": {
         "inputCapitalAssets": 350000,
         "inputWithdrawlAmount": 1200,
@@ -137,7 +137,7 @@
       }
     },
     {
-      "name": "Kapital, Standardwerte",
+      "name": "Capital, default values",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -152,7 +152,7 @@
       }
     },
     {
-      "name": "Kapital, ohne Kapitalverzehr",
+      "name": "Capital, capital kept",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -167,7 +167,7 @@
       }
     },
     {
-      "name": "Kapital, jährlich",
+      "name": "Capital, yearly",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -182,7 +182,7 @@
       }
     },
     {
-      "name": "Kapital, vierteljährlich, ohne Verzehr",
+      "name": "Capital, quarterly, capital kept",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -197,7 +197,7 @@
       }
     },
     {
-      "name": "Zeitraum, Standardwerte",
+      "name": "Period, default values",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,
@@ -213,7 +213,7 @@
       }
     },
     {
-      "name": "Zeitraum, endlos",
+      "name": "Period, endless",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 400,
@@ -229,7 +229,7 @@
       }
     },
     {
-      "name": "Zeitraum, vierteljährlich",
+      "name": "Period, quarterly",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 5000,
@@ -245,7 +245,7 @@
       }
     },
     {
-      "name": "Zeitraum, jährlich",
+      "name": "Period, yearly",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 20000,
@@ -261,7 +261,7 @@
       }
     },
     {
-      "name": "Zeitraum, unter 1 Jahr",
+      "name": "Period, under 1 year",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 9000,
@@ -277,7 +277,7 @@
       }
     },
     {
-      "name": "Zeitraum, negativer Zins",
+      "name": "Period, negative interest",
       "params": {
         "inputCapitalAssets": 100000,
         "inputWithdrawlAmount": 1200,

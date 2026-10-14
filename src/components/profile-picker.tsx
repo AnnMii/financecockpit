@@ -200,7 +200,7 @@ export function CalculatorProfiles({
         <ProfilePicker scope="shared" />
         <p className="mt-1 text-xs text-ink-2">
           {t.profiles.managedInSettings}{" "}
-          <Link href="/einstellungen" className="font-medium text-accent">
+          <Link href="/settings" className="font-medium text-accent">
             {t.nav.settings}
           </Link>
           .

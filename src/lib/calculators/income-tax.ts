@@ -1,6 +1,6 @@
 /**
- * Tarifliche Einkommensteuer (Grundtarif, § 32a EStG) inklusive
- * Solidaritätszuschlag. Bei einem neuen Tarif genügt ein weiterer Eintrag.
+ * Income tax by the tariff (basic tariff, § 32a EStG) including the
+ * solidarity surcharge. A new tariff only needs one more entry.
  */
 
 interface Tariff {
@@ -31,8 +31,8 @@ const TARIFFS: Record<number, Tariff> = {
 
 export const INCOME_TAX_YEAR = 2026;
 
-function tariffTax(zve: number, t: Tariff): number {
-  const x = Math.floor(zve);
+function tariffTax(taxableIncome: number, t: Tariff): number {
+  const x = Math.floor(taxableIncome);
   if (x <= t.grundfreibetrag) return 0;
   if (x <= t.zone2End) {
     const y = (x - t.grundfreibetrag) / 10_000;
@@ -55,15 +55,15 @@ function solidaritySurcharge(tax: number, t: Tariff): number {
   );
 }
 
-/** Einkommensteuer + Soli für ein zu versteuerndes Einkommen (Einzelveranlagung). */
-export function incomeTax(zve: number, year: number = INCOME_TAX_YEAR): number {
+/** Income tax + solidarity surcharge for a taxable income (single assessment). */
+export function incomeTax(taxableIncome: number, year: number = INCOME_TAX_YEAR): number {
   const tariff = TARIFFS[year];
-  if (!tariff) throw new Error(`Kein Einkommensteuertarif für ${year} hinterlegt`);
-  const tax = tariffTax(Math.max(0, zve), tariff);
+  if (!tariff) throw new Error(`No income tax tariff stored for ${year}`);
+  const tax = tariffTax(Math.max(0, taxableIncome), tariff);
   return tax + solidaritySurcharge(tax, tariff);
 }
 
-/** Mehrsteuer, die `amount` zusätzlich zu `zve` auslöst (Differenzmethode). */
-export function marginalTax(amount: number, zve: number): number {
-  return incomeTax(zve + amount) - incomeTax(zve);
+/** Additional tax that `amount` triggers on top of `taxableIncome`, the taxable income (difference method). */
+export function marginalTax(amount: number, taxableIncome: number): number {
+  return incomeTax(taxableIncome + amount) - incomeTax(taxableIncome);
 }

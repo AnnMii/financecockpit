@@ -1,10 +1,10 @@
 /**
- * Entnahmeplan: Aus Anlagevermögen, Entnahmebetrag und Entnahmezeitraum wird
- * jeweils die dritte Größe berechnet, mit oder ohne Kapitalverzehr.
+ * Withdrawal plan: from the portfolio, the withdrawal amount and the withdrawal
+ * period the third figure is calculated, with or without using up the capital.
  *
- * Die Formeln sind aus den Antworten des Finanzfluss-Rechners hergeleitet
- * (https://www.finanzfluss.de/rechner/entnahmeplan/); dessen Quellcode ist
- * nicht öffentlich. Die Antworten liegen in test/fixtures/withdrawal-plan.json.
+ * The formulas are derived from the answers of the Finanzfluss calculator
+ * (https://www.finanzfluss.de/rechner/entnahmeplan/); its source code is
+ * not public. The answers are in test/fixtures/withdrawal-plan.json.
  */
 
 import type { CalculationError } from "./errors";
@@ -20,28 +20,28 @@ export const WITHDRAWALS_PER_YEAR: Record<WithdrawalInterval, number> = {
 };
 
 export interface WithdrawalPlanInput {
-  /** Die gesuchte Größe; ihr Eingabewert wird ignoriert. */
+  /** The searched figure; its input value is ignored. */
   output: WithdrawalOutput;
   capital: number;
-  /** Entnahme je Intervall. */
+  /** Withdrawal per interval. */
   amount: number;
   periodYears: number;
-  /** Zinssatz pro Jahr in Prozent. */
+  /** Interest rate per year in percent. */
   interestRate: number;
   interval: WithdrawalInterval;
-  /** Ohne Kapitalverzehr werden nur die Zinsen entnommen. Für "period" ohne Bedeutung. */
+  /** Without using up the capital only the interest is withdrawn. Meaningless for "period". */
   capitalConsumption: boolean;
 }
 
 export interface WithdrawalPlanResult {
   capital: number;
   amount: number;
-  /** null, wenn die Entnahme die Zinsen nicht übersteigt und das Kapital nie endet. */
+  /** null when the withdrawal does not exceed the interest and the capital never ends. */
   periodYears: number | null;
   withdrawalsPerYear: number;
-  /** Summe aller Entnahmen; null bei endloser Entnahme. */
+  /** Sum of all withdrawals; null for an endless withdrawal. */
   totalWithdrawn: number | null;
-  /** Kapital am Ende jedes Jahres. */
+  /** Capital at the end of each year. */
   years: { year: number; capital: number }[];
 }
 

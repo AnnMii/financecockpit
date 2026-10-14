@@ -114,8 +114,8 @@ function AvDepotWorkspace() {
           </Section>
 
           <Section title={text.sections.income}>
-            <IncomeSetting name="zveSavingsPhase" slider />
-            <IncomeSetting name="zveRetirement" slider />
+            <IncomeSetting name="taxableIncomeSavingsPhase" slider />
+            <IncomeSetting name="taxableIncomeRetirement" slider />
           </Section>
 
           <Section title={text.sections.saving}>

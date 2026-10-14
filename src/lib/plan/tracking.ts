@@ -1,6 +1,6 @@
 /**
- * Verfolgen des Plans über die Zeit: eingefrorene Planversionen, erfasste
- * Ist-Stände und der Vergleich zwischen beiden.
+ * Tracking the plan over time: frozen plan versions, recorded balances
+ * (snapshots) and the comparison between the two.
  */
 import {
   type PlanInput,

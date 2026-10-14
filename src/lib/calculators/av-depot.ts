@@ -1,20 +1,20 @@
 /**
- * Altersvorsorgedepot-Rechner: vergleicht ein gefördertes AV-Depot mit einem
- * normalen ETF-Depot über Anspar- und Auszahlungsphase.
+ * Altersvorsorgedepot calculator: compares a subsidised AV-Depot with a
+ * normal ETF depot over the saving and payout phases.
  *
- * Eigene Umsetzung, die dem Finanzfluss-Rechner folgt
- * (https://www.finanzfluss.de/rechner/altersvorsorgedepot/). Das Original liegt
- * als Submodul unter vendor/finanzfluss-calculators;
- * test/upstream/av-depot.parity.test.ts vergleicht beide. Ablauf für Updates:
- * README, Abschnitt "Abgleich mit dem Finanzfluss-Original".
+ * Own implementation that follows the Finanzfluss calculator
+ * (https://www.finanzfluss.de/rechner/altersvorsorgedepot/). The original is
+ * a submodule under vendor/finanzfluss-calculators;
+ * test/upstream/av-depot.parity.test.ts compares the two. Procedure for updates:
+ * README, section "Syncing with the Finanzfluss original".
  */
 import type { TaxSavingsMode } from "@/lib/settings/schema";
 import type { CalculationError } from "./errors";
 import { incomeTax, marginalTax } from "./income-tax";
 
-export const ABGELTUNGSTEUERSATZ = 0.26375;
-export const TEILFREISTELLUNG = 0.7;
-export const BASISERTRAG_FACTOR = 0.7;
+export const FLAT_TAX_RATE = 0.26375;
+export const TAXABLE_SHARE_OF_EQUITY_FUND_GAINS = 0.7;
+export const BASE_YIELD_FACTOR = 0.7;
 export const AV_SUBSIDIZED_CAP = 1_800;
 /**
  * Legal cap on the effective costs of the standard depot, in percent per year
@@ -22,41 +22,41 @@ export const AV_SUBSIDIZED_CAP = 1_800;
  * apply to a freely composed depot.
  */
 export const AV_COSTS_CAP_PERCENT = 1;
-export const AV_CONTRIBUTION_CAP = 13_680; // 2 Verträge × 6.840 €
-export const KINDERZULAGE_CAP = 300;
+export const AV_CONTRIBUTION_CAP = 13_680; // 2 contracts × 6,840 €
+export const CHILD_ALLOWANCE_CAP = 300;
 export const MIN_OWN_CONTRIBUTION = 120;
-export const BERUFSEINSTEIGER_BONUS = 200;
+export const CAREER_STARTER_BONUS = 200;
 export const AV_DEPOT_START_YEAR = 2027;
 
 export interface AvDepotInput {
   age: number;
   retirementAge: number;
-  /** Zu versteuerndes Einkommen pro Jahr in der Ansparphase / im Ruhestand. */
-  zveSavingsPhase: number;
-  zveRetirement: number;
-  /** Eigene Einzahlung pro Jahr in €. */
+  /** Taxable income per year in the saving phase / in retirement. */
+  taxableIncomeSavingsPhase: number;
+  taxableIncomeRetirement: number;
+  /** Own contribution per year in €. */
   savingsRate: number;
-  /** Erwartete ETF-Rendite nach Fondskosten, in Prozent. */
+  /** Expected ETF return after fund costs, in percent. */
   etfReturnRate: number;
-  /** Zusätzliche Kosten des AV-Depots pro Jahr, in Prozent. */
+  /** Additional costs of the AV-Depot per year, in percent. */
   avDepotCosts: number;
-  /** Sparerpauschbetrag für die Vergleichsrechnung in €. */
+  /** Tax-free allowance for the comparison calculation, in €. */
   exemptionOrder: number;
   taxSavingsMode: TaxSavingsMode;
-  /** Basiszins für die Vorabpauschale, in Prozent. */
+  /** Base rate for the advance lump sum (Vorabpauschale), in percent. */
   baseRate: number;
-  /** Einmalauszahlung bei Renteneintritt, in Prozent des Kapitals. */
+  /** One-time payout at retirement, in percent of the capital. */
   oneTimePayout: number;
-  /** Rendite in der Auszahlungsphase, in Prozent. */
+  /** Return in the payout phase, in percent. */
   payoutReturnRate: number;
   payoutUntilAge: number;
   childBirthYears: number[];
-  /** Erstes Beitragsjahr; Standard ist max(2027, aktuelles Jahr). */
+  /** First contribution year; the default is max(2027, current year). */
   currentYear?: number;
 }
 
 export interface AvDepotYear {
-  /** Alter am Ende des Beitragsjahres. */
+  /** Age at the end of the contribution year. */
   age: number;
   calendarYear: number;
   av: {
@@ -65,10 +65,10 @@ export interface AvDepotYear {
     kinderzulage: number;
     starterBonus: number;
     taxSaving: number;
-    /** Kapital im AV-Depot plus ggf. Nebendepot am Jahresende. */
+    /** Capital in the AV-Depot plus the side depot, if any, at the end of the year. */
     capitalEnd: number;
     cumulativeOwnContributions: number;
-    /** Zulagen plus investierte Steuerersparnis, kumuliert. */
+    /** Allowances plus invested tax savings, cumulative. */
     cumulativeSubsidies: number;
     cumulativeGains: number;
   };
@@ -86,7 +86,7 @@ export interface PayoutYear {
 }
 
 export interface PayoutResult {
-  /** Erstes Jahr inklusive Einmalauszahlung. */
+  /** First year including the one-time payout. */
   firstYear: PayoutYear;
   regularYear: PayoutYear;
   total: PayoutYear;
@@ -105,7 +105,7 @@ export interface AvDepotResult {
     ownContributions: number;
     allowances: number;
     taxSavings: number;
-    /** Teil der Steuerersparnis, der investiert statt konsumiert wurde. */
+    /** Part of the tax savings that was invested instead of spent. */
     investedTaxSavings: number;
     gains: number;
     payout: PayoutResult;
@@ -125,7 +125,7 @@ interface DepotSavings {
   totalVorabpauschale: number;
 }
 
-/** Prüft die Eingaben; eine leere Liste bedeutet, dass gerechnet werden kann. */
+/** Checks the inputs; an empty list means the calculation can run. */
 export function validateAvDepotInput(input: AvDepotInput): CalculationError[] {
   const errors: CalculationError[] = [];
   if (input.age < 18 || input.age > 67) {
@@ -174,16 +174,16 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
   const savingYears = input.retirementAge - input.age;
   const payoutYears = input.payoutUntilAge - input.retirementAge;
 
-  // --- Ansparphase: normales Depot -------------------------------------
+  // --- Saving phase: normal depot --------------------------------------
   const normal = simulateTaxedDepot(
     Array.from({ length: savingYears }, () => input.savingsRate),
     returnRate,
     baseRate,
     input.exemptionOrder,
-    input.zveSavingsPhase,
+    input.taxableIncomeSavingsPhase,
   );
 
-  // --- Ansparphase: AV-Depot -------------------------------------------
+  // --- Saving phase: AV-Depot ------------------------------------------
   const avReturnRate = returnRate - avCosts;
   let subsidizedCapital = 0;
   let unsubsidizedCapital = 0;
@@ -208,8 +208,8 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
       Math.min(contribution, AV_SUBSIDIZED_CAP) + grundzulage + kinderzulage;
     const taxSaving = Math.max(
       0,
-      incomeTax(input.zveSavingsPhase) -
-        incomeTax(Math.max(0, input.zveSavingsPhase - deduction)) -
+      incomeTax(input.taxableIncomeSavingsPhase) -
+        incomeTax(Math.max(0, input.taxableIncomeSavingsPhase - deduction)) -
         grundzulage -
         kinderzulage,
     );
@@ -250,14 +250,14 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
     });
   }
 
-  // --- Ansparphase: Nebendepot für die Steuerersparnis -------------------
+  // --- Saving phase: side depot for the tax savings ----------------------
   const secondary = secondaryContributions.some((c) => c > 0)
     ? simulateTaxedDepot(
         secondaryContributions,
         returnRate,
         baseRate,
         input.exemptionOrder,
-        input.zveSavingsPhase,
+        input.taxableIncomeSavingsPhase,
       )
     : undefined;
 
@@ -276,7 +276,7 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
     };
   });
 
-  // --- Auszahlungsphase ---------------------------------------------------
+  // --- Payout phase -------------------------------------------------------
   const normalGainFraction = gainFraction(
     normal.finalCapital,
     normal.totalContributions + normal.totalVorabpauschale,
@@ -289,9 +289,9 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
   const normalPayoutYear = (gross: number): PayoutYear => {
     const taxable = Math.max(
       0,
-      gross * normalGainFraction * TEILFREISTELLUNG - input.exemptionOrder,
+      gross * normalGainFraction * TAXABLE_SHARE_OF_EQUITY_FUND_GAINS - input.exemptionOrder,
     );
-    const tax = cheaperTax(taxable, input.zveRetirement);
+    const tax = cheaperTax(taxable, input.taxableIncomeRetirement);
     return { gross, tax, net: gross - tax };
   };
 
@@ -318,11 +318,11 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
   );
   const halfIncomeApplies = input.retirementAge >= 62 && savingYears >= 12;
 
-  // Die Quellen werden nacheinander auf das Ruhestandseinkommen aufgeschlagen:
-  // geförderte Entnahme, ungeförderter Gewinnanteil, Kapitalerträge Nebendepot.
+  // The sources are added to the retirement income one after the other:
+  // subsidised withdrawal, unsubsidised share of gains, capital gains of the side depot.
   const avPayoutYear = (avGross: number, secondaryGross: number): PayoutYear => {
     const subsidized = avGross * subsidizedFraction;
-    const subsidizedTax = marginalTax(subsidized, input.zveRetirement);
+    const subsidizedTax = marginalTax(subsidized, input.taxableIncomeRetirement);
 
     const unsubsidizedTaxable =
       avGross *
@@ -331,17 +331,17 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
       (halfIncomeApplies ? 0.5 : 1);
     const unsubsidizedTax = marginalTax(
       unsubsidizedTaxable,
-      input.zveRetirement + subsidized,
+      input.taxableIncomeRetirement + subsidized,
     );
 
     const secondaryTaxable = Math.max(
       0,
-      secondaryGross * secondaryGainFraction * TEILFREISTELLUNG -
+      secondaryGross * secondaryGainFraction * TAXABLE_SHARE_OF_EQUITY_FUND_GAINS -
         input.exemptionOrder,
     );
     const secondaryTax = cheaperTax(
       secondaryTaxable,
-      input.zveRetirement + subsidized + unsubsidizedTaxable,
+      input.taxableIncomeRetirement + subsidized + unsubsidizedTaxable,
     );
 
     const gross = avGross + secondaryGross;
@@ -388,13 +388,13 @@ export function calculateAvDepot(input: AvDepotInput): AvDepotResult {
   };
 }
 
-/** Normal besteuertes Depot: Einzahlung am Jahresende, Steuer auf die Vorabpauschale. */
+/** Normally taxed depot: contribution at the end of the year, tax on the advance lump sum. */
 function simulateTaxedDepot(
   contributions: number[],
   returnRate: number,
   baseRate: number,
   exemptionOrder: number,
-  zve: number,
+  taxableIncome: number,
 ): DepotSavings {
   const years: DepotSavings["years"] = [];
   let capital = 0;
@@ -403,12 +403,12 @@ function simulateTaxedDepot(
   for (const contribution of contributions) {
     const grossReturn = capital * returnRate;
     const vorabpauschale = Math.min(
-      capital * baseRate * BASISERTRAG_FACTOR,
+      capital * baseRate * BASE_YIELD_FACTOR,
       grossReturn,
     );
     const vorabpauschaleTax = cheaperTax(
-      Math.max(0, vorabpauschale * TEILFREISTELLUNG - exemptionOrder),
-      zve,
+      Math.max(0, vorabpauschale * TAXABLE_SHARE_OF_EQUITY_FUND_GAINS - exemptionOrder),
+      taxableIncome,
     );
     capital = capital + contribution + grossReturn - vorabpauschaleTax;
     totalVorabpauschale += vorabpauschale;
@@ -437,23 +437,23 @@ function calculateAllowances(
     Math.min(contribution, 360) * 0.5 +
     Math.max(0, Math.min(contribution, AV_SUBSIDIZED_CAP) - 360) * 0.25;
   const starterBonus =
-    savingsYear === 1 && age < 25 ? BERUFSEINSTEIGER_BONUS : 0;
+    savingsYear === 1 && age < 25 ? CAREER_STARTER_BONUS : 0;
   const calendarYear = startYear + savingsYear - 1;
   const eligibleChildren = childBirthYears.filter((birthYear) => {
     const childAge = calendarYear - birthYear;
     return childAge >= 0 && childAge < 18;
   }).length;
   const kinderzulage =
-    eligibleChildren * Math.min(contribution, KINDERZULAGE_CAP);
+    eligibleChildren * Math.min(contribution, CHILD_ALLOWANCE_CAP);
 
   return { grundzulage, kinderzulage, starterBonus };
 }
 
-/** Günstigerprüfung: Abgeltungsteuer oder persönlicher Steuersatz, je nachdem was niedriger ist. */
-function cheaperTax(taxableGain: number, zve: number): number {
+/** Comparison of the two tax rules: flat tax or personal tax rate, whichever is lower. */
+function cheaperTax(taxableGain: number, taxableIncome: number): number {
   return Math.min(
-    taxableGain * ABGELTUNGSTEUERSATZ,
-    marginalTax(taxableGain, zve),
+    taxableGain * FLAT_TAX_RATE,
+    marginalTax(taxableGain, taxableIncome),
   );
 }
 
@@ -461,7 +461,7 @@ function gainFraction(capital: number, costBasis: number): number {
   return capital > 0 ? Math.max(0, capital - costBasis) / capital : 0;
 }
 
-/** Konstante vorschüssige Entnahme, die `capital` in `years` Jahren aufbraucht. */
+/** Constant withdrawal at the start of the period that uses up `capital` in `years` years. */
 function annuityDue(capital: number, rate: number, years: number): number {
   if (capital <= 0) return 0;
   if (rate === 0) return capital / years;

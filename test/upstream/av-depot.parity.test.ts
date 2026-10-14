@@ -10,7 +10,7 @@ import {
  * Runs our AV-Depot calculation against the original from the pinned
  * submodule vendor/finanzfluss-calculators. After moving the submodule to a
  * newer commit, a failure here shows where our implementation has to follow.
- * See "Abgleich mit dem Finanzfluss-Original" in the README.
+ * See "Syncing with the Finanzfluss original" in the README.
  */
 
 const upstreamFile = fileURLToPath(
@@ -50,8 +50,8 @@ function sampleInput(overrides: Partial<AvDepotInput> = {}): AvDepotInput {
     currentYear: 2027,
     age: 35,
     retirementAge: 67,
-    zveSavingsPhase: 50_000,
-    zveRetirement: 20_000,
+    taxableIncomeSavingsPhase: 50_000,
+    taxableIncomeRetirement: 20_000,
     savingsRate: 5_000,
     etfReturnRate: 7,
     avDepotCosts: 0.2,
@@ -68,7 +68,13 @@ function sampleInput(overrides: Partial<AvDepotInput> = {}): AvDepotInput {
 
 function expectParity(input: AvDepotInput) {
   const ours = calculateAvDepot(input);
-  const theirs = upstream.validateAndCalculate(input);
+  // The original still uses the German abbreviation "zve" for taxable income.
+  const { taxableIncomeSavingsPhase, taxableIncomeRetirement, ...rest } = input;
+  const theirs = upstream.validateAndCalculate({
+    ...rest,
+    zveSavingsPhase: taxableIncomeSavingsPhase,
+    zveRetirement: taxableIncomeRetirement,
+  });
   // The original rounds to whole euros (to cents below 1.000 €).
   const close = (what: string, actual: number, expected: string) =>
     expect(
@@ -107,16 +113,16 @@ describe.skipIf(!upstreamAvailable)("AV-Depot parity with the original", () => {
   });
 
   it.each([
-    ["Steuerersparnis ins Nebendepot", sampleInput()],
-    ["Steuerersparnis ins AV-Depot", sampleInput({ taxSavingsMode: "avDepot" })],
-    ["Steuerersparnis konsumiert", sampleInput({ taxSavingsMode: "consume" })],
-    ["Kinder", sampleInput({ childBirthYears: [2026, 2019] })],
-    ["Berufseinsteiger", sampleInput({ age: 22, savingsRate: 1_800 })],
-    ["Mindestbeitrag", sampleInput({ savingsRate: 120, zveSavingsPhase: 15_000 })],
-    ["Höchstbeitrag", sampleInput({ savingsRate: 13_680, taxSavingsMode: "avDepot" })],
-    ["kurze Ansparzeit", sampleInput({ age: 60, retirementAge: 65, oneTimePayout: 0 })],
-    ["hohes Einkommen", sampleInput({ zveSavingsPhase: 300_000, zveRetirement: 90_000 })],
-    ["kein Einkommen im Alter", sampleInput({ zveRetirement: 0, baseRate: 0 })],
+    ["tax savings into the side depot", sampleInput()],
+    ["tax savings into the AV-Depot", sampleInput({ taxSavingsMode: "avDepot" })],
+    ["tax savings spent", sampleInput({ taxSavingsMode: "consume" })],
+    ["children", sampleInput({ childBirthYears: [2026, 2019] })],
+    ["career starter", sampleInput({ age: 22, savingsRate: 1_800 })],
+    ["minimum contribution", sampleInput({ savingsRate: 120, taxableIncomeSavingsPhase: 15_000 })],
+    ["maximum contribution", sampleInput({ savingsRate: 13_680, taxSavingsMode: "avDepot" })],
+    ["short saving phase", sampleInput({ age: 60, retirementAge: 65, oneTimePayout: 0 })],
+    ["high income", sampleInput({ taxableIncomeSavingsPhase: 300_000, taxableIncomeRetirement: 90_000 })],
+    ["no income in retirement", sampleInput({ taxableIncomeRetirement: 0, baseRate: 0 })],
   ])("matches the original: %s", (_name, input) => {
     expectParity(input);
   });
@@ -133,8 +139,8 @@ describe.skipIf(!upstreamAvailable)("AV-Depot parity with the original", () => {
         currentYear: 2027,
         age: Math.round(between(18, 64)),
         retirementAge: Math.round(between(65, 70)),
-        zveSavingsPhase: Math.round(between(0, 150_000)),
-        zveRetirement: Math.round(between(0, 60_000)),
+        taxableIncomeSavingsPhase: Math.round(between(0, 150_000)),
+        taxableIncomeRetirement: Math.round(between(0, 60_000)),
         savingsRate: Math.round(between(120, 13_680)),
         etfReturnRate: Math.round(between(2, 10) * 10) / 10,
         avDepotCosts: Math.round(between(0, 1) * 100) / 100,

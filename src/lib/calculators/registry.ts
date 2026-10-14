@@ -24,10 +24,10 @@ export interface CalculatorInfo {
  * Titles and descriptions are in src/lib/i18n, under `calculators`.
  */
 export const calculators: CalculatorInfo[] = [
-  { id: "pension-gap", href: "/rechner/rentenluecke" },
-  { id: "av-depot", href: "/rechner/altersvorsorgedepot" },
-  { id: "savings", href: "/rechner/sparrechner" },
-  { id: "withdrawal-plan", href: "/rechner/entnahmeplan" },
+  { id: "pension-gap", href: "/calculators/pension-gap" },
+  { id: "av-depot", href: "/calculators/av-depot" },
+  { id: "savings", href: "/calculators/savings" },
+  { id: "withdrawal-plan", href: "/calculators/withdrawal-plan" },
 ];
 
 /** The most that can be paid into the AV-Depot per month. */
@@ -39,8 +39,8 @@ export function toAvDepotInput(settings: AllSettings): AvDepotInput {
   return {
     age: shared.age,
     retirementAge: shared.retirementAge,
-    zveSavingsPhase: shared.zveSavingsPhase,
-    zveRetirement: shared.zveRetirement,
+    taxableIncomeSavingsPhase: shared.taxableIncomeSavingsPhase,
+    taxableIncomeRetirement: shared.taxableIncomeRetirement,
     savingsRate: savingsRateMonthly * 12,
     etfReturnRate: shared.expectedReturn,
     exemptionOrder: shared.exemptionOrder,

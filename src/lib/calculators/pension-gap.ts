@@ -1,44 +1,44 @@
 /**
- * Rentenlückenrechner: Wie groß ist die Lücke zwischen erwarteter Nettorente
- * und Wunschrente, welches Kapital schließt sie, und welche Sparrate führt
- * dorthin?
+ * Pension gap calculator: how big is the gap between the expected net pension
+ * and the desired pension, which capital closes it, and which savings rate leads
+ * there?
  *
- * Die Formeln sind aus den Antworten des Finanzfluss-Rechners hergeleitet
- * (https://www.finanzfluss.de/rechner/rentenluecke-berechnen/); dessen Quellcode
- * ist nicht öffentlich. Die Antworten liegen in test/fixtures/pension-gap.json.
+ * The formulas are derived from the answers of the Finanzfluss calculator
+ * (https://www.finanzfluss.de/rechner/rentenluecke-berechnen/); its source code
+ * is not public. The answers are in test/fixtures/pension-gap.json.
  */
 
 import type { CalculationError } from "./errors";
 
 export interface PensionGapInput {
-  /** Erwartete Rentenansprüche, jeweils brutto pro Monat. */
+  /** Expected pension entitlements, each gross per month. */
   statePension: number;
   companyPension: number;
   privatePension: number;
   riesterPension: number;
-  /** Geschätzter Steuerabzug in Prozent. */
+  /** Estimated tax deduction in percent. */
   taxPrediction: number;
   yearlyTaxFreeAmount: number;
-  /** Gewünschte Nettorente pro Monat. */
+  /** Desired net pension per month. */
   desiredPension: number;
   age: number;
   retirementAge: number;
-  /** Bis zu diesem Alter soll das Kapital reichen. */
+  /** The capital has to last until this age. */
   payoutUntilAge: number;
   currentCapital: number;
-  /** Erwartete Rendite bis zur Rente / im Ruhestand, in Prozent. */
+  /** Expected return until retirement / in retirement, in percent. */
   returnUntilRetirement: number;
   retirementReturn: number;
   considerInflation: boolean;
   inflationRate: number;
-  /** Kapitalertragsteuer in Prozent, mindert die Rendite bis zur Rente. */
+  /** Capital gains tax in percent; reduces the return until retirement. */
   capitalGainsTax: number;
 }
 
 export interface GapClosing {
-  /** Kapital, das bei Renteneintritt vorhanden sein muss. */
+  /** Capital that has to be there at retirement. */
   capital: number;
-  /** Monatliche Sparrate, die bis zum Renteneintritt dorthin führt. */
+  /** Monthly savings rate that leads there by retirement. */
   savingsRate: number;
 }
 
@@ -51,15 +51,15 @@ export interface PensionGapYear {
 export interface PensionGapResult {
   grossPension: number;
   netPension: number;
-  /** Fehlbetrag pro Monat; 0, wenn die Nettorente die Wunschrente deckt. */
+  /** Shortfall per month; 0 when the net pension covers the desired pension. */
   gap: number;
   yearsUntilRetirement: number;
   payoutYears: number;
-  /** Das Kapital wird bis zum Ende der Auszahlung aufgebraucht. */
+  /** The capital is used up by the end of the payout. */
   withConsumption: GapClosing;
-  /** Nur die Zinsen werden entnommen; null, wenn die Zinsen dafür nicht reichen. */
+  /** Only the interest is withdrawn; null when the interest is not enough for that. */
   withoutConsumption: GapClosing | null;
-  /** Vermögen am Ende jedes Lebensjahres im Modell mit Kapitalverzehr. */
+  /** Wealth at the end of each year of life in the model that uses the capital up. */
   years: PensionGapYear[];
 }
 
@@ -132,7 +132,7 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
   };
 }
 
-/** Monatliche Zinssätze nach Inflation und Steuern: im Ruhestand und bis dahin. */
+/** Monthly interest rates after inflation and taxes: in retirement and until then. */
 export function pensionGapRates(input: PensionGapInput): {
   payoutRate: number;
   savingRate: number;
@@ -150,13 +150,13 @@ export function pensionGapRates(input: PensionGapInput): {
   };
 }
 
-/** Barwert einer vorschüssigen Monatsrente. */
+/** Present value of a monthly pension paid at the start of each month. */
 export function presentValueDue(payment: number, rate: number, months: number): number {
   if (rate === 0) return payment * months;
   return ((payment * (1 - (1 + rate) ** -months)) / rate) * (1 + rate);
 }
 
-/** Nachschüssige Monatsrate, mit der `current` in `months` Monaten auf `target` wächst. */
+/** Monthly rate paid at the end of each month with which `current` grows to `target` in `months` months. */
 function requiredSavingsRate(
   target: number,
   current: number,

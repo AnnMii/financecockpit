@@ -130,12 +130,12 @@ const numbers: NumberTexts = {
       unit: "%",
       hint: "25 % plus Solidaritätszuschlag; mit Kirchensteuer höher.",
     },
-    zveSavingsPhase: {
+    taxableIncomeSavingsPhase: {
       label: "Einkommen in der Ansparphase",
       unit: "€ / Jahr",
       hint: "Zu versteuerndes Einkommen.",
     },
-    zveRetirement: {
+    taxableIncomeRetirement: {
       label: "Einkommen im Ruhestand",
       unit: "€ / Jahr",
       hint: "Zu versteuerndes Einkommen, ohne die Auszahlungen.",
@@ -366,9 +366,9 @@ const fieldInfo: FieldInfoTexts = {
       "Ob du das Einkommen in der Ansparphase pro Jahr (wie im Einkommensteuerbescheid) oder pro Monat eingibst. Gerechnet wird mit dem Jahreswert, also Monatsbetrag mal 12.",
     incomeIntervalRetirement:
       "Ob du das Einkommen im Ruhestand pro Monat (wie die Rentenversicherung es nennt) oder pro Jahr eingibst. Gerechnet wird mit dem Jahreswert, also Monatsbetrag mal 12.",
-    zveSavingsPhase:
+    taxableIncomeSavingsPhase:
       "Dein zu versteuerndes Einkommen, solange du sparst: Brutto abzüglich Werbungskosten, Vorsorgeaufwendungen und Freibeträgen. Es steht im Einkommensteuerbescheid und bestimmt, wie viel Steuer dir die Einzahlungen ins AV-Depot sparen.",
-    zveRetirement:
+    taxableIncomeRetirement:
       "Dein zu versteuerndes Einkommen im Ruhestand ohne die Auszahlungen aus dem AV-Depot, vor allem der steuerpflichtige Teil deiner Renten. Es bestimmt den Steuersatz auf die Auszahlungen.",
     exemptionOrder:
       "Kapitalerträge bis zu diesem Betrag bleiben pro Jahr steuerfrei: 1.000 € für Einzelpersonen, 2.000 € für zusammen Veranlagte. Trage ein, was davon für diese Geldanlage noch frei ist.",

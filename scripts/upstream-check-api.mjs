@@ -1,4 +1,4 @@
-// Two calculators (Rentenlücke, Entnahmeplan) are not part of the Finanzfluss
+// Two calculators (pension gap, withdrawal plan) are not part of the Finanzfluss
 // source repository; their website computes them on a server. Our formulas
 // were derived from that server's answers, which are stored as fixtures in
 // test/fixtures and checked by the unit tests.

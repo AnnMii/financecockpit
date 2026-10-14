@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   type AvDepotInput,
-  BERUFSEINSTEIGER_BONUS,
+  CAREER_STARTER_BONUS,
   calculateAvDepot,
   validateAvDepotInput,
 } from "./av-depot";
@@ -18,8 +18,8 @@ function sampleInput(overrides: Partial<AvDepotInput> = {}): AvDepotInput {
     currentYear: 2027,
     age: 35,
     retirementAge: 67,
-    zveSavingsPhase: 50_000,
-    zveRetirement: 20_000,
+    taxableIncomeSavingsPhase: 50_000,
+    taxableIncomeRetirement: 20_000,
     savingsRate: 5_000,
     etfReturnRate: 7,
     avDepotCosts: 0.2,
@@ -74,7 +74,7 @@ describe("calculateAvDepot", () => {
     ["Kinderzulage", { childBirthYears: [2026, 2019] }, 637_769, 596_414, 578_137],
     ["Steuerersparnis konsumiert", { taxSavingsMode: "consume" }, 587_306, 554_239, 578_137],
     ["Steuerersparnis ins AV-Depot", { taxSavingsMode: "avDepot" }, 616_141, 584_016, 578_137],
-    ["niedriges Einkommen", { zveSavingsPhase: 5_000 }, 587_306, 554_239, 600_373],
+    ["low income", { taxableIncomeSavingsPhase: 5_000 }, 587_306, 554_239, 600_373],
   ] as const)(
     "reproduces the reference: %s",
     (_name, overrides, avCapital, avNet, normalNet) => {
@@ -103,16 +103,16 @@ describe("calculateAvDepot", () => {
     const withBonus = calculateAvDepot(sampleInput({ age: 24, taxSavingsMode: "avDepot" }));
     const without = calculateAvDepot(sampleInput({ age: 25, taxSavingsMode: "avDepot" }));
 
-    expect(withBonus.years[0].av.starterBonus).toBe(BERUFSEINSTEIGER_BONUS);
+    expect(withBonus.years[0].av.starterBonus).toBe(CAREER_STARTER_BONUS);
     expect(withBonus.years[1].av.starterBonus).toBe(0);
     expect(without.years[0].av.starterBonus).toBe(0);
     expect(
       withBonus.years[0].av.capitalEnd - without.years[0].av.capitalEnd,
-    ).toBeCloseTo(BERUFSEINSTEIGER_BONUS, 6);
+    ).toBeCloseTo(CAREER_STARTER_BONUS, 6);
   });
 
   it("moves tax savings beyond the contribution cap into the secondary depot", () => {
-    const common = { savingsRate: 13_680, zveSavingsPhase: 100_000 };
+    const common = { savingsRate: 13_680, taxableIncomeSavingsPhase: 100_000 };
     const viaAvDepot = calculateAvDepot(sampleInput({ ...common, taxSavingsMode: "avDepot" }));
     const viaSecondary = calculateAvDepot(sampleInput({ ...common, taxSavingsMode: "secondaryDepot" }));
     expect(viaAvDepot).toEqual(viaSecondary);

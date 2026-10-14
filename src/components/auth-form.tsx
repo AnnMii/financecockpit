@@ -82,7 +82,7 @@ export function AuthForm({
         ? registrationOpen && (
             <p className="text-center text-sm text-ink-2">
               {t.auth.noAccount}{" "}
-              <Link href="/registrieren" className="font-medium text-accent">
+              <Link href="/register" className="font-medium text-accent">
                 {t.auth.registerLink}
               </Link>
             </p>

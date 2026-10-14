@@ -1,15 +1,15 @@
 /**
- * Sparrechner: Aus Anfangskapital, Sparrate, Zinssatz, Laufzeit und Endkapital
- * wird jeweils die fünfte Größe berechnet, auf Wunsch mit Kapitalertragsteuer.
+ * Savings calculator: from starting capital, savings rate, interest rate,
+ * duration and final capital the fifth figure is calculated, with capital gains tax on request.
  *
- * Eigene Umsetzung, die dem Finanzfluss-Rechner folgt
- * (https://www.finanzfluss.de/rechner/sparrechner/). Das Original liegt als
- * Submodul unter vendor/finanzfluss-calculators;
- * test/upstream/savings.parity.test.ts vergleicht beide.
+ * Own implementation that follows the Finanzfluss calculator
+ * (https://www.finanzfluss.de/rechner/sparrechner/). The original is a
+ * submodule under vendor/finanzfluss-calculators;
+ * test/upstream/savings.parity.test.ts compares the two.
  *
- * Anders als das Original, das je Größe eine eigene Formel hat, wird hier nur
- * das Endkapital als Formel gerechnet; die anderen vier Größen ergeben sich
- * durch Suche nach dem Wert, der zum gewünschten Endkapital führt.
+ * Unlike the original, which has a formula of its own for each figure, only
+ * the final capital is calculated as a formula here; the other four figures
+ * follow from a search for the value that leads to the desired final capital.
  */
 
 import type { CalculationError } from "./errors";
@@ -25,30 +25,30 @@ export type InterestInterval = "monthly" | "quarterly" | "yearly";
 export type DistributionType = "distributing" | "accumulating";
 
 export interface SavingsInput {
-  /** Die gesuchte Größe; ihr Eingabewert wird ignoriert. */
+  /** The searched figure; its input value is ignored. */
   output: SavingsOutput;
   startValue: number;
-  /** Einzahlung je Sparintervall, zu Beginn des Intervalls. */
+  /** Deposit per saving interval, at the start of the interval. */
   savingRate: number;
   saveInterval: SaveInterval;
-  /** Zinssatz pro Jahr in Prozent, vor den Kosten. */
+  /** Interest rate per year in percent, before the costs. */
   yearlyInterest: number;
-  /** Laufende Kosten pro Jahr in Prozent, etwa eine Depotgebühr; mindern den Zinssatz. */
+  /** Running costs per year in percent, e.g. a custody fee; they reduce the interest rate. */
   costs?: number;
   /**
-   * Inflationsrate in Prozent, die vom Zinssatz abgezogen wird: Die Einzahlungen
-   * bleiben dann in heutiger Kaufkraft gleich und das Ergebnis steht in heutigen Euro.
+   * Inflation rate in percent that is deducted from the interest rate: the deposits
+   * then stay the same in today's purchasing power and the result is in today's euros.
    */
   inflation?: number;
   interestInterval: InterestInterval;
   durationYears: number;
   endValue: number;
   considerTax: boolean;
-  /** Kapitalertragsteuer in Prozent. */
+  /** Capital gains tax in percent. */
   capitalGainsTax: number;
-  /** Ausschüttend: Zinsen werden laufend versteuert. Thesaurierend: am Ende. */
+  /** Distributing: interest is taxed as it is paid. Accumulating: at the end. */
   distributionType: DistributionType;
-  /** Teilfreistellung in Prozent; 0, wenn sie nicht berücksichtigt wird. */
+  /** Partial exemption (Teilfreistellung) in percent; 0 when it is not taken into account. */
   partialExemption: number;
 }
 
@@ -58,15 +58,15 @@ export interface SavingsResult {
   yearlyInterest: number;
   durationYears: number;
   endValue: number;
-  /** Anfangskapital plus alle Einzahlungen. */
+  /** Starting capital plus all deposits. */
   deposits: number;
-  /** Zinsen nach Steuern. */
+  /** Interest after taxes. */
   interest: number;
-  /** Stand am Ende jedes Jahres; das letzte Jahr kann angebrochen sein. */
+  /** Balance at the end of each year; the last year may be a fraction. */
   years: { year: number; deposits: number; interest: number }[];
   /**
-   * Das gewünschte Endkapital wird schon erreicht, wenn die gesuchte Größe 0
-   * ist. Das Ergebnis ist dann dieser Plan, und `endValue`, was er erreicht.
+   * The desired final capital is already reached when the searched figure is 0
+   * The result is then this plan, and `endValue` is what it reaches.
    */
   alreadyReached: boolean;
 }
@@ -80,7 +80,7 @@ function depositsOf(plan: Plan): number {
   return plan.startValue + plan.savingRate * plan.durationYears * perYear;
 }
 
-/** Endkapital nach Steuern. */
+/** Final capital after taxes. */
 function endValueOf(plan: Plan): number {
   const taxShare =
     (plan.capitalGainsTax / 100) * (1 - plan.partialExemption / 100);

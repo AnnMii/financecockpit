@@ -52,7 +52,7 @@ describe("deathShares", () => {
       const at = (age: number) => shares.find((d) => d.age === age)!.share;
       expect(stats.mode).toBeGreaterThan(stats.mean);
       expect(at(stats.mode + 10)).toBeLessThan(at(stats.mode) / 3);
-      // Fewer die 10 years before the peak than at it, but far more than 10 years after.
+      // Fewer people die 10 years before the peak than at it, but far more than 10 years after.
       expect(at(stats.mode - 10)).toBeGreaterThan(at(stats.mode + 10));
     }
     expect(lifeStats("male", 67).mode).toBe(88);

@@ -113,7 +113,7 @@ function PlanSection() {
           <Link href="/plan" className="text-accent">
             {text.openPlan}
           </Link>
-          <Link href="/verlauf" className="text-accent">
+          <Link href="/history" className="text-accent">
             {text.openHistory}
           </Link>
         </p>
@@ -124,7 +124,7 @@ function PlanSection() {
           {snapshot
             ? text.staleSnapshot(formatDate(locale, snapshot.date))
             : text.noSnapshot(f.euro(settings.shared.currentCapital))}{" "}
-          <Link href="/verlauf" className="font-medium text-accent">
+          <Link href="/history" className="font-medium text-accent">
             {text.recordSnapshot}
           </Link>
         </p>

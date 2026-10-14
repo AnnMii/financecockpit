@@ -6,7 +6,7 @@ import { type SavingsInput, calculateSavings } from "@/lib/calculators/savings";
 
 /**
  * Runs our Sparrechner against the original from the pinned submodule
- * vendor/finanzfluss-calculators. See "Abgleich mit dem Finanzfluss-Original"
+ * vendor/finanzfluss-calculators. See "Syncing with the Finanzfluss original"
  * in the README.
  */
 
@@ -132,17 +132,17 @@ describe.skipIf(!upstreamAvailable)("Sparrechner parity with the original", () =
   });
 
   it.each([
-    ["Standardwerte der Finanzfluss-Seite", sampleInput()],
-    ["jährlich sparen, monatliche Zinsen", sampleInput({ saveInterval: "yearly", savingRate: 1_800 })],
-    ["jährlich sparen, vierteljährliche Zinsen", sampleInput({ saveInterval: "yearly", savingRate: 1_800, interestInterval: "quarterly" })],
-    ["jährlich sparen, jährliche Zinsen", sampleInput({ saveInterval: "yearly", savingRate: 1_800, interestInterval: "yearly" })],
-    ["monatlich sparen, vierteljährliche Zinsen", sampleInput({ interestInterval: "quarterly", yearlyInterest: 4 })],
-    ["monatlich sparen, jährliche Zinsen", sampleInput({ interestInterval: "yearly", yearlyInterest: 4 })],
-    ["ausschüttend mit Steuer", sampleInput({ considerTax: true, yearlyInterest: 6, durationYears: 20 })],
-    ["thesaurierend mit Steuer", sampleInput({ considerTax: true, distributionType: "accumulating", yearlyInterest: 6, durationYears: 20 })],
-    ["thesaurierend mit Teilfreistellung", sampleInput({ considerTax: true, distributionType: "accumulating", partialExemption: 30, yearlyInterest: 7, durationYears: 30 })],
-    ["ohne Sparrate", sampleInput({ savingRate: 0, yearlyInterest: 5, startValue: 10_000 })],
-    ["ohne Anfangskapital", sampleInput({ startValue: 0, yearlyInterest: 5 })],
+    ["default values of the Finanzfluss page", sampleInput()],
+    ["yearly saving, monthly interest", sampleInput({ saveInterval: "yearly", savingRate: 1_800 })],
+    ["yearly saving, quarterly interest", sampleInput({ saveInterval: "yearly", savingRate: 1_800, interestInterval: "quarterly" })],
+    ["yearly saving, yearly interest", sampleInput({ saveInterval: "yearly", savingRate: 1_800, interestInterval: "yearly" })],
+    ["monthly saving, quarterly interest", sampleInput({ interestInterval: "quarterly", yearlyInterest: 4 })],
+    ["monthly saving, yearly interest", sampleInput({ interestInterval: "yearly", yearlyInterest: 4 })],
+    ["distributing with tax", sampleInput({ considerTax: true, yearlyInterest: 6, durationYears: 20 })],
+    ["accumulating with tax", sampleInput({ considerTax: true, distributionType: "accumulating", yearlyInterest: 6, durationYears: 20 })],
+    ["accumulating with partial exemption", sampleInput({ considerTax: true, distributionType: "accumulating", partialExemption: 30, yearlyInterest: 7, durationYears: 30 })],
+    ["without savings rate", sampleInput({ savingRate: 0, yearlyInterest: 5, startValue: 10_000 })],
+    ["without starting capital", sampleInput({ startValue: 0, yearlyInterest: 5 })],
   ])("matches the original for every question: %s", (_name, plan) => {
     for (const input of allOutputs(plan)) expect(expectParity(input)).toBe(true);
   });

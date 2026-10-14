@@ -43,11 +43,11 @@ export const numberFields = {
     /** Expected yearly return in retirement. */
     retirementReturn: percent(3, 20),
     inflationRate: percent(2, 20),
-    /** Kapitalertragsteuer including Solidaritätszuschlag. */
+    /** Capital gains tax including the solidarity surcharge. */
     capitalGainsTax: percent(26.375),
     /** Taxable income (zvE) per year while saving / in retirement. */
-    zveSavingsPhase: euro(50_000, 10_000_000),
-    zveRetirement: euro(20_000, 10_000_000),
+    taxableIncomeSavingsPhase: euro(50_000, 10_000_000),
+    taxableIncomeRetirement: euro(20_000, 10_000_000),
     /** Sparerpauschbetrag still available for these savings. */
     exemptionOrder: euro(1_000, 2_000),
   },

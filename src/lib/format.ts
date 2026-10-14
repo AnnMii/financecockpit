@@ -13,7 +13,7 @@ export interface Format {
   euroCompact: (value: number) => string;
   /** 0.2 -> "0,2", 50000 -> "50.000" */
   number: (value: number) => string;
-  /** 8.5 -> "8,5 Jahre", 1 -> "1 Jahr" */
+  /** 8.5 -> "8,5 Jahre" (German), 1 -> "1 Jahr" */
   years: (value: number) => string;
   /** 5.123 -> "5,12 %" */
   percent: (value: number) => string;

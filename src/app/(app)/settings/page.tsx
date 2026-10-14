@@ -55,8 +55,8 @@ export default async function SettingsPage() {
             </Section>
             <Section title={text.incomeAndTax}>
               <div className="grid gap-4 sm:grid-cols-2">
-                <IncomeSetting name="zveSavingsPhase" />
-                <IncomeSetting name="zveRetirement" />
+                <IncomeSetting name="taxableIncomeSavingsPhase" />
+                <IncomeSetting name="taxableIncomeRetirement" />
                 <NumberSetting scope="shared" name="exemptionOrder" />
                 <NumberSetting scope="shared" name="capitalGainsTax" />
               </div>
