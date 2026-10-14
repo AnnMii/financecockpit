@@ -31,6 +31,8 @@ interface DraftControls {
   changedCount: number;
   /** Whether any of them are shared values. */
   sharedChanged: boolean;
+  /** The scopes with local changes. */
+  changedScopes: SettingsScope[];
   /**
    * Writes the local values into profiles: calculator values into the profile
    * in use, shared values into `sharedTarget` (default: the one in use), which
@@ -94,6 +96,9 @@ export function DraftSettings({ children }: { children: React.ReactNode }) {
     0,
   );
   const sharedChanged = hasChanges(overrides.shared);
+  const changedScopes = SETTINGS_SCOPES.filter((scope) =>
+    hasChanges(overrides[scope]),
+  );
 
   const save = useCallback<DraftControls["save"]>(
     async (sharedTarget) => {
@@ -147,8 +152,15 @@ export function DraftSettings({ children }: { children: React.ReactNode }) {
   );
 
   const controls = useMemo(
-    () => ({ changedCount, sharedChanged, save, reset, resetScope }),
-    [changedCount, sharedChanged, save, reset, resetScope],
+    () => ({
+      changedCount,
+      sharedChanged,
+      changedScopes,
+      save,
+      reset,
+      resetScope,
+    }),
+    [changedCount, sharedChanged, changedScopes, save, reset, resetScope],
   );
 
   return (
@@ -173,7 +185,7 @@ const NEW_PROFILE = "__new__";
 export function DraftBar() {
   const draft = useDraft();
   if (!draft) throw new Error("DraftBar must be used inside DraftSettings");
-  const { changedCount, sharedChanged, save, reset } = draft;
+  const { changedCount, sharedChanged, changedScopes, save, reset } = draft;
 
   const id = useId();
   const { t } = useLocale();
@@ -187,6 +199,19 @@ export function DraftBar() {
   const [busy, setBusy] = useState(false);
 
   if (changedCount === 0) return null;
+
+  // Shared values go where the list below says; the rest into the profile in
+  // use of the calculator they belong to.
+  const savedInto = changedScopes
+    .filter((scope) => scope !== "shared")
+    .map((scope) => {
+      const { activeId, profiles: list } = profiles[scope] as {
+        activeId: string;
+        profiles: { id: string; name: string }[];
+      };
+      const name = list.find((profile) => profile.id === activeId)?.name;
+      return `${t.scopes[scope]} „${name}“`;
+    });
 
   const stillExists = sharedProfiles.some((profile) => profile.id === choice);
   const target = choice === NEW_PROFILE || stillExists ? choice! : activeId;
@@ -227,6 +252,11 @@ export function DraftBar() {
         </strong>{" "}
         {text.notSaved}
       </p>
+      {savedInto.length > 0 && (
+        <p className="mt-1 text-xs text-ink-2">
+          {text.savesIn(savedInto.join(", "))}
+        </p>
+      )}
 
       {sharedChanged && (
         <div className="mt-3">

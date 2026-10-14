@@ -84,6 +84,8 @@ interface NumberFieldProps {
   readOnly?: boolean;
   /** A small control at the right end of the label row, e.g. a button. */
   action?: React.ReactNode;
+  /** Colours the number red and says why below the field; the value stays valid. */
+  warning?: React.ReactNode;
 }
 
 /**
@@ -104,6 +106,7 @@ export function NumberField({
   info,
   readOnly = false,
   action,
+  warning,
 }: NumberFieldProps) {
   const id = useId();
   const { locale, t, f } = useLocale();
@@ -134,7 +137,11 @@ export function NumberField({
       </div>
       <div
         className={`flex items-center rounded-md border focus-within:outline-2 focus-within:outline-offset-1 focus-within:outline-accent ${
-          invalid ? "border-critical" : readOnly ? "border-line" : "border-axis"
+          invalid || warning
+            ? "border-critical"
+            : readOnly
+              ? "border-line"
+              : "border-axis"
         } ${readOnly ? "bg-plane" : "bg-surface"}`}
       >
         <input
@@ -153,7 +160,7 @@ export function NumberField({
           }}
           onBlur={() => setText(f.number(value))}
           className={`w-full min-w-0 bg-transparent px-3 py-2 text-sm tabular-nums outline-none ${
-            readOnly ? "text-ink-2" : "text-ink"
+            readOnly ? "text-ink-2" : warning ? "font-semibold text-critical" : "text-ink"
           }`}
         />
         {unit && (
@@ -185,6 +192,11 @@ export function NumberField({
           hint
         )}
       </p>
+      {warning && !invalid && (
+        <p role="alert" className="mt-1 text-xs font-medium text-critical">
+          {warning}
+        </p>
+      )}
     </div>
   );
 }

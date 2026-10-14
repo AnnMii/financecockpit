@@ -77,6 +77,8 @@ export function toSavingsInput(settings: AllSettings): SavingsInput {
       savings.savingsRateMonthly * (savings.saveInterval === "monthly" ? 1 : 12),
     saveInterval: savings.saveInterval,
     yearlyInterest: shared.expectedReturn,
+    costs: savings.costs,
+    inflation: savings.realTerms ? shared.inflationRate : 0,
     interestInterval: savings.interestInterval,
     durationYears: savings.untilRetirement
       ? shared.retirementAge - shared.age
@@ -144,6 +146,7 @@ export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
     pension: settings["pension-gap"],
     rates,
     budget: shared.investableMonthly,
+    depotCosts: settings.savings.costs,
     values: values ?? { av: 0, depot: shared.currentCapital, cash: 0 },
     avDepot: {
       ...toAvDepotInput(settings),

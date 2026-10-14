@@ -42,6 +42,7 @@ export function NumberSetting<S extends SettingsScope>({
   derived,
   scale = 1,
   action,
+  warning,
 }: {
   scope: S;
   name: NumberFieldName<S>;
@@ -64,6 +65,8 @@ export function NumberSetting<S extends SettingsScope>({
   scale?: number;
   /** A small control at the right end of the label row, e.g. a button. */
   action?: React.ReactNode;
+  /** Colours the number red and says why below the field. */
+  warning?: React.ReactNode;
 }) {
   const { t } = useLocale();
   const { settings, update, isChanged } = useSettingsEditor();
@@ -88,6 +91,7 @@ export function NumberSetting<S extends SettingsScope>({
       slider={derived === undefined ? slider : undefined}
       readOnly={derived !== undefined}
       action={action}
+      warning={warning}
       info={
         info ?? (
           <FieldInfo label={label ?? text.label}>

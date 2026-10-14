@@ -410,6 +410,31 @@ describe("the payout of the free capital", () => {
   });
 });
 
+describe("the costs of the ETF depot", () => {
+  it("reduce its growth, so more has to be saved", () => {
+    const free = calculatePlan(depotPlan({ depotVolatility: 0, cashVolatility: 0 }));
+    const costly = calculatePlan(
+      depotPlan({ depotVolatility: 0, cashVolatility: 0, depotCosts: 1 }),
+    );
+    expect(costly.wealthAtRetirement.p50).toBeLessThan(free.wealthAtRetirement.p50);
+    expect(costly.requiredRate).toBeGreaterThan(free.requiredRate);
+  });
+
+  it("do not touch the AV-Depot, which has its own costs", () => {
+    const only = (depotCosts: number) =>
+      calculatePlan(
+        depotPlan({
+          depotVolatility: 0,
+          cashVolatility: 0,
+          rates: { av: 150, depot: 0, cash: 0 },
+          avDepot: avInput,
+          depotCosts,
+        }),
+      ).wealthAtRetirement.p50;
+    expect(only(2)).toBeCloseTo(only(0), 8);
+  });
+});
+
 describe("validatePlanInput", () => {
   it("accepts the sample plan", () => {
     expect(validatePlanInput(depotPlan())).toEqual([]);

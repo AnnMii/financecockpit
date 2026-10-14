@@ -16,6 +16,12 @@ export const ABGELTUNGSTEUERSATZ = 0.26375;
 export const TEILFREISTELLUNG = 0.7;
 export const BASISERTRAG_FACTOR = 0.7;
 export const AV_SUBSIDIZED_CAP = 1_800;
+/**
+ * Legal cap on the effective costs of the standard depot, in percent per year
+ * (Altersvorsorgereformgesetz of 2026; earlier drafts had 1,5 %). It does not
+ * apply to a freely composed depot.
+ */
+export const AV_COSTS_CAP_PERCENT = 1;
 export const AV_CONTRIBUTION_CAP = 13_680; // 2 Verträge × 6.840 €
 export const KINDERZULAGE_CAP = 300;
 export const MIN_OWN_CONTRIBUTION = 120;

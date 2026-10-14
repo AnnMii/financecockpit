@@ -17,8 +17,8 @@ export const en: Dictionary = {
     history: "History",
     planning: "Planning",
     calculators: "Calculators",
-    account: "Account",
-    settings: "Settings",
+    account: "Basics",
+    settings: "Global values",
     logout: "Sign out",
   },
 
@@ -84,6 +84,8 @@ export const en: Dictionary = {
     eurosPerMonth: "€ / month",
     eurosPerYear: "€ / year",
     endless: "endless",
+    advancedToggle: "Advanced inputs",
+    advancedForced: "The advanced inputs are shown because of the error message.",
   },
 
   fieldInfo: {
@@ -141,7 +143,7 @@ export const en: Dictionary = {
       savingsRateMonthly:
         "What you pay into the Altersvorsorgedepot per month. Up to €150 per month (€1,800 per year) is subsidised, up to €1,140 (€13,680 per year) is possible. You invest the rest of your budget in the savings calculator.",
       avDepotCosts:
-        "Running costs of the Altersvorsorgedepot per year, on top of the fund costs – such as custody or administration fees. They reduce the return.",
+        "Running costs of the Altersvorsorgedepot per year, on top of the fund costs – such as custody or administration fees. They reduce the return. For the standard depot the effective costs are capped by law at 1.0% per year; the cap does not apply to a freely composed depot. There the TER of the chosen ETFs comes on top of these costs, unless it is already in the expected return.",
       baseRate:
         "The base rate set yearly by the German Federal Ministry of Finance. It yields the Vorabpauschale, the yearly minimum taxation of accumulating funds in a regular portfolio.",
       oneTimePayout:
@@ -168,12 +170,16 @@ export const en: Dictionary = {
     savings: {
       savingsRateMonthly:
         "What you pay into your savings plan, i.e. the ETF account, per month. The value belongs to the profile of the savings calculator and is used as the rate of the ETF account in the overall plan.",
+      costs:
+        "Running costs per year that reduce the return – such as a custody fee. The fund costs (TER) are already in the interest rate or the expected return. In the overall plan these costs reduce the return of the ETF account.",
       durationYears:
         "How many years you save.",
       endValue:
         "The capital that should be there at the end of the duration – deposits and interest together.",
       partialExemption:
         "The part of the fund income that stays tax-free: 30% for equity funds, 15% for mixed funds.",
+      realTerms:
+        "Checked, the inflation rate (field below) is deducted from the interest rate; the deposits stay the same in today's purchasing power and the result is in today's euros. The tax is then calculated on the real interest, a simplification. Unchecked, the calculator works nominally, as at Finanzfluss.",
       untilRetirement:
         "Checked, the duration is retirement age minus age and follows the shared values. Unchecked, you enter the duration freely, e.g. for a savings goal before retirement.",
       considerTax:
@@ -222,7 +228,7 @@ export const en: Dictionary = {
   profiles: {
     heading: "Profiles",
     ownValues: "Values of this calculator",
-    managedInSettings: "Create, rename and delete in the",
+    managedInSettings: "Create, rename and delete under",
     create: "New …",
     rename: "Rename",
     delete: "Delete",
@@ -248,6 +254,7 @@ export const en: Dictionary = {
     changes: (count) =>
       count === 1 ? "1 local change" : `${count} local changes`,
     notSaved: "– only in this view, not saved.",
+    savesIn: (profiles) => `Saving writes into the active profiles: ${profiles}.`,
     saveSharedIn: "Save shared values to",
     active: "(active)",
     newProfile: "New profile …",
@@ -427,6 +434,11 @@ export const en: Dictionary = {
     },
     savings: {
       savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
+      costs: {
+        label: "Costs per year",
+        unit: "% p.a.",
+        hint: "On top of the fund costs, e.g. a custody fee.",
+      },
       durationYears: { label: "Duration", unit: "years" },
       endValue: { label: "Final capital", unit: "€" },
       partialExemption: {
@@ -456,6 +468,10 @@ export const en: Dictionary = {
     "pension-gap": {},
     savings: {
       untilRetirement: { label: "Duration until retirement" },
+      realTerms: {
+        label: "Account for inflation (today's purchasing power)",
+        hint: "Deducts the inflation rate from the interest rate; deposits and result in today's euros.",
+      },
       considerTax: { label: "Include taxes" },
       considerPartialExemption: {
         label: "Apply the partial exemption for funds",
@@ -759,7 +775,7 @@ export const en: Dictionary = {
       actualSeries: "Actual savings rate",
     },
     assumptions: [
-      "All amounts in today's purchasing power; the inflation rate is always deducted, regardless of the switch in the settings.",
+      "All amounts in today's purchasing power; the inflation rate is always deducted, regardless of the switch in the global values.",
       "The corridor comes from 2,000 random courses of the return with constant fluctuation; AV-Depot and ETF account move together. Extreme events beyond this assumption are not covered.",
       "Savings rates rise with inflation; the contributions to the AV-Depot stay nominally the same and follow its calculator.",
       "The required savings rate is your total savings rate with the same split over the pots. At most €1,140 per month go into the AV-Depot; what exceeds that goes into the ETF account.",
@@ -805,7 +821,7 @@ export const en: Dictionary = {
   },
 
   settingsPage: {
-    title: "Settings",
+    title: "Global values",
     intro:
       "The calculators share these values. Changes only apply once you save them at the bottom right.",
     profileLabel: "Profile of the shared values",
@@ -818,7 +834,7 @@ export const en: Dictionary = {
   dashboard: {
     title: "Cockpit",
     profilesHint:
-      "The selection also applies in the calculators. You can create and change profiles there and in the settings.",
+      "The selection also applies in the calculators. You can create and change profiles there and under “Global values”.",
     desiredPension: "Desired pension",
     notCalculable: "Cannot be calculated with the selected profiles:",
     resultsHeading: "Results of the calculators",
@@ -866,8 +882,6 @@ export const en: Dictionary = {
       children: "Children",
       payout: "Payout phase",
     },
-    advancedToggle: "Advanced inputs",
-    advancedForced: "The advanced inputs are shown because of the error message.",
     presets: {
       minimum: "Minimum",
       subsidyLimit: "Subsidy limit",
@@ -876,6 +890,8 @@ export const en: Dictionary = {
     retirementAgeHint: "Between 65 and 70.",
     savingsRateHint: (perYear) =>
       `${perYear}. Subsidised up to €150 per month, possible up to €1,140.`,
+    costsAboveCap: (cap) =>
+      `Above the cost cap: for the standard depot the effective costs are capped by law at ${cap} per year. These costs alone, without the fund costs, are already above it. The cap does not apply to a freely composed depot; there the TER of the chosen ETFs comes on top of these costs, unless it is already in the expected return.`,
     payoutUntilHint: "In the Altersvorsorgedepot at least until 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF savings plan",
@@ -984,6 +1000,7 @@ export const en: Dictionary = {
     duration: "Duration",
     savingRate: (perInterval) => `Savings rate ${perInterval}`,
     durationMonths: (months) => `That is ${months} months.`,
+    realNote: "All amounts in today's purchasing power.",
     endValueMinimum: {
       startValue: (amount) => `Even without starting capital you reach ${amount}.`,
       savingRate: (amount) => `Even without a savings rate you reach ${amount}.`,
@@ -1012,6 +1029,7 @@ export const en: Dictionary = {
       "Deposits are made at the beginning of the saving interval; interest is credited in the chosen interest interval and compounds.",
       "Distributing: the tax reduces the interest continuously. Accumulating: the tax on the whole gain is due at the end; the chart shows the balance after taxes, as if you sold at the end of each year.",
       "The partial exemption makes the chosen share of the returns tax-free; a saver's allowance is not included.",
+      "With “Account for inflation” the inflation rate is deducted from the interest rate; the deposits stay the same in today's purchasing power, the tax is calculated on the real interest.",
       "Calculation follows the Finanzfluss savings calculator. Not tax or investment advice.",
     ],
   },

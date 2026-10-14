@@ -82,6 +82,8 @@ export interface PlanInput {
   values: Pots;
   /** What can be invested per month in all; the rates are compared with it. */
   budget?: number;
+  /** Running costs of the ETF depot per year in percent, on top of its fund costs. */
+  depotCosts?: number;
   /**
    * How the savings rate is split, as entered; `rates` follows from it (see
    * `splitSavingsRate`). Plans frozen before the shares were stored lack them.
@@ -414,7 +416,7 @@ function frameOf(input: PlanInput): Frame {
     retirementAge: input.retirementAge,
     payoutUntilAge: input.payoutUntilAge,
     currentCapital: 0,
-    returnUntilRetirement: input.expectedReturn,
+    returnUntilRetirement: input.expectedReturn - (input.depotCosts ?? 0),
     retirementReturn: input.retirementReturn,
     considerInflation: true,
     inflationRate: input.inflationRate,

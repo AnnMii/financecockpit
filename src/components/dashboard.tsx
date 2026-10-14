@@ -262,7 +262,11 @@ export function Dashboard() {
                 : savings.input.distributionType === "distributing"
                   ? text.taxNote.savingsDistributing
                   : text.taxNote.savingsAccumulating
-            } ${text.currencyNote.nominal}`}
+            } ${
+              settings.savings.realTerms
+                ? text.currencyNote.real
+                : text.currencyNote.nominal
+            }`}
             errors={savings.errors}
             chart={
               savings.result && (

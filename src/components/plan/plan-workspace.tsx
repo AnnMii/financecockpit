@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { AdvancedSwitch } from "@/components/advanced-switch";
 import { BudgetHint, RestButton } from "@/components/budget";
 import { Assumptions, CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
@@ -34,6 +35,12 @@ function Workspace() {
   const text = t.plan;
   const { input, errors, result, snapshot } = usePlan();
 
+  // The advanced inputs start hidden to keep the plan simple. With an error
+  // they are shown anyway: it may be one of them that has to change.
+  const [advanced, setAdvanced] = useState(false);
+  const forced = errors.length > 0;
+  const showAdvanced = advanced || forced;
+
   return (
     <CalculatorShell
       scope="plan"
@@ -44,14 +51,24 @@ function Workspace() {
       }
       form={
         <>
+          <AdvancedSwitch
+            checked={advanced}
+            forced={forced}
+            onChange={setAdvanced}
+          />
+
           <Section title={text.sections.pension}>
             <NumberSetting scope="pension-gap" name="desiredPension" />
             <NumberSetting scope="pension-gap" name="statePension" />
-            <NumberSetting scope="pension-gap" name="companyPension" />
-            <NumberSetting scope="pension-gap" name="privatePension" />
-            <NumberSetting scope="pension-gap" name="riesterPension" />
-            <NumberSetting scope="pension-gap" name="taxPrediction" />
-            <NumberSetting scope="pension-gap" name="yearlyTaxFreeAmount" />
+            {showAdvanced && (
+              <>
+                <NumberSetting scope="pension-gap" name="companyPension" />
+                <NumberSetting scope="pension-gap" name="privatePension" />
+                <NumberSetting scope="pension-gap" name="riesterPension" />
+                <NumberSetting scope="pension-gap" name="taxPrediction" />
+                <NumberSetting scope="pension-gap" name="yearlyTaxFreeAmount" />
+              </>
+            )}
             <p className="text-xs text-ink-2">{text.pensionNote}</p>
           </Section>
 
@@ -91,40 +108,54 @@ function Workspace() {
               label={text.rateLabels.depot}
               action={<RestButton part="depot" />}
             />
-            <NumberSetting
-              scope="plan"
-              name="cashMonthly"
-              action={<RestButton part="cash" />}
-            />
+            {showAdvanced && (
+              <NumberSetting
+                scope="plan"
+                name="cashMonthly"
+                action={<RestButton part="cash" />}
+              />
+            )}
             <p className="text-xs text-ink-2">
               <BudgetHint />
             </p>
             <p className="text-xs text-ink-2">{text.ratesNote}</p>
           </Section>
 
-          <Section title={text.sections.payout}>
-            <ToggleSetting scope="withdrawal-plan" name="capitalConsumption" />
-            <p className="text-xs text-ink-2">{text.payoutNote}</p>
-          </Section>
+          {showAdvanced && (
+            <Section title={text.sections.payout}>
+              <ToggleSetting scope="withdrawal-plan" name="capitalConsumption" />
+              <p className="text-xs text-ink-2">{text.payoutNote}</p>
+            </Section>
+          )}
 
           <Section title={text.sections.confidence}>
             <NumberSetting scope="plan" name="confidenceTarget" />
-            <NumberSetting scope="plan" name="lowerGuardrail" />
-            <NumberSetting scope="plan" name="upperGuardrail" />
+            {showAdvanced && (
+              <>
+                <NumberSetting scope="plan" name="lowerGuardrail" />
+                <NumberSetting scope="plan" name="upperGuardrail" />
+              </>
+            )}
           </Section>
 
           <Section title={text.sections.returns}>
             <NumberSetting scope="shared" name="expectedReturn" />
-            <NumberSetting scope="plan" name="cashReturn" />
             <NumberSetting scope="shared" name="retirementReturn" />
             <NumberSetting scope="shared" name="inflationRate" />
-            <NumberSetting scope="shared" name="capitalGainsTax" />
+            {showAdvanced && (
+              <>
+                <NumberSetting scope="plan" name="cashReturn" />
+                <NumberSetting scope="shared" name="capitalGainsTax" />
+              </>
+            )}
           </Section>
 
-          <Section title={text.sections.volatility}>
-            <NumberSetting scope="plan" name="depotVolatility" />
-            <NumberSetting scope="plan" name="cashVolatility" />
-          </Section>
+          {showAdvanced && (
+            <Section title={text.sections.volatility}>
+              <NumberSetting scope="plan" name="depotVolatility" />
+              <NumberSetting scope="plan" name="cashVolatility" />
+            </Section>
+          )}
 
           <Section title={text.sections.time}>
             <NumberSetting scope="shared" name="age" />
@@ -141,32 +172,54 @@ function Workspace() {
   );
 }
 
-function PercentileTiles({
-  title,
-  values,
+/** Wealth at retirement and pension per month in the pessimistic, middle and optimistic course. */
+function PercentileTable({
+  result,
   format,
 }: {
-  title: string;
-  values: Percentiles;
+  result: PlanResult;
   format: (value: number) => string;
 }) {
   const { t } = useLocale();
-  const rows: [string, number][] = [
-    [t.plan.pessimistic, values.p10],
-    [t.plan.expected, values.p50],
-    [t.plan.optimistic, values.p90],
+  const columns = [t.plan.pessimistic, t.plan.expected, t.plan.optimistic];
+  const rows: [string, Percentiles][] = [
+    [t.plan.wealthAtRetirement, result.wealthAtRetirement],
+    [t.plan.pensionPerMonth, result.pension],
   ];
   return (
     <Card>
-      <h2 className="mb-3 text-base font-semibold">{title}</h2>
-      <dl className="grid grid-cols-3 gap-3">
-        {rows.map(([label, value]) => (
-          <div key={label}>
-            <dt className="text-xs text-ink-2">{label}</dt>
-            <dd className="text-lg font-semibold tabular-nums">{format(value)}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-xs text-ink-2">
+            <tr className="border-b border-line">
+              <th className="py-2 pr-3 text-left font-medium" />
+              {columns.map((column) => (
+                <th
+                  key={column}
+                  className="whitespace-nowrap px-3 py-2 text-right font-medium"
+                >
+                  {column}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([label, values]) => (
+              <tr key={label} className="border-b border-line last:border-0">
+                <th className="py-3 pr-3 text-left font-semibold">{label}</th>
+                {[values.p10, values.p50, values.p90].map((value, index) => (
+                  <td
+                    key={columns[index]}
+                    className="whitespace-nowrap px-3 py-3 text-right text-base font-semibold tabular-nums"
+                  >
+                    {format(value)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </Card>
   );
 }
@@ -348,18 +401,7 @@ function Results({ input, result }: { input: PlanInput; result: PlanResult }) {
         />
       </Card>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <PercentileTiles
-          title={text.wealthAtRetirement}
-          values={result.wealthAtRetirement}
-          format={f.euro}
-        />
-        <PercentileTiles
-          title={text.pensionPerMonth}
-          values={result.pension}
-          format={f.euro}
-        />
-      </div>
+      <PercentileTable result={result} format={f.euro} />
 
       {compared.version && (
         <ThenAndNow version={compared.version} result={result} />

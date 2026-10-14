@@ -42,7 +42,7 @@ Dann <http://localhost:3000> öffnen und ein Konto anlegen. Die Datenbank
 src/
   app/
     (auth)/            Anmelden, Registrieren
-    (app)/             alles hinter dem Login: Cockpit, Rechner, Einstellungen
+    (app)/             alles hinter dem Login: Cockpit, Rechner, Globale Werte
     actions/           Server Actions (Login, Einstellungen speichern)
   components/          Oberfläche; settings-provider.tsx hält die Einstellungen
   db/                  Datenbankschema und Verbindung (Drizzle + libSQL)
@@ -88,8 +88,8 @@ heutiger Kaufkraft rechnen“) und zeigt dafür die globale Inflationsrate, die
 übrigen Rechner rechnen immer nominal.
 
 Jedes Feld hat neben dem Label ein „i" mit einer kurzen Erklärung (Texte unter
-`fieldInfo` in den Wörterbüchern). Bei „Auszahlung bis Alter" zeigt es in den
-Einstellungen die Verteilung der Sterbealter in Deutschland
+`fieldInfo` in den Wörterbüchern). Bei „Auszahlung bis Alter" zeigt es auf der
+Seite „Globale Werte" die Verteilung der Sterbealter in Deutschland
 (`src/lib/data/life-table.ts`, Sterbetafel 2023/2025 des Statistischen
 Bundesamts; bei einer neuen Sterbetafel von Hand zu ersetzen).
 
@@ -98,9 +98,9 @@ Bundesamts; bei einer neuen Sterbetafel von Hand zu ersetzen).
 Jeder Bereich hat eine eigene Liste benannter Profile; je Bereich ist eines
 aktiv. So lässt sich etwa das globale Profil „Basis“ mit dem AV-Depot-Profil
 „Mit Einmalauszahlung“ kombinieren. Die Auswahl gilt überall: im Cockpit, in den
-Rechnern und in den Einstellungen.
+Rechnern und auf der Seite „Globale Werte".
 
-- **Einstellungen-Seite, Rechner und Gesamtplan:** Änderungen gelten zunächst
+- **Globale Werte, Rechner und Gesamtplan:** Änderungen gelten zunächst
   nur lokal in der Ansicht
   (`DraftSettings` in `src/components/draft-settings.tsx`). „Zurücksetzen“ oder
   ein Neuladen stellt die gespeicherten Werte wieder her. „Speichern“ im Fenster
@@ -109,7 +109,7 @@ Rechnern und in den Einstellungen.
   sollen: das aktive (Vorgabe), ein anderes oder ein neues. Das gewählte Profil
   wird danach das aktive.
 - **Globale Profile verwalten:** Umbenennen und Löschen gehen nur auf der
-  Einstellungen-Seite. In den Rechnern lässt sich das aktive globale Profil
+  Seite „Globale Werte". In den Rechnern lässt sich das aktive globale Profil
   sehen und wechseln; ein neues entsteht dort nur über das Speichern-Fenster.
 - **Profile eines Rechners:** „Neu …“ im Rechner legt ein Profil mit den Werten
   an, die gerade zu sehen sind – inklusive ungespeicherter Änderungen.

@@ -70,6 +70,8 @@ export const numberFields = {
   savings: {
     /** Per month into the savings plan, which is the ETF depot. */
     savingsRateMonthly: euro(150, 100_000),
+    /** Running costs per year on top of the fund costs, e.g. a custody fee. */
+    costs: percent(0, 5),
     // Used when the duration does not follow the retirement age.
     durationYears: { min: 1, max: 100, default: 30, integer: true },
     // Above what the default plan reaches anyway, so every searched figure
@@ -103,6 +105,8 @@ export const toggleFields = {
   "pension-gap": {},
   savings: {
     untilRetirement: true,
+    /** Deduct the inflation from the interest rate; all amounts in today's money. */
+    realTerms: false,
     considerTax: false,
     considerPartialExemption: false,
   },

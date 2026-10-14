@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AdvancedSwitch } from "@/components/advanced-switch";
 import { BudgetHint, RestButton } from "@/components/budget";
 import { CalculatorShell } from "@/components/calculator-shell";
 import { DraftSettings } from "@/components/draft-settings";
@@ -13,6 +14,7 @@ import {
   SelectSetting,
 } from "@/components/setting-fields";
 import { useSettingsEditor } from "@/components/settings-provider";
+import { AV_COSTS_CAP_PERCENT } from "@/lib/calculators/av-depot";
 import { AV_DEPOT_MAX_MONTHLY } from "@/lib/calculators/registry";
 import { AvDepotResults } from "./av-depot-results";
 import { useAvDepot } from "./use-av-depot";
@@ -93,21 +95,11 @@ function AvDepotWorkspace() {
       errors={errors}
       form={
         <>
-          <div>
-            <label className="flex items-center justify-between gap-3 text-sm font-medium text-ink">
-              {text.advancedToggle}
-              <input
-                type="checkbox"
-                checked={showAdvanced}
-                disabled={forced}
-                onChange={(event) => setAdvanced(event.target.checked)}
-                className="size-4 accent-(--accent)"
-              />
-            </label>
-            {forced && (
-              <p className="mt-1 text-xs text-ink-2">{text.advancedForced}</p>
-            )}
-          </div>
+          <AdvancedSwitch
+            checked={advanced}
+            forced={forced}
+            onChange={setAdvanced}
+          />
 
           <Section title={text.sections.personal}>
             <NumberSetting scope="shared" name="age" slider={sliders.age} />
@@ -153,6 +145,11 @@ function AvDepotWorkspace() {
                   scope="av-depot"
                   name="avDepotCosts"
                   slider={sliders.avDepotCosts}
+                  warning={
+                    input.avDepotCosts > AV_COSTS_CAP_PERCENT
+                      ? text.costsAboveCap(f.percent(AV_COSTS_CAP_PERCENT))
+                      : undefined
+                  }
                 />
                 <NumberSetting
                   scope="shared"

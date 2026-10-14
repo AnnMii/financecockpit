@@ -250,7 +250,7 @@ Zinssatz im Sparrechner, Entnahmebetrag im Entnahmeplan)?
 
 - [ ] **Dunkles Farbschema** ist angelegt, aber nie im Browser angesehen.
 - [ ] **Profil-Auswahl im Cockpit** erlaubt nur das Wechseln; Anlegen,
-      Umbenennen und Löschen gehen nur in den Rechnern und Einstellungen.
+      Umbenennen und Löschen gehen nur in den Rechnern und unter „Globale Werte".
 - [ ] **Vor einem öffentlichen Betrieb:** Begrenzung von Anmeldeversuchen und
       „Passwort vergessen" fehlen; `ALLOW_REGISTRATION=false` setzen.
 - [ ] **Lizenz:** Bei Hosting für andere Nutzer den Quellcode unter AGPL
@@ -346,3 +346,46 @@ im mittleren Verlauf von rund 99.000 € auf rund 192.000 € (Standardwerte).
 Sparrechner und Rentenlücke rechnen weiter mit dem „Vorhandenen Kapital"; beide
 Angaben musst du selbst gleich halten. Soll das „Vorhandene Kapital" beim
 Erfassen eines Ist-Stands automatisch auf dessen Summe gesetzt werden?
+
+---
+
+## 16. Mehrere Sparrechner statt Tagesgeld
+
+- [ ] **Entscheiden, ob und wie das gebaut wird** (noch nicht umgesetzt)
+
+**Idee:** Der Gesamtplan hat heute drei feste Töpfe: Altersvorsorgedepot,
+ETF-Depot (Sparrechner) und Tagesgeld. Statt des Tagesgelds soll es beliebig
+viele Anlagen geben (ETF, Gold, Bitcoin, Bonds, Tagesgeld, …), jede mit eigener
+Sparrate, Rendite, Schwankung und Kosten. Der Plan berücksichtigt alle und
+vergleicht die Summe der Raten mit dem Budget.
+
+**Was dafür nötig wäre:**
+
+- **Rendite und Schwankung je Anlage:** Heute gilt für den Sparrechner die globale
+  „Erwartete Rendite", für den Plan zwei feste Schwankungen (Depot, Tagesgeld).
+- **Korrelation:** Die Verläufe der Anlagen sind nicht unabhängig. Der Plan
+  bräuchte eine Annahme dazu, sonst wird der Korridor zu eng oder zu breit.
+- **Ist-Stände und eingefrorene Pläne:** Sie speichern heute genau drei Töpfe und
+  müssten dynamisch werden; alte Einträge müssen lesbar bleiben.
+- **Profile:** Je Rechner ist nur ein Profil aktiv. Mehrere Sparrechner heißt
+  entweder mehrere aktive Profile („einbeziehen" je Profil) oder eine eigene
+  Liste von Anlagen im Plan (Name, Sparrate, Rendite, Schwankung, Kosten,
+  Startbetrag). Der Sparrechner bliebe das Werkzeug für eine Anlage zum
+  Durchspielen.
+
+**Aufwand:** groß, etwa drei bis vier Runden samt Migration der gespeicherten
+Daten.
+
+**Vorab zu entscheiden:**
+
+- Reicht eine pauschale Annahme für die Korrelation (alle riskanten Anlagen laufen
+  weitgehend gemeinsam), oder soll sie je Paar einstellbar sein?
+- Ist-Stände je Anlage erfassen? Dann müssen alte Stände (AV, ETF, Tagesgeld)
+  auf die neuen Anlagen abgebildet werden.
+- Bleibt das Altersvorsorgedepot ein fester Topf, weil es eigene Förder- und
+  Steuerregeln hat?
+
+**Kleine Vorarbeiten, die offen geblieben sind:** „Sparrate ETF-Depot
+(Sparrechner)" auf der Plan-Seite zu „Sparrate ETF-Depot" kürzen; das Budget
+„Zum Investieren verfügbar pro Monat" auch im AV-Depot- und im Sparrechner
+editierbar machen (dort steht es bisher nur als Hinweis unter der Sparrate).

@@ -31,8 +31,15 @@ export interface SavingsInput {
   /** Einzahlung je Sparintervall, zu Beginn des Intervalls. */
   savingRate: number;
   saveInterval: SaveInterval;
-  /** Zinssatz pro Jahr in Prozent. */
+  /** Zinssatz pro Jahr in Prozent, vor den Kosten. */
   yearlyInterest: number;
+  /** Laufende Kosten pro Jahr in Prozent, etwa eine Depotgebühr; mindern den Zinssatz. */
+  costs?: number;
+  /**
+   * Inflationsrate in Prozent, die vom Zinssatz abgezogen wird: Die Einzahlungen
+   * bleiben dann in heutiger Kaufkraft gleich und das Ergebnis steht in heutigen Euro.
+   */
+  inflation?: number;
   interestInterval: InterestInterval;
   durationYears: number;
   endValue: number;
@@ -78,7 +85,10 @@ function endValueOf(plan: Plan): number {
   const taxShare =
     (plan.capitalGainsTax / 100) * (1 - plan.partialExemption / 100);
   const taxedYearly = plan.considerTax && plan.distributionType === "distributing";
-  const yearlyRate = (plan.yearlyInterest / 100) * (taxedYearly ? 1 - taxShare : 1);
+  // A loss earns no tax credit.
+  const yearlyRate =
+    (plan.yearlyInterest / 100) *
+    (taxedYearly && plan.yearlyInterest > 0 ? 1 - taxShare : 1);
 
   // Bring saving and interest intervals to one period length.
   let rate: number;
@@ -162,15 +172,22 @@ export function minimumEndValue(input: SavingsInput): number | null {
   const { output } = input;
   if (output === "endValue") return null;
   const key = output === "duration" ? "durationYears" : output;
-  return endValueOf({ ...input, [key]: 0 });
+  const plan = {
+    ...input,
+    yearlyInterest: input.yearlyInterest - (input.costs ?? 0) - (input.inflation ?? 0),
+  };
+  return endValueOf({ ...plan, [key]: 0 });
 }
 
 export function calculateSavings(input: SavingsInput): {
   result: SavingsResult | null;
   errors: CalculationError[];
 } {
-  const { output, endValue: target, ...given } = input;
-  const plan: Plan = { ...given };
+  const { output, endValue: target, costs = 0, inflation = 0, ...given } = input;
+  // Costs and inflation reduce the interest rate; the searched rate is the one
+  // after them, and the result names it before.
+  const deductions = costs + inflation;
+  const plan: Plan = { ...given, yearlyInterest: given.yearlyInterest - deductions };
 
   if (output !== "duration" && plan.durationYears <= 0) {
     return { result: null, errors: ["durationPositive"] };
@@ -225,7 +242,7 @@ export function calculateSavings(input: SavingsInput): {
     result: {
       startValue: plan.startValue,
       savingRate: plan.savingRate,
-      yearlyInterest: plan.yearlyInterest,
+      yearlyInterest: plan.yearlyInterest + deductions,
       durationYears: plan.durationYears,
       endValue,
       deposits,

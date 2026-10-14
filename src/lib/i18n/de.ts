@@ -193,6 +193,11 @@ const numbers: NumberTexts = {
   },
   savings: {
     savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
+    costs: {
+      label: "Kosten pro Jahr",
+      unit: "% p. a.",
+      hint: "Zusätzlich zu den Fondskosten, z. B. eine Depotgebühr.",
+    },
     durationYears: { label: "Laufzeit", unit: "Jahre" },
     endValue: { label: "Endkapital", unit: "€" },
     partialExemption: {
@@ -222,6 +227,10 @@ const toggles: ToggleTexts = {
   "pension-gap": {},
   savings: {
     untilRetirement: { label: "Laufzeit bis Renteneintritt" },
+    realTerms: {
+      label: "Inflation berücksichtigen (heutige Kaufkraft)",
+      hint: "Zieht die Inflationsrate vom Zinssatz ab; Einzahlungen und Ergebnis in heutigen Euro.",
+    },
     considerTax: { label: "Steuern mitberechnen" },
     considerPartialExemption: {
       label: "Teilfreistellung bei Fonds berücksichtigen",
@@ -370,7 +379,7 @@ const fieldInfo: FieldInfoTexts = {
     savingsRateMonthly:
       "Was du pro Monat ins Altersvorsorgedepot einzahlst. Gefördert werden bis zu 150 € im Monat (1.800 € im Jahr), möglich sind bis zu 1.140 € (13.680 € im Jahr). Den Rest deines Budgets legst du im Sparrechner an.",
     avDepotCosts:
-      "Laufende Kosten des Altersvorsorgedepots pro Jahr, zusätzlich zu den Fondskosten – etwa Depot- oder Verwaltungsgebühr. Sie mindern die Rendite.",
+      "Laufende Kosten des Altersvorsorgedepots pro Jahr, zusätzlich zu den Fondskosten – etwa Depot- oder Verwaltungsgebühr. Sie mindern die Rendite. Für das Standarddepot sind die Effektivkosten gesetzlich auf 1,0 % pro Jahr begrenzt; im frei zusammengestellten Depot gilt der Deckel nicht. Dort kommt die TER der gewählten ETFs zu diesen Kosten hinzu, soweit sie nicht schon in der erwarteten Rendite steckt.",
     baseRate:
       "Der Basiszins, den das Bundesfinanzministerium jährlich festlegt. Aus ihm ergibt sich die Vorabpauschale, also die jährliche Mindestbesteuerung thesaurierender Fonds im normalen Depot.",
     oneTimePayout:
@@ -397,12 +406,16 @@ const fieldInfo: FieldInfoTexts = {
   savings: {
     savingsRateMonthly:
       "Was du pro Monat in deinen Sparplan, also das ETF-Depot, einzahlst. Der Wert gehört zum Profil des Sparrechners und wird im Gesamtplan als Rate des ETF-Depots genutzt.",
+    costs:
+      "Laufende Kosten pro Jahr, die die Rendite mindern – etwa eine Depotgebühr. Die Fondskosten (TER) stecken schon im Zinssatz bzw. in der erwarteten Rendite. Im Gesamtplan mindern diese Kosten die Rendite des ETF-Depots.",
     durationYears:
       "Wie viele Jahre du sparst.",
     endValue:
       "Das Kapital, das am Ende der Laufzeit vorhanden sein soll – Einzahlungen und Zinsen zusammen.",
     partialExemption:
       "Der Teil der Fondserträge, der steuerfrei bleibt: 30 % bei Aktienfonds, 15 % bei Mischfonds.",
+    realTerms:
+      "Mit Haken wird die Inflationsrate (Feld darunter) vom Zinssatz abgezogen; die Einzahlungen bleiben in heutiger Kaufkraft gleich und das Ergebnis steht in heutigen Euro. Die Steuer wird dann auf den realen Zins gerechnet, eine Vereinfachung. Ohne Haken rechnet der Rechner nominal, wie Finanzfluss.",
     untilRetirement:
       "Mit Haken ist die Laufzeit Renteneintritt minus Alter und folgt den globalen Werten. Ohne Haken gibst du die Laufzeit frei ein, etwa für ein Sparziel vor der Rente.",
     considerTax:
@@ -505,8 +518,8 @@ export const de = {
     history: "Verlauf",
     planning: "Planung",
     calculators: "Rechner",
-    account: "Konto",
-    settings: "Einstellungen",
+    account: "Grundlagen",
+    settings: "Globale Werte",
     logout: "Abmelden",
   },
 
@@ -564,6 +577,9 @@ export const de = {
     eurosPerMonth: "€ / Monat",
     eurosPerYear: "€ / Jahr",
     endless: "endlos",
+    advancedToggle: "Erweiterte Eingaben",
+    advancedForced:
+      "Wegen der Fehlermeldung sind die erweiterten Eingaben eingeblendet.",
   },
 
   children: {
@@ -579,7 +595,7 @@ export const de = {
   profiles: {
     heading: "Profile",
     ownValues: "Werte dieses Rechners",
-    managedInSettings: "Anlegen, umbenennen und löschen in den",
+    managedInSettings: "Anlegen, umbenennen und löschen unter",
     create: "Neu …",
     rename: "Umbenennen",
     delete: "Löschen",
@@ -597,6 +613,8 @@ export const de = {
     changes: (count: number) =>
       count === 1 ? "1 lokale Änderung" : `${count} lokale Änderungen`,
     notSaved: "– nur in dieser Ansicht, nicht gespeichert.",
+    savesIn: (profiles: string) =>
+      `Speichern schreibt in die aktiven Profile: ${profiles}.`,
     saveSharedIn: "Globale Werte speichern in",
     active: "(aktiv)",
     newProfile: "Neues Profil …",
@@ -805,7 +823,7 @@ export const de = {
       actualSeries: "Tatsächliche Sparrate",
     },
     assumptions: [
-      "Alle Beträge in heutiger Kaufkraft; die Inflationsrate wird immer abgezogen, unabhängig vom Schalter in den Einstellungen.",
+      "Alle Beträge in heutiger Kaufkraft; die Inflationsrate wird immer abgezogen, unabhängig vom Schalter in den globalen Werten.",
       "Der Korridor entsteht aus 2.000 zufälligen Verläufen der Rendite mit gleichbleibender Schwankung; AV-Depot und ETF-Depot bewegen sich gemeinsam. Extremereignisse jenseits dieser Annahme sind nicht abgebildet.",
       "Sparraten steigen mit der Inflation; die Einzahlungen ins AV-Depot bleiben nominal gleich und folgen dessen Rechner.",
       "Die nötige Sparrate ist deine gesamte Sparrate bei gleicher Aufteilung auf die Töpfe. Ins AV-Depot fließen höchstens 1.140 € pro Monat; was darüber liegt, geht ins ETF-Depot.",
@@ -852,7 +870,7 @@ export const de = {
   },
 
   settingsPage: {
-    title: "Einstellungen",
+    title: "Globale Werte",
     intro:
       "Diese Werte teilen sich die Rechner. Änderungen gelten erst, wenn du sie unten rechts speicherst.",
     profileLabel: "Profil der globalen Werte",
@@ -865,7 +883,7 @@ export const de = {
   dashboard: {
     title: "Cockpit",
     profilesHint:
-      "Die Auswahl gilt auch in den Rechnern. Profile anlegen und ändern kannst du dort und in den Einstellungen.",
+      "Die Auswahl gilt auch in den Rechnern. Profile anlegen und ändern kannst du dort und unter „Globale Werte“.",
     desiredPension: "Wunschrente",
     notCalculable: "Mit den gewählten Profilen nicht berechenbar:",
     resultsHeading: "Ergebnisse der Rechner",
@@ -913,9 +931,6 @@ export const de = {
       children: "Kinder",
       payout: "Auszahlphase",
     },
-    advancedToggle: "Erweiterte Eingaben",
-    advancedForced:
-      "Wegen der Fehlermeldung sind die erweiterten Eingaben eingeblendet.",
     presets: {
       minimum: "Minimum",
       subsidyLimit: "Fördergrenze",
@@ -924,6 +939,8 @@ export const de = {
     retirementAgeHint: "Zwischen 65 und 70 Jahren.",
     savingsRateHint: (perYear: string) =>
       `${perYear}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`,
+    costsAboveCap: (cap: string) =>
+      `Über dem Kostendeckel: Für das Standarddepot sind die Effektivkosten gesetzlich auf ${cap} pro Jahr begrenzt. Diese Kosten allein, ohne die Fondskosten, liegen schon darüber. Im frei zusammengestellten Depot gilt der Deckel nicht; dort kommt die TER der gewählten ETFs zu diesen Kosten hinzu, soweit sie nicht schon in der erwarteten Rendite steckt.`,
     payoutUntilHint: "Im Altersvorsorgedepot mindestens bis 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF-Sparplan",
@@ -1037,6 +1054,7 @@ export const de = {
     duration: "Laufzeit",
     savingRate: (perInterval: string) => `Sparrate ${perInterval}`,
     durationMonths: (months: number) => `Das sind ${months} Monate.`,
+    realNote: "Alle Beträge in heutiger Kaufkraft.",
     endValueMinimum: {
       startValue: (amount: string) =>
         `Schon ohne Anfangskapital erreichst du ${amount}.`,
@@ -1070,6 +1088,7 @@ export const de = {
       "Einzahlungen erfolgen zu Beginn des Sparintervalls; Zinsen werden im gewählten Zinsintervall gutgeschrieben und mitverzinst.",
       "Ausschüttend: Die Steuer mindert die Zinsen laufend. Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an; das Diagramm zeigt den Stand nach Steuern, als würdest du am Ende des jeweiligen Jahres verkaufen.",
       "Die Teilfreistellung stellt den gewählten Anteil der Erträge steuerfrei; ein Sparerpauschbetrag ist nicht berücksichtigt.",
+      "Mit „Inflation berücksichtigen“ wird die Inflationsrate vom Zinssatz abgezogen; die Einzahlungen bleiben in heutiger Kaufkraft gleich, die Steuer wird auf den realen Zins gerechnet.",
       "Rechenweg nach dem Finanzfluss-Sparrechner. Keine Steuer- oder Anlageberatung.",
     ],
   },

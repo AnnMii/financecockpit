@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { AdvancedSwitch } from "@/components/advanced-switch";
 import { BudgetHint, RestButton } from "@/components/budget";
 import {
   Assumptions,
@@ -42,6 +44,7 @@ function Workspace() {
     untilRetirement,
     considerTax,
     considerPartialExemption,
+    realTerms,
     saveInterval,
   } = settings.savings;
   const { age, retirementAge } = settings.shared;
@@ -51,12 +54,24 @@ function Workspace() {
     f.euro(settings.savings.savingsRateMonthly * 12),
   );
 
+  // The advanced inputs start hidden to keep the calculator simple. With an
+  // error they are shown anyway: it may be one of them that has to change.
+  const [advanced, setAdvanced] = useState(false);
+  const forced = errors.length > 0;
+  const showAdvanced = advanced || forced;
+
   return (
     <CalculatorShell
       scope="savings"
       errors={errors}
       form={
         <>
+          <AdvancedSwitch
+            checked={advanced}
+            forced={forced}
+            onChange={setAdvanced}
+          />
+
           <Section title={text.sections.calculation}>
             <SelectSetting scope="savings" name="output" />
             <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
@@ -86,7 +101,9 @@ function Workspace() {
                 action={<RestButton part="depot" />}
               />
             )}
-            <SelectSetting scope="savings" name="saveInterval" />
+            {showAdvanced && (
+              <SelectSetting scope="savings" name="saveInterval" />
+            )}
             {output !== "duration" && (
               <>
                 <ToggleSetting scope="savings" name="untilRetirement" />
@@ -124,26 +141,47 @@ function Workspace() {
                 hint={text.interestRateHint}
               />
             )}
-            <SelectSetting scope="savings" name="interestInterval" />
-          </Section>
-
-          <Section title={text.sections.tax}>
-            <ToggleSetting scope="savings" name="considerTax" />
-            {considerTax && (
+            {showAdvanced && (
               <>
-                <NumberSetting scope="shared" name="capitalGainsTax" />
-                <SelectSetting scope="savings" name="distributionType" />
-                <ToggleSetting scope="savings" name="considerPartialExemption" />
-                {considerPartialExemption && (
-                  <NumberSetting scope="savings" name="partialExemption" />
+                <NumberSetting scope="savings" name="costs" />
+                <SelectSetting scope="savings" name="interestInterval" />
+                <ToggleSetting scope="savings" name="realTerms" />
+                {realTerms && (
+                  <NumberSetting scope="shared" name="inflationRate" />
                 )}
               </>
             )}
           </Section>
+
+          {showAdvanced && (
+            <Section title={text.sections.tax}>
+              <ToggleSetting scope="savings" name="considerTax" />
+              {considerTax && (
+                <>
+                  <NumberSetting scope="shared" name="capitalGainsTax" />
+                  <SelectSetting scope="savings" name="distributionType" />
+                  <ToggleSetting
+                    scope="savings"
+                    name="considerPartialExemption"
+                  />
+                  {considerPartialExemption && (
+                    <NumberSetting scope="savings" name="partialExemption" />
+                  )}
+                </>
+              )}
+            </Section>
+          )}
         </>
       }
     >
-      {result && <Results input={input} result={result} />}
+      {result && (
+        <>
+          {input.inflation ? (
+            <p className="text-sm text-ink-2">{text.realNote}</p>
+          ) : null}
+          <Results input={input} result={result} />
+        </>
+      )}
     </CalculatorShell>
   );
 }

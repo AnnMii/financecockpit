@@ -70,3 +70,12 @@ describe("the rates in the calculators", () => {
     expect(plan.rates).toEqual({ av: 0, depot: 255, cash: 50 });
   });
 });
+
+describe("the inflation of the savings calculator", () => {
+  it("is taken from the shared values only when switched on", () => {
+    const s = settingsWith({});
+    expect(toSavingsInput(s).inflation).toBe(0);
+    const real = { ...s, savings: { ...s.savings, realTerms: true } };
+    expect(toSavingsInput(real).inflation).toBe(s.shared.inflationRate);
+  });
+});
