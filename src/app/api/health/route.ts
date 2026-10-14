@@ -1,0 +1,15 @@
+import { sql } from "drizzle-orm";
+import { getDb } from "@/db";
+
+export const dynamic = "force-dynamic";
+
+/** Liveness check for the container and uptime monitors; returns no data. */
+export async function GET() {
+  try {
+    const db = await getDb();
+    await db.run(sql`select 1`);
+    return Response.json({ ok: true });
+  } catch {
+    return Response.json({ ok: false }, { status: 503 });
+  }
+}

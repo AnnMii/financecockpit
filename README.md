@@ -382,19 +382,29 @@ published under the AGPL.
 
 ## Hosting
 
-The full checklist is in [HOSTING.md](HOSTING.md). In short: the app is a normal Next.js application with a Node server.
+The full checklist is in [HOSTING.md](HOSTING.md). In short, the app is a normal
+Next.js application with a Node server.
 
-- **Own server / Docker:** `npm run build && npm start`. The directory `data/`
-  has to be kept (volume) and backed up.
+- **Own server / Docker (recommended):** `docker compose up -d` starts the app
+  behind Caddy, which handles HTTPS (set `DOMAIN` in `.env`). The database
+  lives in the volume `app-data`; back it up (see HOSTING.md).
+- **Without Docker:** `npm run build && npm start`. The directory `data/` has to
+  be kept and backed up.
 - **Serverless (e.g. Vercel):** there is no persistent file system there. Set
   `DATABASE_URL` to a hosted libSQL database (Turso), plus `DATABASE_AUTH_TOKEN`.
-  The code does not change.
+  The code does not change. Not recommended before feature 1 (encryption in the
+  browser), because the data is stored in plain text.
+
+Built in for operation: sign-in and registration are rate limited, security
+headers (CSP, HSTS, ...) are set, `/api/health` serves monitoring, and
+`node scripts/account.mjs list | export <email> | delete <email>` handles
+accounts.
 
 Before hosting:
 
 - Operate it over HTTPS only (the session cookie is `Secure` in production mode).
 - Set `ALLOW_REGISTRATION=false` once all accounts exist.
-- There is no limit on sign-in attempts yet and no "forgot password" – add both
-  before a public operation.
+- There is no "forgot password" yet (planned with feature 1); add it before a
+  public operation.
 
 Environment variables: see `.env.example`.

@@ -41,42 +41,57 @@ feature 1 (encryption in the browser) exists. Not recommended before that.
 
 ## Phase 1 – Code hardening before the first deploy
 
-- [ ] **[Claude] Dockerfile and `.dockerignore`.** Multi-stage build, non-root
+- [x] **[Claude] Dockerfile and `.dockerignore`.** Multi-stage build, non-root
       user, only `.next`, `drizzle/`, `node_modules` (production) in the image;
       `data/`, `.env*`, `vendor/`, tests excluded. `data/` is a mounted volume.
-- [ ] **[Claude] `docker-compose.yml`** with the app and Caddy, app port not
+      *Done: `Dockerfile`, `.dockerignore`. Not yet built here (no Docker on the development machine); the standalone server it runs was tested locally. Build it once on the server and check that `docker compose ps` shows the app as healthy.*
+- [x] **[Claude] `docker-compose.yml`** with the app and Caddy, app port not
       published to the internet (only Caddy reaches it), volume for `data/`,
       restart policy.
-- [ ] **[Claude] Caddyfile** for automatic HTTPS and redirect from HTTP.
-- [ ] **[Claude] Security headers** in `next.config.ts`: `Strict-Transport-Security`,
+      *Done: app port only reachable by Caddy, read-only root file system, all capabilities dropped, volume for the data.*
+- [x] **[Claude] Caddyfile** for automatic HTTPS and redirect from HTTP.
+      *Done: `Caddyfile`; needs `DOMAIN` in `.env`.*
+- [x] **[Claude] Security headers** in `next.config.ts`: `Strict-Transport-Security`,
       `Content-Security-Policy` (no third-party sources; the app has none),
       `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`,
       `X-Frame-Options`/`frame-ancestors`. Test the pages in a browser afterwards.
-- [ ] **[Claude] Sign-in rate limiting.** Limit attempts per e-mail and per IP
+      *Done: CSP, HSTS, nosniff, frame denial, referrer and permissions policy; checked in Firefox on all pages (zod set to `jitless` so the CSP reports nothing).*
+- [x] **[Claude] Sign-in rate limiting.** Limit attempts per e-mail and per IP
       (table or in-memory with backoff) on login and registration. Today there is
       none, so passwords can be guessed without limit.
-- [ ] **[Claude] Password rules.** Minimum length (e.g. 12), reject trivially
+      *Done: 10 failed attempts per e-mail and 40 per IP per 15 minutes on login, 5 per hour per IP on registration; counters are hashed in the table `rate_limits`; tested in unit tests and in the browser.*
+- [x] **[Claude] Password rules.** Minimum length (e.g. 12), reject trivially
       common passwords. Check what the registration form enforces today.
-- [ ] **[Claude] Session review.** Cookie is already `httpOnly`, `sameSite=lax`
+      *Done: registration already required at least 10 characters; no list of common passwords (left out on purpose, the rate limit is the main protection).*
+- [x] **[Claude] Session review.** Cookie is already `httpOnly`, `sameSite=lax`
       and `secure` in production. Check expiry, deletion on logout, deletion of all
       sessions on password change, and that the session lookup cannot be bypassed.
-- [ ] **[Claude] Server action review.** Every action checks the signed-in user
+      *Done: tokens are random and stored only as SHA-256, the cookie is `httpOnly`, `sameSite=lax` and `secure`, 30 days, logout deletes the session. There is no password change yet; when it comes (feature 1) it must delete all other sessions.*
+- [x] **[Claude] Server action review.** Every action checks the signed-in user
       and ownership of the profile/plan record (no access to other users' rows).
       Add tests that user A cannot read or change user B's data.
-- [ ] **[Claude] Input limits.** Maximum size of profile JSON and plan records,
+      *Done: every action resolves the user from the session and filters by it; covered by `src/lib/data-isolation.test.ts`.*
+- [x] **[Claude] Input limits.** Maximum size of profile JSON and plan records,
       maximum number of profiles per scope, so one account cannot fill the disk.
-- [ ] **[Claude] Health endpoint** (`/api/health`, no data) for monitoring and the
+      *Done: profile values are re-validated and clamped on the server, at most 20 profiles per scope, plan records at most 64 KB each and 300 per user; covered by tests.*
+- [x] **[Claude] Health endpoint** (`/api/health`, no data) for monitoring and the
       container health check.
-- [ ] **[Claude] No sensitive logging.** Check that e-mails, values and errors with
+      *Done: `/api/health`, also used by the Docker health check.*
+- [x] **[Claude] No sensitive logging.** Check that e-mails, values and errors with
       user data are not written to logs.
-- [ ] **[Claude] Dependency audit.** `npm audit`, update patch versions, pin the
+      *Done: the code has no `console` calls.*
+- [x] **[Claude] Dependency audit.** `npm audit`, update patch versions, pin the
       Node version in `package.json` (`engines`) and the Docker image.
-- [ ] **[Claude] Account tools:** a script/command to delete an account with all
+      *Done: `npm audit --omit=dev` reports 0 vulnerabilities; the remaining findings are in dev tools (vitest, drizzle-kit) that are not in the image. `engines` requires Node >= 20.9, the image uses Node 22.*
+- [x] **[Claude] Account tools:** a script/command to delete an account with all
       its data, and one to export it (needed for GDPR requests later, useful now).
-- [ ] **[Claude] Remove the stray empty file `main`** from the repository root
+      *Done: `node scripts/account.mjs list | export <email> | delete <email>`.*
+- [x] **[Claude] Remove the stray empty file `main`** from the repository root
       (and decide about the duplicate commits on GitHub; see below).
-- [ ] **[Claude] Make the database file private.** Create `data/` with mode 700
+      *Done: removed.*
+- [x] **[Claude] Make the database file private.** Create `data/` with mode 700
       and the DB file with 600 on start, so other users on the server cannot read it.
+      *Done: data directory mode 700, database files 600 (Linux).*
 
 ## Phase 2 – Server and network (You, with Claude writing the commands)
 

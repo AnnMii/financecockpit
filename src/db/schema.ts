@@ -58,3 +58,11 @@ export const planRecords = sqliteTable("plan_records", {
   data: text("data").notNull(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+/** Attempt counters that throttle sign-in and registration, see src/lib/auth/rate-limit.ts. */
+export const rateLimits = sqliteTable("rate_limits", {
+  // Hashed, so no e-mail address or IP is stored in clear text.
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  windowStart: integer("window_start").notNull(),
+});

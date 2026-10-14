@@ -11,4 +11,5 @@ export type AuthError =
   | "invalidEmail"
   | "passwordTooShort"
   | "passwordMismatch"
-  | "emailTaken";
+  | "emailTaken"
+  | "tooManyAttempts";

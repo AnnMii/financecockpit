@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.gitignore
+data
+.env*
+vendor
+test
+scratchpad
+*.md
+Dockerfile
+docker-compose.yml
+Caddyfile
+npm-debug.log*
+tsconfig.tsbuildinfo

@@ -7,6 +7,14 @@ import { z } from "zod";
 import { getDb, schema } from "@/db";
 import { type AuthError, registrationAllowed } from "@/lib/auth/config";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
+import {
+  LIMITS,
+  allowAttempt,
+  clearAttempts,
+  clientIp,
+  limitKey,
+  pruneAttempts,
+} from "@/lib/auth/rate-limit";
 import { createSession, deleteSession } from "@/lib/auth/session";
 
 export interface AuthFormState {
@@ -33,6 +41,14 @@ export async function login(
     return { error: "missingCredentials", email };
   }
 
+  const emailKey = limitKey("login-email", parsed.data.email);
+  const allowed =
+    (await allowAttempt(emailKey, LIMITS.loginPerEmail)) &&
+    (await allowAttempt(limitKey("login-ip", await clientIp()), LIMITS.loginPerIp));
+  if (!allowed) {
+    return { error: "tooManyAttempts", email };
+  }
+
   const db = await getDb();
   const [user] = await db
     .select()
@@ -48,6 +64,8 @@ export async function login(
     return { error: "wrongCredentials", email };
   }
 
+  await clearAttempts(emailKey);
+  await pruneAttempts();
   await createSession(user.id);
   redirect("/");
 }
@@ -70,6 +88,10 @@ export async function register(
   }
   if (parsed.data.password !== formData.get("passwordRepeat")) {
     return { error: "passwordMismatch", email };
+  }
+
+  if (!(await allowAttempt(limitKey("register-ip", await clientIp()), LIMITS.registerPerIp))) {
+    return { error: "tooManyAttempts", email };
   }
 
   const db = await getDb();

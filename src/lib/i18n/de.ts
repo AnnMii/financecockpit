@@ -504,6 +504,7 @@ const authErrors: Record<AuthError, string> = {
   passwordTooShort: "Das Passwort braucht mindestens 10 Zeichen.",
   passwordMismatch: "Die Passwörter stimmen nicht überein.",
   emailTaken: "Für diese E-Mail-Adresse gibt es schon ein Konto.",
+  tooManyAttempts: "Zu viele Versuche. Bitte warte einige Minuten und versuche es dann erneut.",
 };
 
 export const de = {

@@ -50,6 +50,7 @@ export const en: Dictionary = {
       passwordTooShort: "The password needs at least 10 characters.",
       passwordMismatch: "The passwords do not match.",
       emailTaken: "There is already an account for this email address.",
+      tooManyAttempts: "Too many attempts. Please wait a few minutes and try again.",
     },
   },
 

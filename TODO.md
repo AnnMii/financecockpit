@@ -255,8 +255,8 @@ the savings calculator, withdrawal amount in the withdrawal plan)?
 - [ ] **Dark colour scheme** is set up but never looked at in the browser.
 - [ ] **Profile picker in the cockpit** only allows switching; creating, renaming
       and deleting only work in the calculators and under "Globale Werte".
-- [ ] **Before public operation:** limiting sign-in attempts and "forgot
-      password" are missing; set `ALLOW_REGISTRATION=false`.
+- [ ] **Before public operation:** "forgot password" is missing (sign-in rate
+      limiting is done); set `ALLOW_REGISTRATION=false`.
 - [ ] **License:** When hosting for other users, publish the source code under
       the AGPL (see README, section "Syncing with the Finanzfluss original").
 - [ ] **Backup** `data/financecockpit.backup-2026-10-11.db`: delete it once

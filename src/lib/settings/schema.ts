@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+// Zod otherwise probes for eval(), which the strict Content-Security-Policy
+// (next.config.ts) reports as a violation although the probe is caught.
+z.config({ jitless: true });
+
 /**
  * Settings are stored per user in profiles, one list of profiles per scope.
  * The "shared" scope holds the values several calculators read (age, savings
