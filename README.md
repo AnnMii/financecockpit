@@ -382,7 +382,7 @@ published under the AGPL.
 
 ## Hosting
 
-The full checklist is in [HOSTING.md](HOSTING.md). In short, the app is a normal
+The full checklist and a step-by-step first deployment are in [HOSTING.md](HOSTING.md); the server scripts are in `deploy/`. In short, the app is a normal
 Next.js application with a Node server.
 
 - **Own server / Docker (recommended):** `docker compose up -d` starts the app

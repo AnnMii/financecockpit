@@ -98,9 +98,10 @@ feature 1 (encryption in the browser) exists. Not recommended before that.
 - [ ] **[You] Create the VM** (Ubuntu LTS, EU region), add your SSH key, disable
       password login and root login.
 - [ ] **[You] Point the domain** (A/AAAA record) at the server.
-- [ ] **[Claude] Provide a server setup script/checklist:** automatic security
+- [x] **[Claude] Provide a server setup script/checklist:** automatic security
       updates (`unattended-upgrades`), firewall allowing only 22 (ideally restricted
       to your IP), 80 and 443, `fail2ban` for SSH, Docker install.
+      *Done: `deploy/setup-server.sh` (updates, automatic security updates, firewall 22/80/443, fail2ban, SSH keys only, 2 GB swap, Docker check). Not run on a real server yet; read the output and test SSH from a second terminal.*
 - [ ] **[You] Run the setup**, clone the repository, create `.env` on the server
       only (never in Git), `docker compose up -d`.
 - [ ] **[You] Turn on full-disk or volume encryption** at the provider (or LUKS)
@@ -127,20 +128,64 @@ Done in the code and the Docker setup, active by default:
 `ROBOTS_TAG=all` in `.env`, then `docker compose up -d`. No rebuild needed.
 Already indexed pages disappear only after the search engine re-crawls.
 
+## First deployment, step by step
+
+Everything happens on the server via SSH (`ssh root@<server-ip>`). The scripts
+are in `deploy/`.
+
+1. **Create the server** in the Hetzner Console (Ubuntu or the "Docker CE" app
+   image, your SSH key, firewall off, the console's backups optional).
+2. **Get the code:** `git clone <repository-url> /opt/financecockpit` and
+   `cd /opt/financecockpit`. For a private repository add a deploy key on
+   GitHub first (Settings > Deploy keys) or copy the folder with `scp`.
+3. **Harden the server:** `bash deploy/setup-server.sh`. Test a second SSH
+   login from a new terminal before closing the first.
+4. **Configure:** `cp .env.example .env && nano .env`. Set `DOMAIN` (your
+   random subdomain) and, for now, `ALLOW_REGISTRATION=true`. Create the DNS
+   A record of the domain pointing at the server.
+5. **Start:** `bash deploy/deploy.sh`. It builds, starts and waits for the
+   health check.
+6. **Create the accounts** in the browser, then set `ALLOW_REGISTRATION=false`
+   in `.env` and run `bash deploy/deploy.sh` again.
+7. **Backups:** `bash deploy/setup-backup.sh`. Create the key pair on your own
+   computer with `age-keygen -o key.txt` (age is a small tool for Windows,
+   macOS and Linux), keep `key.txt` in your password manager, and enter only
+   the public key (`age1...`) when asked.
+8. **Test a restore once** (below).
+
+**Update later:** `bash deploy/deploy.sh` (takes a backup, pulls, rebuilds,
+restarts). **Logs:** `docker compose logs -f app`.
+
+### Restore
+
+```bash
+# copy your private key to the server temporarily
+scp key.txt root@<server-ip>:/root/key.txt
+bash deploy/restore.sh /var/backups/financecockpit/fc-<time>.db.age /root/key.txt
+shred -u /root/key.txt
+```
+
+The current database is kept as `pre-restore-<time>.db` in the data volume.
+To test without risk, do the first restore right after the first backup, with
+an account you created for the test.
+
 ## Phase 3 – Backups and recovery
 
 The database is one file; losing it means losing every account.
 
-- [ ] **[Claude] Backup script** using SQLite's online backup (`sqlite3 .backup` or
+- [x] **[Claude] Backup script** using SQLite's online backup (`sqlite3 .backup` or
       `VACUUM INTO`), not a plain file copy of a running database; compress and
       **encrypt** the result (e.g. `age` or `gpg`) before it leaves the server.
-- [ ] **[Claude] Restore script** and a restore description in this file.
+      *Done: `scripts/backup.mjs` (consistent copy via `VACUUM INTO`) and `deploy/backup.sh` (encrypted with `age` for a public key, 14 daily and 12 monthly copies, optional copy to a Storage Box).*
+- [x] **[Claude] Restore script** and a restore description in this file.
+      *Done: `deploy/restore.sh`, see "Restore" below.*
 - [ ] **[You] Provide a second location** for backups (object storage or another
       server in a different datacenter), with credentials that can only *write*
       new backups, not delete old ones. Keep the encryption key **off** the server
       (password manager plus a printed copy).
-- [ ] **[You] Schedule the backup** (cron/systemd timer, daily; keep e.g. 7 daily,
+- [x] **[You] Schedule the backup** (cron/systemd timer, daily; keep e.g. 7 daily,
       4 weekly, 12 monthly).
+      *Done: `deploy/setup-backup.sh` installs a daily systemd timer (03:15).*
 - [ ] **[You] Test a restore** into a scratch directory before relying on it, and
       repeat every few months. An untested backup is not a backup.
 - [ ] **[You] Delete** `data/financecockpit.backup-2026-10-11.db` once everything
