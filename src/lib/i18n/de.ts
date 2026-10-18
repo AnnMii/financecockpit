@@ -524,6 +524,7 @@ export const de = {
       "Das Finanzcockpit bündelt Rechner für Rente, Sparen und Entnahme an einem Ort. Du gibst Alter, Einkommen, Sparrate und Renditeannahmen einmal ein – alle Rechner nutzen dieselben Werte, und das Cockpit zeigt ihre Ergebnisse zusammen.",
     login: "Anmelden",
     register: "Konto anlegen",
+    openCockpit: "Zum Cockpit",
     invitationOnly: "Der Zugang ist derzeit nur für eingeladene Nutzer.",
     featuresHeading: "Was die Website macht",
     features: {
@@ -573,6 +574,8 @@ export const de = {
     account: "Grundlagen",
     settings: "Globale Werte",
     logout: "Abmelden",
+    menu: "Menü",
+    about: "Über das Finanzcockpit",
   },
 
   saveState: {

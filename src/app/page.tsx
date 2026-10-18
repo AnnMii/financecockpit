@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { LanguageSwitch } from "@/components/locale-provider";
 import { calculators } from "@/lib/calculators/registry";
 import { registrationAllowed } from "@/lib/auth/config";
@@ -10,7 +9,7 @@ const button =
   "inline-flex min-h-11 items-center justify-center rounded-md px-5 py-2 text-sm font-semibold";
 
 export default async function LandingPage() {
-  if (await getCurrentUser()) redirect("/cockpit");
+  const signedIn = (await getCurrentUser()) !== null;
   const t = await getDictionary();
   const l = t.landing;
   const registrationOpen = registrationAllowed();
@@ -22,10 +21,10 @@ export default async function LandingPage() {
         <div className="flex items-center gap-3">
           <LanguageSwitch />
           <Link
-            href="/login"
+            href={signedIn ? "/cockpit" : "/login"}
             className="hidden min-h-11 items-center rounded-md border border-axis px-4 text-sm hover:bg-accent-wash sm:inline-flex"
           >
-            {l.login}
+            {signedIn ? l.openCockpit : l.login}
           </Link>
         </div>
       </header>
@@ -39,10 +38,13 @@ export default async function LandingPage() {
             {l.intro}
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link href="/login" className={`${button} bg-accent text-on-accent`}>
-              {l.login}
+            <Link
+              href={signedIn ? "/cockpit" : "/login"}
+              className={`${button} bg-accent text-on-accent`}
+            >
+              {signedIn ? l.openCockpit : l.login}
             </Link>
-            {registrationOpen ? (
+            {signedIn ? null : registrationOpen ? (
               <Link
                 href="/register"
                 className={`${button} border border-axis hover:bg-accent-wash`}

@@ -16,6 +16,7 @@ export const en: Dictionary = {
       "The Finanzcockpit brings calculators for pension, saving and withdrawal together in one place. You enter age, income, savings rate and return assumptions once – all calculators use the same values, and the cockpit shows their results side by side.",
     login: "Sign in",
     register: "Create account",
+    openCockpit: "Go to the cockpit",
     invitationOnly: "Access is currently by invitation only.",
     featuresHeading: "What the website does",
     features: {
@@ -65,6 +66,8 @@ export const en: Dictionary = {
     account: "Basics",
     settings: "Global values",
     logout: "Sign out",
+    menu: "Menu",
+    about: "About the Finanzcockpit",
   },
 
   saveState: {
