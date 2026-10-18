@@ -1,14 +1,17 @@
 // Account administration on the database, for GDPR requests and housekeeping.
 //
-//   node scripts/account.mjs list
+//   node scripts/account.mjs list             accounts with role and beta flag
+//   node scripts/account.mjs set-role <email> admin|user   e.g. to make the first admin
+//   node scripts/account.mjs set-beta <email> on|off
 //   node scripts/account.mjs export <email>   prints all data of the account as JSON
 //   node scripts/account.mjs delete <email>   deletes the account and everything it owns
 //
 // Uses DATABASE_URL (and DATABASE_AUTH_TOKEN) like the app. With Docker:
 //   docker compose exec app node scripts/account.mjs list
+import { randomUUID } from "node:crypto";
 import { createClient } from "@libsql/client";
 
-const [command, rawEmail] = process.argv.slice(2);
+const [command, rawEmail, rawValue] = process.argv.slice(2);
 const client = createClient({
   url: process.env.DATABASE_URL ?? "file:./data/financecockpit.db",
   authToken: process.env.DATABASE_AUTH_TOKEN,
@@ -38,10 +41,38 @@ function parseJson(text) {
 
 if (command === "list") {
   for (const user of await rows(
-    "select email, created_at from users order by created_at",
+    "select email, created_at, role, beta_access from users order by created_at",
   )) {
-    console.log(`${user.email}\tcreated ${new Date(Number(user.created_at) * 1000).toISOString()}`);
+    const beta = user.role === "admin" || Number(user.beta_access) ? "beta" : "-";
+    console.log(
+      `${user.email}\t${user.role}\t${beta}\tcreated ${new Date(Number(user.created_at) * 1000).toISOString()}`,
+    );
   }
+} else if ((command === "set-role" || command === "set-beta") && rawEmail) {
+  const user = await findUser(rawEmail);
+  const roleChange = command === "set-role";
+  const allowed = roleChange ? ["admin", "user"] : ["on", "off"];
+  if (!allowed.includes(rawValue)) {
+    console.error(`Usage: node scripts/account.mjs ${command} <email> ${allowed.join("|")}`);
+    process.exit(1);
+  }
+  const [before] = await rows("select role, beta_access from users where id = ?", [user.id]);
+  const detail = roleChange
+    ? `${before.role} -> ${rawValue}`
+    : `${Number(before.beta_access) ? "on" : "off"} -> ${rawValue}`;
+  await client.batch(
+    [
+      roleChange
+        ? { sql: "update users set role = ? where id = ?", args: [rawValue, user.id] }
+        : { sql: "update users set beta_access = ? where id = ?", args: [rawValue === "on" ? 1 : 0, user.id] },
+      {
+        sql: "insert into admin_log (id, actor_id, target_id, action, detail, created_at) values (?, ?, ?, ?, ?, ?)",
+        args: [randomUUID(), "cli", user.id, roleChange ? "role" : "beta", detail, Math.floor(Date.now() / 1000)],
+      },
+    ],
+    "write",
+  );
+  console.log(`${user.email}: ${roleChange ? "role" : "beta"} ${detail}`);
 } else if (command === "export" && rawEmail) {
   const user = await findUser(rawEmail);
   const profiles = await rows(
@@ -79,7 +110,9 @@ if (command === "list") {
   );
   console.log(`Deleted the account ${user.email} with all its data.`);
 } else {
-  console.error("Usage: node scripts/account.mjs list | export <email> | delete <email>");
+  console.error(
+    "Usage: node scripts/account.mjs list | export <email> | delete <email> | set-role <email> admin|user | set-beta <email> on|off",
+  );
   process.exit(1);
 }
 client.close();

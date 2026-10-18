@@ -147,6 +147,8 @@ are in `deploy/`.
    health check.
 6. **Create the accounts** in the browser, then set `ALLOW_REGISTRATION=false`
    in `.env` and run `bash deploy/deploy.sh` again.
+6b. **First admin:** `docker compose exec app node scripts/account.mjs set-role <email> admin`.
+   Afterwards roles and beta access are managed at `/admin`.
 7. **Backups:** `bash deploy/setup-backup.sh`. Create the key pair on your own
    computer with `age-keygen -o key.txt` (age is a small tool for Windows,
    macOS and Linux), keep `key.txt` in your password manager, and enter only

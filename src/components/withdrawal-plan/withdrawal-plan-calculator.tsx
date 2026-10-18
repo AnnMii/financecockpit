@@ -7,6 +7,7 @@ import {
   YearlyTable,
 } from "@/components/calculator-shell";
 import { WithdrawalChart } from "@/components/charts/calculator-charts";
+import { useAccess } from "@/components/access-provider";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
@@ -104,6 +105,7 @@ function Workspace() {
   const text = t.withdrawal;
   const { input, errors, result } = useWithdrawalPlan();
   const { settings } = useSettingsEditor();
+  const { beta } = useAccess();
   const { output, interval, considerTax, realTerms, capitalAssets } =
     settings["withdrawal-plan"];
   // What the button took over, shown under the field while it still applies.
@@ -118,8 +120,14 @@ function Workspace() {
       form={
         <>
           <Section title={text.sections.calculation}>
-            <SelectSetting scope="withdrawal-plan" name="output" />
-            <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
+            {beta ? (
+              <>
+                <SelectSetting scope="withdrawal-plan" name="output" />
+                <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
+              </>
+            ) : (
+              <p className="text-sm text-ink-2">{text.betaNote}</p>
+            )}
           </Section>
 
           <Section title={text.sections.withdrawal}>

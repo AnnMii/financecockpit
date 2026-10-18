@@ -6,6 +6,7 @@ type Plan = typeof import("@/lib/plan/store");
 
 let settings: Settings;
 let plan: Plan;
+const FULL = { role: "user", beta: true } as const;
 let alice: string;
 let bob: string;
 
@@ -38,18 +39,18 @@ const snapshot = {
 
 describe("profiles belong to their user", () => {
   it("never shows another user's profiles", async () => {
-    const created = await settings.createProfile(alice, "shared", "Secret name", {});
+    const created = await settings.createProfile(alice, "shared", "Secret name", {}, FULL);
     expect(created.ok).toBe(true);
-    const bobs = await settings.loadProfiles(bob);
+    const bobs = await settings.loadProfiles(bob, FULL);
     const names = Object.values(bobs).flatMap((s) => s.profiles.map((p) => p.name));
     expect(names).not.toContain("Secret name");
   });
 
   it("refuses to read, change, rename, activate or delete someone else's profile", async () => {
-    const state = await settings.loadProfiles(alice);
+    const state = await settings.loadProfiles(alice, FULL);
     const target = state.shared.profiles[0];
 
-    expect(await settings.saveProfileData(bob, target.id, { age: 70 })).toEqual({
+    expect(await settings.saveProfileData(bob, target.id, { age: 70 }, FULL)).toEqual({
       ok: false,
       error: "notFound",
     });
@@ -57,7 +58,7 @@ describe("profiles belong to their user", () => {
     expect((await settings.setActiveProfile(bob, target.id)).ok).toBe(false);
     expect((await settings.deleteProfile(bob, target.id)).ok).toBe(false);
 
-    const after = await settings.loadProfiles(alice);
+    const after = await settings.loadProfiles(alice, FULL);
     const still = after.shared.profiles.find((p) => p.id === target.id);
     expect(still?.name).toBe(target.name);
     expect(still?.data).toEqual(target.data);
@@ -66,20 +67,20 @@ describe("profiles belong to their user", () => {
   it("limits the number of profiles per scope", async () => {
     let last;
     for (let i = 0; i < settings.MAX_PROFILES_PER_SCOPE + 2; i++) {
-      last = await settings.createProfile(bob, "savings", `P${i}`, {});
+      last = await settings.createProfile(bob, "savings", `P${i}`, {}, FULL);
     }
     expect(last).toEqual({ ok: false, error: "tooMany" });
   });
 
   it("stores only valid values, whatever the client sends", async () => {
-    const state = await settings.loadProfiles(alice);
+    const state = await settings.loadProfiles(alice, FULL);
     const id = state.shared.profiles[0].id;
     await settings.saveProfileData(alice, id, {
       age: 9_999,
       evil: "<script>",
       huge: "x".repeat(100_000),
-    });
-    const stored = (await settings.loadProfiles(alice)).shared.profiles.find(
+    }, FULL);
+    const stored = (await settings.loadProfiles(alice, FULL)).shared.profiles.find(
       (p) => p.id === id,
     )!.data;
     expect(stored.age).toBeLessThanOrEqual(80);

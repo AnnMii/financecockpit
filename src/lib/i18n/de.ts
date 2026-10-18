@@ -613,6 +613,7 @@ export const de = {
     settings: "Globale Werte",
     logout: "Abmelden",
     menu: "Menü",
+    admin: "Admin",
     about: "Über das Finanzcockpit",
   },
 
@@ -978,6 +979,56 @@ export const de = {
     incomeAndTax: "Einkommen und Steuern",
   },
 
+  admin: {
+    title: "Admin",
+    intro:
+      "Nur für Administratoren sichtbar. Hier vergibst du Rollen, schaltest den Beta-Zugang frei und siehst, wie die Seite genutzt wird.",
+    usersHeading: "Nutzer",
+    columns: {
+      email: "E-Mail",
+      registered: "Registriert",
+      role: "Rolle",
+      beta: "Beta",
+      profiles: "Profile",
+      lastActive: "Zuletzt aktiv",
+    },
+    roles: { user: "Nutzer", admin: "Admin" },
+    betaImplied: "Admins haben Beta-Zugang",
+    betaTitle: "Beta-Zugang für diesen Nutzer",
+    never: "nie",
+    you: "du",
+    saved: "Gespeichert",
+    errors: {
+      forbidden: "Dafür fehlt dir die Berechtigung.",
+      notFound: "Nutzer nicht gefunden.",
+      self: "Du kannst deine eigene Rolle nicht ändern.",
+      lastAdmin: "Der letzte Admin kann nicht herabgestuft werden.",
+      invalid: "Ungültige Eingabe.",
+      failed: "Speichern fehlgeschlagen.",
+    },
+    statsHeading: "Nutzung",
+    statsNote:
+      "Ausgewertet aus den gespeicherten Daten der Konten. Es wird nichts zusätzlich erfasst.",
+    totals: {
+      users: "Registrierte Nutzer",
+      admins: "Admins",
+      beta: "Beta-Nutzer",
+      active30: "Aktiv in den letzten 30 Tagen",
+      withPlanRecords: "Mit Plan-Einträgen",
+      advancedInputs: "Mit „Erweiterte Eingaben“",
+    },
+    active30Hint: "Aktiv heißt: ein Profil wurde gespeichert.",
+    signupsHeading: "Neue Konten pro Monat",
+    scopesHeading: "Nutzung je Bereich",
+    scopeColumns: {
+      scope: "Bereich",
+      profiles: "Profile",
+      customised: "Nutzer mit eigenen Werten",
+    },
+    changesHeading: "Letzte Änderungen",
+    changeKinds: { role: "Rolle", beta: "Beta" },
+    noChanges: "Noch keine Änderungen.",
+  },
   dashboard: {
     title: "Cockpit",
     profilesHint:
@@ -1141,6 +1192,8 @@ export const de = {
       interest: "Zinsen",
       tax: "Steuern",
     },
+    betaNote:
+      "Berechnet wird das Endkapital. Die Berechnung von Anfangskapital, Sparrate, Zinssatz und Laufzeit ist im Beta-Test und für dich noch nicht freigeschaltet.",
     searchedFieldHint:
       "Das gesuchte Feld entfällt bei den Eingaben und erscheint als Ergebnis.",
     startValue: "Anfangskapital",
@@ -1205,6 +1258,8 @@ export const de = {
       withdrawal: "Entnahme",
       interest: "Zinsen",
     },
+    betaNote:
+      "Berechnet wird der Entnahmebetrag. Die Berechnung von Entnahmezeitraum und Anlagevermögen ist im Beta-Test und für dich noch nicht freigeschaltet.",
     searchedFieldHint:
       "Das gesuchte Feld entfällt bei den Eingaben und erscheint als Ergebnis.",
     interestRate: "Zinssatz p. a.",

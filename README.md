@@ -132,6 +132,37 @@ in `users.preferences` (see `src/lib/preferences.ts`). They apply at once, need
 no saving and follow you to every device. Today that is the switch "Erweiterte
 Eingaben" (advanced inputs), shared by all forms that have it.
 
+### Roles, beta access and the admin portal
+
+Every account has a **role** (`user` or `admin`) and a **beta flag**; both are
+columns of `users`. Admins also have beta access. The helpers are in
+`src/lib/access.ts`.
+
+- **Admin portal** (`/admin`, link only visible to admins): list of accounts,
+  assigning roles, switching beta access on and off, usage figures and the
+  latest changes. Everybody else gets a plain "not found".
+- **Usage figures** are evaluated from what accounts store anyway (accounts per
+  month, accounts active in the last 30 days, profiles and users with own values
+  per area, plan records, the advanced-inputs switch). Nothing is tracked on the
+  side. The anonymous statistics from PLANNED_FEATURES.md (feature 1) do not
+  exist yet.
+- **Beta features:** without beta access the savings calculator only calculates
+  the final capital and the withdrawal plan only the withdrawal amount. The
+  restriction is applied on the server when settings are loaded and saved
+  (`restrictSettings`), so a stored value cannot unlock a feature; the
+  interface only hides the choice.
+- **First admin:** there is no sign-up for it. On the server run
+  `docker compose exec app node scripts/account.mjs set-role <email> admin`
+  (without Docker: `node scripts/account.mjs set-role <email> admin`). The same
+  script has `set-beta <email> on|off` and shows roles in `list`.
+- **How it is set up cleanly:** roles live in the database and are read from the
+  session user on every request, never from a cookie or a client value. The
+  admin page, both server actions and every function of the data layer check the
+  admin role again, so hiding a link is never the protection. Nobody can change
+  their own role and the last admin cannot be demoted. Each change is written to
+  `admin_log` (which outlives deleted accounts). New permissions get a column or
+  a role, not a hard-coded e-mail address in the code.
+
 ### Cockpit
 
 For the chosen combination of profiles the start page shows the overall plan

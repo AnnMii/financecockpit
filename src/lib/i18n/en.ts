@@ -105,6 +105,7 @@ export const en: Dictionary = {
     settings: "Global values",
     logout: "Sign out",
     menu: "Menu",
+    admin: "Admin",
     about: "About the Finanzcockpit",
   },
 
@@ -929,6 +930,56 @@ export const en: Dictionary = {
     incomeAndTax: "Income and taxes",
   },
 
+  admin: {
+    title: "Admin",
+    intro:
+      "Visible to administrators only. Here you assign roles, unlock beta access and see how the site is used.",
+    usersHeading: "Users",
+    columns: {
+      email: "Email",
+      registered: "Registered",
+      role: "Role",
+      beta: "Beta",
+      profiles: "Profiles",
+      lastActive: "Last active",
+    },
+    roles: { user: "User", admin: "Admin" },
+    betaImplied: "Admins have beta access",
+    betaTitle: "Beta access for this user",
+    never: "never",
+    you: "you",
+    saved: "Saved",
+    errors: {
+      forbidden: "You are not allowed to do that.",
+      notFound: "User not found.",
+      self: "You cannot change your own role.",
+      lastAdmin: "The last admin cannot be demoted.",
+      invalid: "Invalid input.",
+      failed: "Saving failed.",
+    },
+    statsHeading: "Usage",
+    statsNote:
+      "Evaluated from the data the accounts store anyway. Nothing additional is recorded.",
+    totals: {
+      users: "Registered users",
+      admins: "Admins",
+      beta: "Beta users",
+      active30: "Active in the last 30 days",
+      withPlanRecords: "With plan records",
+      advancedInputs: "With “Advanced inputs”",
+    },
+    active30Hint: "Active means: a profile was saved.",
+    signupsHeading: "New accounts per month",
+    scopesHeading: "Usage by area",
+    scopeColumns: {
+      scope: "Area",
+      profiles: "Profiles",
+      customised: "Users with own values",
+    },
+    changesHeading: "Latest changes",
+    changeKinds: { role: "Role", beta: "Beta" },
+    noChanges: "No changes yet.",
+  },
   dashboard: {
     title: "Cockpit",
     profilesHint:
@@ -1088,6 +1139,8 @@ export const en: Dictionary = {
       interest: "Interest",
       tax: "Taxes",
     },
+    betaNote:
+      "The savings calculator shows the final capital. Calculating the starting capital, savings rate, interest rate and duration is in beta and not unlocked for you yet.",
     searchedFieldHint:
       "The field you are looking for is removed from the inputs and appears as the result.",
     startValue: "Starting capital",
@@ -1146,6 +1199,8 @@ export const en: Dictionary = {
       withdrawal: "Withdrawal",
       interest: "Interest",
     },
+    betaNote:
+      "The withdrawal plan calculates the withdrawal amount. Calculating the withdrawal period and the capital is in beta and not unlocked for you yet.",
     searchedFieldHint:
       "The field you are looking for is removed from the inputs and appears as the result.",
     interestRate: "Interest rate p.a.",

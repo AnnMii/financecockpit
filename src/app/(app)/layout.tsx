@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/actions/auth";
+import { AccessProvider } from "@/components/access-provider";
 import { AppNav, SaveIndicator } from "@/components/app-nav";
 import { LanguageSwitch } from "@/components/locale-provider";
 import { PlanRecordsProvider } from "@/components/plan/plan-records";
@@ -17,7 +18,7 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
-  const profiles = await loadProfiles(user.id);
+  const profiles = await loadProfiles(user.id, user.access);
   const planRecords = await loadPlanRecords(user.id);
   const preferences = await loadPreferences(user.id);
   const t = await getDictionary();
@@ -26,12 +27,13 @@ export default async function AppLayout({
     <SettingsProvider initialProfiles={profiles}>
       <PlanRecordsProvider initialRecords={planRecords}>
       <PreferencesProvider initial={preferences}>
+      <AccessProvider access={user.access}>
       <div className="mx-auto flex min-h-screen max-w-7xl flex-col lg:flex-row">
         <aside className="relative flex shrink-0 items-center justify-between border-b border-line px-4 py-2 lg:block lg:w-60 lg:border-b-0 lg:border-r lg:px-4 lg:py-6">
           <Link href="/cockpit" className="block px-3 text-base font-semibold lg:mb-6">
             {t.appName}
           </Link>
-          <AppNav />
+          <AppNav isAdmin={user.access.role === "admin"} />
         </aside>
 
         <div className="min-w-0 flex-1">
@@ -51,6 +53,7 @@ export default async function AppLayout({
           <main className="min-w-0 px-4 py-8 sm:px-8">{children}</main>
         </div>
       </div>
+      </AccessProvider>
       </PreferencesProvider>
       </PlanRecordsProvider>
     </SettingsProvider>

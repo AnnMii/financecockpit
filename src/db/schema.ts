@@ -11,6 +11,10 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   // Interface choices that follow the account, as JSON; see src/lib/preferences.ts.
   preferences: text("preferences").notNull().default("{}"),
+  // "user" or "admin", see src/lib/access.ts.
+  role: text("role").notNull().default("user"),
+  // Switched on by an admin; unlocks the features that are still in beta.
+  betaAccess: integer("beta_access", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
@@ -67,4 +71,16 @@ export const rateLimits = sqliteTable("rate_limits", {
   key: text("key").primaryKey(),
   count: integer("count").notNull(),
   windowStart: integer("window_start").notNull(),
+});
+
+/** What admins changed about accounts. Kept even when an account is deleted, hence no foreign keys. */
+export const adminLog = sqliteTable("admin_log", {
+  id: text("id").primaryKey(),
+  actorId: text("actor_id").notNull(),
+  targetId: text("target_id").notNull(),
+  // "role" or "beta"
+  action: text("action").notNull(),
+  // e.g. "user -> admin"
+  detail: text("detail").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { AdvancedSwitch } from "@/components/advanced-switch";
+import { useAccess } from "@/components/access-provider";
 import { useAdvancedInputs } from "@/components/preferences-provider";
 import { BudgetHint, RestButton } from "@/components/budget";
 import {
@@ -57,6 +58,7 @@ function Workspace() {
   // The advanced inputs start hidden to keep the calculator simple. With an
   // error they are shown anyway: it may be one of them that has to change.
   const [advanced, setAdvanced] = useAdvancedInputs();
+  const { beta } = useAccess();
   const forced = errors.length > 0;
   const showAdvanced = advanced || forced;
 
@@ -73,8 +75,14 @@ function Workspace() {
           />
 
           <Section title={text.sections.calculation}>
-            <SelectSetting scope="savings" name="output" />
-            <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
+            {beta ? (
+              <>
+                <SelectSetting scope="savings" name="output" />
+                <p className="text-xs text-ink-2">{text.searchedFieldHint}</p>
+              </>
+            ) : (
+              <p className="text-sm text-ink-2">{text.betaNote}</p>
+            )}
           </Section>
 
           <Section title={text.sections.plan}>

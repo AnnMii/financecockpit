@@ -43,7 +43,13 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
 }
 
 /** All links of the app; the same list in the sidebar and in the phone menu. */
-function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+function NavLinks({
+  onNavigate,
+  isAdmin,
+}: {
+  onNavigate?: () => void;
+  isAdmin: boolean;
+}) {
   const { t } = useLocale();
   return (
     <>
@@ -70,12 +76,17 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
       <NavLink href="/" onNavigate={onNavigate}>
         {t.nav.about}
       </NavLink>
+      {isAdmin && (
+        <NavLink href="/admin" onNavigate={onNavigate}>
+          {t.nav.admin}
+        </NavLink>
+      )}
     </>
   );
 }
 
 /** Sidebar on large screens, a burger menu on phones and tablets. */
-export function AppNav() {
+export function AppNav({ isAdmin }: { isAdmin: boolean }) {
   const { t } = useLocale();
   const [open, setOpen] = useState(false);
 
@@ -91,7 +102,7 @@ export function AppNav() {
   return (
     <>
       <nav aria-label={t.nav.main} className="hidden flex-col gap-1 lg:flex">
-        <NavLinks />
+        <NavLinks isAdmin={isAdmin} />
       </nav>
 
       <div className="lg:hidden">
@@ -132,7 +143,7 @@ export function AppNav() {
               aria-label={t.nav.main}
               className="absolute inset-x-0 top-full z-30 max-h-[calc(100vh-4.5rem)] overflow-y-auto border-b border-line bg-plane px-4 pb-4 shadow-lg"
             >
-              <NavLinks onNavigate={() => setOpen(false)} />
+              <NavLinks isAdmin={isAdmin} onNavigate={() => setOpen(false)} />
             </nav>
           </>
         )}

@@ -19,7 +19,7 @@ const SIGNED_OUT = { ok: false, error: "signedOut" } as const;
 /** All profiles of the signed-in user, for tabs that catch up with a change. */
 export async function loadProfilesAction(): Promise<ProfileState | null> {
   const user = await getCurrentUser();
-  return user ? loadProfiles(user.id) : null;
+  return user ? loadProfiles(user.id, user.access) : null;
 }
 
 export async function saveProfileDataAction(
@@ -28,7 +28,7 @@ export async function saveProfileDataAction(
 ): Promise<ProfileResult> {
   const user = await getCurrentUser();
   if (!user || typeof profileId !== "string") return SIGNED_OUT;
-  return saveProfileData(user.id, profileId, data);
+  return saveProfileData(user.id, profileId, data, user.access);
 }
 
 export async function createProfileAction(
@@ -40,7 +40,7 @@ export async function createProfileAction(
   if (!user || !isSettingsScope(scope) || typeof name !== "string") {
     return SIGNED_OUT;
   }
-  return createProfile(user.id, scope, name, data);
+  return createProfile(user.id, scope, name, data, user.access);
 }
 
 export async function renameProfileAction(

@@ -3,8 +3,9 @@ import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { and, eq, gt, lt } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getDb, schema } from "@/db";
+import { type Access, accessOf } from "@/lib/access";
 
 const COOKIE_NAME = "fc_session";
 const SESSION_DAYS = 30;
@@ -12,6 +13,7 @@ const SESSION_DAYS = 30;
 export interface CurrentUser {
   id: string;
   email: string;
+  access: Access;
 }
 
 function hashToken(token: string): string {
@@ -62,7 +64,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   const db = await getDb();
   const [row] = await db
-    .select({ id: schema.users.id, email: schema.users.email })
+    .select({
+      id: schema.users.id,
+      email: schema.users.email,
+      role: schema.users.role,
+      betaAccess: schema.users.betaAccess,
+    })
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
     .where(
@@ -72,11 +79,20 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       ),
     )
     .limit(1);
-  return row ?? null;
+  return row
+    ? { id: row.id, email: row.email, access: accessOf(row) }
+    : null;
 });
 
 export async function requireUser(): Promise<CurrentUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  return user;
+}
+
+/** For pages only admins may see: everybody else gets a plain "not found". */
+export async function requireAdmin(): Promise<CurrentUser> {
+  const user = await requireUser();
+  if (user.access.role !== "admin") notFound();
   return user;
 }

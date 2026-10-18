@@ -2,6 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { getDb, schema } from "@/db";
+import { type Access, restrictSettings } from "@/lib/access";
 import type { ProfileError } from "./labels";
 import {
   type AllSettings,
@@ -80,7 +81,10 @@ async function activate(userId: string, scope: SettingsScope, id: string) {
     .where(and(inScope, eq(profiles.id, id)));
 }
 
-export async function loadProfiles(userId: string): Promise<ProfileState> {
+export async function loadProfiles(
+  userId: string,
+  access: Access,
+): Promise<ProfileState> {
   const db = await getDb();
   const rows = await db
     .select()
@@ -113,7 +117,7 @@ export async function loadProfiles(userId: string): Promise<ProfileState> {
       profiles: own.map((row) => ({
         id: row.id,
         name: row.name,
-        data: parseSettings(scope, safeJson(row.data)),
+        data: restrictSettings(scope, parseSettings(scope, safeJson(row.data)), access),
       })),
     };
   }
@@ -124,6 +128,7 @@ export async function saveProfileData(
   userId: string,
   profileId: string,
   data: unknown,
+  access: Access,
 ): Promise<ProfileResult> {
   const profile = await ownProfile(userId, profileId);
   if (!profile) return NOT_FOUND;
@@ -132,7 +137,9 @@ export async function saveProfileData(
   await db
     .update(profiles)
     .set({
-      data: JSON.stringify(parseSettings(profile.scope, data)),
+      data: JSON.stringify(
+        restrictSettings(profile.scope, parseSettings(profile.scope, data), access),
+      ),
       updatedAt: new Date(),
     })
     .where(eq(profiles.id, profileId));
@@ -145,6 +152,7 @@ export async function createProfile(
   scope: SettingsScope,
   name: string,
   data: unknown,
+  access: Access,
 ): Promise<ProfileResult<{ profile: Profile }>> {
   const cleaned = cleanName(name);
   if (!cleaned) return { ok: false, error: "nameLength" };
@@ -162,7 +170,7 @@ export async function createProfile(
   const profile: Profile = {
     id: randomUUID(),
     name: cleaned,
-    data: parseSettings(scope, data),
+    data: restrictSettings(scope, parseSettings(scope, data), access),
   };
   await db.insert(profiles).values({
     id: profile.id,
