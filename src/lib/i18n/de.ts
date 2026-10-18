@@ -1165,7 +1165,7 @@ export const de = {
     },
     alreadyReached: {
       startValue: (target: string, reached: string) =>
-        `Dein Ziel von ${target} erreichst du schon ohne Anfangskapital: Mit Sparrate und Zinsen kommst du auf ${reached}.`,
+        `Mit Sparrate und Zinsen allein erreichst du schon ${reached} und damit mehr als dein Ziel von ${target}. Das negative Anfangskapital zeigt, wie viel du zu Beginn weniger bräuchtest, damit du das Ziel genau erreichst.`,
       savingRate: (target: string, reached: string) =>
         `Dein Ziel von ${target} erreichst du schon ohne Sparrate: Dein Anfangskapital wächst auf ${reached}.`,
       yearlyInterest: (target: string, reached: string) =>

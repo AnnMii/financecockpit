@@ -147,6 +147,21 @@ describe.skipIf(!upstreamAvailable)("Sparrechner parity with the original", () =
     for (const input of allOutputs(plan)) expect(expectParity(input)).toBe(true);
   });
 
+  it("matches the original when the goal is already exceeded (negative starting capital)", () => {
+    for (const extra of [
+      {},
+      { considerTax: true },
+      { saveInterval: "yearly", savingRate: 1_800, interestInterval: "yearly" },
+    ] as const) {
+      // 150 € for 7 years deposit 12.600 €, more than these goals.
+      for (const endValue of [8_000, 10_000, 12_000]) {
+        const input = sampleInput({ output: "startValue", startValue: 0, endValue, ...extra });
+        expect(expectParity(input)).toBe(true);
+        expect(calculateSavings(input).result!.startValue).toBeLessThan(0);
+      }
+    }
+  });
+
   it("matches the original across random inputs", () => {
     // Fixed seed, so a failing input can be reproduced.
     let seed = 7;

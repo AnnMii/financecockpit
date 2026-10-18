@@ -1108,7 +1108,7 @@ export const en: Dictionary = {
     },
     alreadyReached: {
       startValue: (target, reached) =>
-        `You reach your goal of ${target} even without starting capital: savings rate and interest take you to ${reached}.`,
+        `Savings and interest alone already reach ${reached}, more than your goal of ${target}. The negative starting capital shows how much less you would need at the start to hit the goal exactly.`,
       savingRate: (target, reached) =>
         `You reach your goal of ${target} even without a savings rate: your starting capital grows to ${reached}.`,
       yearlyInterest: (target, reached) =>

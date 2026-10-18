@@ -210,10 +210,14 @@ original aborts with an error ("Newton's method failed to converge"). The
 calculator here returns a result there. The comparison test skips these cases and
 allows at most 20 of them in 300 comparisons.
 
-**Not supported:** Negative results. If the goal is already exceeded without the
-searched figure being needed (e.g. €5,000 starting capital, €150 per month, 7
-years, goal €10,000, interest rate searched), the result is 0 with a note on what
-is reached anyway (here €17,600) instead of a negative interest rate.
+**Goal already exceeded:** If the goal is already reached without the searched
+figure being needed (e.g. €5,000 starting capital, €150 per month, 7 years, goal
+€10,000, interest rate searched), the result is 0 with a note on what is reached
+anyway (here €17,600). Only the **starting capital** goes negative instead, as
+at Finanzfluss (e.g. −€2,965.08 for €150 per month, 7 years, 1.5 %, goal
+€10,000): the amount that brings the end value down to the goal. The parity test
+covers this case; with accumulating tax the original gives up there, ours still
+returns a value.
 
 ---
 

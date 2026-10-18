@@ -65,8 +65,10 @@ export interface SavingsResult {
   /** Balance at the end of each year; the last year may be a fraction. */
   years: { year: number; deposits: number; interest: number }[];
   /**
-   * The desired final capital is already reached when the searched figure is 0
-   * The result is then this plan, and `endValue` is what it reaches.
+   * The desired final capital is already reached when the searched figure is
+   * 0. The result is then this plan with 0, and `endValue` is what it
+   * reaches. Only the starting capital goes below 0 instead, like at
+   * Finanzfluss: the negative amount that makes the end value hit the target.
    */
   alreadyReached: boolean;
 }
@@ -156,6 +158,29 @@ function solve(
   return (lower + upper) / 2;
 }
 
+/**
+ * Finds the negative starting capital for which the end value hits a target
+ * that is already exceeded with a starting capital of 0.
+ */
+function solveBelowZero(
+  target: number,
+  endValueFor: (value: number) => number,
+): number | null {
+  let lower = -(endValueFor(0) - target) - 1;
+  for (let expansion = 0; endValueFor(lower) > target; expansion++) {
+    if (expansion === 12) return null;
+    lower *= 2;
+  }
+  let upper = 0;
+  for (let i = 0; i < 200 && upper - lower > 1e-10 * Math.max(1, -lower); i++) {
+    const middle = (lower + upper) / 2;
+    if (endValueFor(middle) >= target) upper = middle;
+    else lower = middle;
+  }
+  // The upper end never ends below the target (the end value is rounded to cents).
+  return upper;
+}
+
 const UNREACHABLE: Record<Exclude<SavingsOutput, "endValue">, CalculationError> = {
   startValue: "unreachableStartValue",
   savingRate: "unreachableSavingRate",
@@ -198,9 +223,17 @@ export function calculateSavings(input: SavingsInput): {
     const key = output === "duration" ? "durationYears" : output;
     const endValueFor = (value: number) => endValueOf({ ...plan, [key]: value });
     if (endValueFor(0) > target) {
-      // Nothing of the searched figure is needed: the answer is zero.
       alreadyReached = true;
-      plan[key] = 0;
+      if (output === "startValue") {
+        // As at Finanzfluss: a negative starting capital that brings the end
+        // value down to the target.
+        const negative = solveBelowZero(target, endValueFor);
+        if (negative === null) return { result: null, errors: [UNREACHABLE[output]] };
+        plan.startValue = negative;
+      } else {
+        // Nothing of the searched figure is needed: the answer is zero.
+        plan[key] = 0;
+      }
     } else {
       const range = {
         startValue: [0, Math.max(1, target)],

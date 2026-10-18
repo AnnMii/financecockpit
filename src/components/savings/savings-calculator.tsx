@@ -233,7 +233,8 @@ function Results({
           result.alreadyReached && input.output !== "endValue"
             ? text.alreadyReached[input.output](
                 f.euro(input.endValue),
-                f.euro(result.endValue),
+                // What the plan reaches without the searched figure.
+                f.euro(minimumEndValue(input) ?? result.endValue),
               )
             : input.output === "duration"
               ? text.durationMonths(Math.ceil(result.durationYears * 12))

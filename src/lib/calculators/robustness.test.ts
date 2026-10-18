@@ -137,7 +137,10 @@ describe("calculators with arbitrary settings", () => {
             context,
           ).toBeLessThanOrEqual(0.02 + 1e-6 * endValue);
         }
+        // Only a goal that is exceeded without any starting capital gives a negative one.
+        const negativeStart = savingsInput.output === "startValue" && savings.result.alreadyReached;
         for (const key of ["startValue", "savingRate", "durationYears", "endValue"] as const) {
+          if (key === "startValue" && negativeStart) continue;
           expect(savings.result[key], `${key} ${context}`).toBeGreaterThanOrEqual(0);
         }
       }

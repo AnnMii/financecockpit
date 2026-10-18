@@ -64,12 +64,18 @@ describe("minimumEndValue", () => {
     expect(minimum).toBeGreaterThan(0);
     const key = output === "duration" ? "durationYears" : output;
 
-    // Below it nothing of the searched figure is needed: the answer is zero.
+    // Below it nothing of the searched figure is needed: the answer is zero,
+    // except for the starting capital, which goes negative like at Finanzfluss.
     const below = calculateSavings({ ...plan, output, endValue: minimum * 0.9 });
     expect(below.errors).toEqual([]);
     expect(below.result!.alreadyReached).toBe(true);
-    expect(below.result![key]).toBe(0);
-    expect(below.result!.endValue).toBeCloseTo(minimum, 6);
+    if (output === "startValue") {
+      expect(below.result!.startValue).toBeLessThan(0);
+      expect(below.result!.endValue).toBeCloseTo(minimum * 0.9, 1);
+    } else {
+      expect(below.result![key]).toBe(0);
+      expect(below.result!.endValue).toBeCloseTo(minimum, 6);
+    }
 
     const above = calculateSavings({ ...plan, output, endValue: minimum * 1.2 });
     expect(above.errors).toEqual([]);
