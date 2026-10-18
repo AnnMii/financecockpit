@@ -11,6 +11,7 @@ import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import { NumberSetting, ToggleSetting } from "@/components/setting-fields";
+import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
 import { usePensionGap } from "@/components/use-calculators";
 import type {
@@ -36,6 +37,7 @@ export function PensionGapCalculator() {
 function Workspace() {
   const { t } = useLocale();
   const { input, errors, result } = usePensionGap();
+  const { settings } = useSettingsEditor();
   const text = t.pensionGap;
 
   return (
@@ -88,7 +90,9 @@ function Workspace() {
 
           <Section title={text.sections.inflation}>
             <ToggleSetting scope="shared" name="considerInflation" />
-            <NumberSetting scope="shared" name="inflationRate" />
+            {settings.shared.considerInflation && (
+              <NumberSetting scope="shared" name="inflationRate" />
+            )}
           </Section>
         </>
       }
