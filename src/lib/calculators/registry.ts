@@ -33,14 +33,34 @@ export const calculators: CalculatorInfo[] = [
 /** The most that can be paid into the AV-Depot per month. */
 export const AV_DEPOT_MAX_MONTHLY = AV_CONTRIBUTION_CAP / 12;
 
-export function toAvDepotInput(settings: AllSettings): AvDepotInput {
+/** How much prices have risen between today and the year of retirement. */
+export function inflationFactorToRetirement(shared: {
+  age: number;
+  retirementAge: number;
+  inflationRate: number;
+}): number {
+  return (1 + shared.inflationRate / 100) ** Math.max(0, shared.retirementAge - shared.age);
+}
+
+/**
+ * The income in retirement is entered in today's purchasing power. With the
+ * inflation switched on (the global "Inflation berücksichtigen", or always in
+ * the overall plan) it is raised to the year of retirement, where the
+ * payouts are taxed in future euros.
+ */
+export function toAvDepotInput(
+  settings: AllSettings,
+  inflateRetirementIncome: boolean = settings.shared.considerInflation,
+): AvDepotInput {
   const { shared } = settings;
   const { savingsRateMonthly, ...own } = settings["av-depot"];
   return {
     age: shared.age,
     retirementAge: shared.retirementAge,
     taxableIncomeSavingsPhase: shared.taxableIncomeSavingsPhase,
-    taxableIncomeRetirement: shared.taxableIncomeRetirement,
+    taxableIncomeRetirement:
+      shared.taxableIncomeRetirement *
+      (inflateRetirementIncome ? inflationFactorToRetirement(shared) : 1),
     savingsRate: savingsRateMonthly * 12,
     etfReturnRate: shared.expectedReturn,
     exemptionOrder: shared.exemptionOrder,
@@ -160,7 +180,8 @@ export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
         : { av: 0, depot: 0, cash: shared.currentCapital }),
     avDepot: useAv
       ? {
-          ...toAvDepotInput(settings),
+          // The plan always accounts for inflation.
+          ...toAvDepotInput(settings, true),
           savingsRate: rates.av * 12,
           // Fixed, so a frozen plan does not change with the calendar.
           currentYear: Math.max(AV_DEPOT_START_YEAR, new Date().getFullYear()),

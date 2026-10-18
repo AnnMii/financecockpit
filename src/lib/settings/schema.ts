@@ -42,7 +42,7 @@ export const numberFields = {
     /** What can be invested per month in all; the calculators split it. */
     investableMonthly: euro(300, 1_000_000),
     currentCapital: euro(0),
-    /** Expected yearly return while saving (on the invested capital, after fund costs). */
+    /** Expected yearly return while saving (on the invested capital, before costs and taxes). */
     expectedReturn: percent(6, 20),
     /** Expected yearly return in retirement. */
     retirementReturn: percent(3, 20),
@@ -74,7 +74,7 @@ export const numberFields = {
   savings: {
     /** Per month into the savings plan, which is the ETF depot. */
     savingsRateMonthly: euro(150, 100_000),
-    /** Running costs per year on top of the fund costs, e.g. a custody fee. */
+    /** Costs per year, fund costs (TER) and fees together; deducted from the return. */
     costs: percent(0, 5),
     // Used when the duration does not follow the retirement age.
     durationYears: { min: 1, max: 100, default: 30, integer: true },

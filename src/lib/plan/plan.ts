@@ -82,7 +82,7 @@ export interface PlanInput {
   values: Pots;
   /** What can be invested per month in all; the rates are compared with it. */
   budget?: number;
-  /** Running costs of the ETF depot per year in percent, on top of its fund costs. */
+  /** Costs of the ETF depot per year in percent: fund costs (TER) and fees together. */
   depotCosts?: number;
   /**
    * How the savings rate is split, as entered; `rates` follows from it (see

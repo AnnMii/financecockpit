@@ -117,7 +117,7 @@ const numbers: NumberTexts = {
     expectedReturn: {
       label: "Erwartete Rendite in der Sparphase",
       unit: "% p. a.",
-      hint: "Nach Fondskosten (TER), vor Steuern.",
+      hint: "Vor Kosten und Steuern; die Fondskosten (TER) gehören ins Feld „Kosten“.",
     },
     retirementReturn: {
       label: "Rendite im Ruhestand",
@@ -138,7 +138,7 @@ const numbers: NumberTexts = {
     taxableIncomeRetirement: {
       label: "Einkommen im Ruhestand",
       unit: "€ / Jahr",
-      hint: "Zu versteuerndes Einkommen, ohne die Auszahlungen.",
+      hint: "Zu versteuerndes Einkommen in heutiger Kaufkraft, ohne die Auszahlungen.",
     },
     exemptionOrder: {
       label: "Sparerpauschbetrag",
@@ -151,7 +151,7 @@ const numbers: NumberTexts = {
     avDepotCosts: {
       label: "Kosten des AV-Depots",
       unit: "% p. a.",
-      hint: "Zusätzlich zu den Fondskosten, z. B. Depotgebühr.",
+      hint: "Fondskosten (TER) und Gebühren zusammen.",
     },
     baseRate: {
       label: "Basiszins",
@@ -196,7 +196,7 @@ const numbers: NumberTexts = {
     costs: {
       label: "Kosten pro Jahr",
       unit: "% p. a.",
-      hint: "Zusätzlich zu den Fondskosten, z. B. eine Depotgebühr.",
+      hint: "Fondskosten (TER) und Depotgebühr zusammen.",
     },
     durationYears: { label: "Laufzeit", unit: "Jahre" },
     endValue: { label: "Endkapital", unit: "€" },
@@ -222,7 +222,7 @@ const toggles: ToggleTexts = {
   shared: {
     considerInflation: {
       label: "Inflation berücksichtigen",
-      hint: "Der Rentenlücke-Rechner rechnet dann mit Renditen nach Abzug der Inflationsrate.",
+      hint: "Rentenlücke-Rechner: Renditen nach Abzug der Inflationsrate. AV-Depot-Rechner: Einkommen im Ruhestand auf den Renteneintritt hochgerechnet.",
     },
   },
   "av-depot": {},
@@ -361,7 +361,7 @@ const fieldInfo: FieldInfoTexts = {
     currentCapital:
       "Vermögen, das du heute schon angelegt hast und das mit der erwarteten Rendite weiterwächst. Im Gesamtplan gilt es als Stand im ETF-Depot, bis du im Verlauf einen Ist-Stand erfasst.",
     expectedReturn:
-      "Jährliche Rendite, mit der das angelegte Geld in der Sparphase wächst – nach Fondskosten, vor Steuern. Ein weltweiter Aktien-ETF lag langfristig nominal bei etwa 6 bis 7 % pro Jahr; das ist keine Garantie.",
+      "Jährliche Rendite, mit der das angelegte Geld in der Sparphase wächst – vor Kosten und Steuern. Die Fondskosten (TER) und Gebühren trägst du im Sparrechner und im AV-Depot-Rechner bei „Kosten“ ein; sie werden von dieser Rendite abgezogen. Rentenlücke-Rechner und Entnahmeplan haben kein Kostenfeld und rechnen mit der Rendite, wie du sie einträgst. Ein weltweiter Aktien-ETF lag langfristig nominal bei etwa 6 bis 7 % pro Jahr; das ist keine Garantie.",
     retirementReturn:
       "Jährliche Rendite deines Vermögens während der Auszahlung. Meist niedriger angesetzt als in der Sparphase, weil im Ruhestand vorsichtiger angelegt wird.",
     inflationRate:
@@ -375,17 +375,17 @@ const fieldInfo: FieldInfoTexts = {
     taxableIncomeSavingsPhase:
       "Dein zu versteuerndes Einkommen, solange du sparst: Brutto abzüglich Werbungskosten, Vorsorgeaufwendungen und Freibeträgen. Es steht im Einkommensteuerbescheid und bestimmt, wie viel Steuer dir die Einzahlungen ins AV-Depot sparen.",
     taxableIncomeRetirement:
-      "Dein zu versteuerndes Einkommen im Ruhestand ohne die Auszahlungen aus dem AV-Depot, vor allem der steuerpflichtige Teil deiner Renten. Es bestimmt den Steuersatz auf die Auszahlungen.",
+      "Dein zu versteuerndes Einkommen im Ruhestand ohne die Auszahlungen aus dem AV-Depot, vor allem der steuerpflichtige Teil deiner Renten. Trag es in heutiger Kaufkraft ein, so als würdest du heute in Rente gehen. Es bestimmt den Steuersatz auf die Auszahlungen. Mit „Inflation berücksichtigen“ wird der Betrag mit der Inflationsrate auf das Jahr des Renteneintritts hochgerechnet, bevor die Steuer berechnet wird; ohne den Haken gilt der Betrag unverändert. Der Gesamtplan rechnet immer mit dem hochgerechneten Betrag.",
     exemptionOrder:
       "Kapitalerträge bis zu diesem Betrag bleiben pro Jahr steuerfrei: 1.000 € für Einzelpersonen, 2.000 € für zusammen Veranlagte. Trage ein, was davon für diese Geldanlage noch frei ist.",
     considerInflation:
-      "Gilt für den Rentenlücke-Rechner. Mit Haken rechnet er mit der Rendite nach Abzug der Inflationsrate; die Ergebnisse stehen dann in heutiger Kaufkraft. Ohne Haken sind sie nominal, also in künftigen Euro. Der Gesamtplan rechnet immer in heutiger Kaufkraft, der Entnahmeplan hat dafür einen eigenen Schalter, die übrigen Rechner rechnen immer nominal.",
+      "Mit Haken wird die Inflationsrate dort berücksichtigt, wo die globalen Werte eine Rolle spielen. Rentenlücke-Rechner: Er rechnet mit der Rendite nach Abzug der Inflationsrate, die Ergebnisse stehen in heutiger Kaufkraft. AV-Depot-Rechner: Das Einkommen im Ruhestand (in heutiger Kaufkraft eingetragen) wird auf das Jahr des Renteneintritts hochgerechnet, bevor die Steuer auf die Auszahlungen berechnet wird; Endvermögen und Renten bleiben nominal, also in künftigen Euro. Ohne Haken sind beide nominal und das Einkommen gilt unverändert. Unabhängig vom Haken rechnet der Gesamtplan immer in heutiger Kaufkraft, Sparrechner und Entnahmeplan haben einen eigenen Schalter und nutzen dann die hier eingestellte Inflationsrate.",
   },
   "av-depot": {
     savingsRateMonthly:
       "Was du pro Monat ins Altersvorsorgedepot einzahlst. Gefördert werden bis zu 150 € im Monat (1.800 € im Jahr), möglich sind bis zu 1.140 € (13.680 € im Jahr). Den Rest deines Budgets legst du im Sparrechner an.",
     avDepotCosts:
-      "Laufende Kosten des Altersvorsorgedepots pro Jahr, zusätzlich zu den Fondskosten – etwa Depot- oder Verwaltungsgebühr. Sie mindern die Rendite. Für das Standarddepot sind die Effektivkosten gesetzlich auf 1,0 % pro Jahr begrenzt; im frei zusammengestellten Depot gilt der Deckel nicht. Dort kommt die TER der gewählten ETFs zu diesen Kosten hinzu, soweit sie nicht schon in der erwarteten Rendite steckt.",
+      "Laufende Kosten des Altersvorsorgedepots pro Jahr: die Fondskosten (TER) und Gebühren wie eine Depot- oder Verwaltungsgebühr zusammen. Sie mindern die Rendite. Für das Standarddepot sind die Effektivkosten gesetzlich auf 1,0 % pro Jahr begrenzt; im frei zusammengestellten Depot gilt der Deckel nicht. Dort trägst du die TER der gewählten ETFs zusätzlich zur Gebühr des Depots hier ein.",
     baseRate:
       "Der Basiszins, den das Bundesfinanzministerium jährlich festlegt. Aus ihm ergibt sich die Vorabpauschale, also die jährliche Mindestbesteuerung thesaurierender Fonds im normalen Depot.",
     oneTimePayout:
@@ -413,7 +413,7 @@ const fieldInfo: FieldInfoTexts = {
     savingsRateMonthly:
       "Was du pro Monat in deinen Sparplan, also das ETF-Depot, einzahlst. Der Wert gehört zum Profil des Sparrechners und wird im Gesamtplan als Rate des ETF-Depots genutzt.",
     costs:
-      "Laufende Kosten pro Jahr, die die Rendite mindern – etwa eine Depotgebühr. Die Fondskosten (TER) stecken schon im Zinssatz bzw. in der erwarteten Rendite. Im Gesamtplan mindern diese Kosten die Rendite des ETF-Depots.",
+      "Laufende Kosten pro Jahr, die die Rendite mindern: die Fondskosten (TER) und, falls vorhanden, eine Depotgebühr. Trag sie hier ein; der Zinssatz bzw. die erwartete Rendite gilt vor diesen Kosten. Im Gesamtplan mindern diese Kosten die Rendite des ETF-Depots.",
     durationYears:
       "Wie viele Jahre du sparst.",
     endValue:
@@ -653,6 +653,8 @@ export const de = {
     yearlyTable: "Jahreswerte als Tabelle",
     chartKeyboardHint: "Mit den Pfeiltasten durch die Jahre blättern.",
     perYearEquals: (amount: string) => `= ${amount} pro Jahr`,
+    inflatedIncome: (amount: string) =>
+      `Mit Inflation auf den Renteneintritt hochgerechnet: ${amount} pro Jahr.`,
     age: "Alter",
     ageN: (age: number) => `Alter ${age}`,
     year: "Jahr",
@@ -1035,7 +1037,7 @@ export const de = {
     savingsRateHint: (perYear: string) =>
       `${perYear}. Gefördert bis 150 € pro Monat, möglich bis 1.140 €.`,
     costsAboveCap: (cap: string) =>
-      `Über dem Kostendeckel: Für das Standarddepot sind die Effektivkosten gesetzlich auf ${cap} pro Jahr begrenzt. Diese Kosten allein, ohne die Fondskosten, liegen schon darüber. Im frei zusammengestellten Depot gilt der Deckel nicht; dort kommt die TER der gewählten ETFs zu diesen Kosten hinzu, soweit sie nicht schon in der erwarteten Rendite steckt.`,
+      `Über dem Kostendeckel: Für das Standarddepot sind die Effektivkosten gesetzlich auf ${cap} pro Jahr begrenzt. Diese Kosten liegen darüber. Im frei zusammengestellten Depot gilt der Deckel nicht; dort trägst du die TER der gewählten ETFs zusätzlich zur Gebühr des Depots ein.`,
     payoutUntilHint: "Im Altersvorsorgedepot mindestens bis 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF-Sparplan",

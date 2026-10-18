@@ -154,6 +154,8 @@ export const en: Dictionary = {
     yearlyTable: "Yearly values as a table",
     chartKeyboardHint: "Use the arrow keys to move through the years.",
     perYearEquals: (amount) => `= ${amount} per year`,
+    inflatedIncome: (amount) =>
+      `Raised with inflation to retirement: ${amount} per year.`,
     age: "Age",
     ageN: (age) => `Age ${age}`,
     year: "Year",
@@ -210,7 +212,7 @@ export const en: Dictionary = {
       currentCapital:
         "Assets you have already invested today, which keep growing at the expected return. In the overall plan they count as the balance of the ETF account until you record an actual balance in the history.",
       expectedReturn:
-        "Yearly return at which the invested money grows while saving – after fund costs, before taxes. A global equity ETF returned about 6 to 7% per year nominally in the long run; that is no guarantee.",
+        "Yearly return at which the invested money grows while saving – before costs and taxes. The fund costs (TER) and fees are entered under “Costs” in the savings calculator and the AV-Depot calculator; they are deducted from this return. The pension gap calculator and the withdrawal plan have no cost field and use the return as you enter it. A global equity ETF returned about 6 to 7% per year nominally in the long run; that is no guarantee.",
       retirementReturn:
         "Yearly return of your assets during the payout. Usually set lower than while saving, because investments are more cautious in retirement.",
       inflationRate:
@@ -224,17 +226,17 @@ export const en: Dictionary = {
       taxableIncomeSavingsPhase:
         "Your taxable income while you save: gross income minus income-related expenses, pension contributions and allowances. It is stated in your income tax assessment and determines how much tax the deposits into the AV-Depot save you.",
       taxableIncomeRetirement:
-        "Your taxable income in retirement without the payouts from the AV-Depot, mainly the taxable part of your pensions. It determines the tax rate on the payouts.",
+        "Your taxable income in retirement without the payouts from the AV-Depot, mainly the taxable part of your pensions. Enter it in today's purchasing power, as if you retired today. It determines the tax rate on the payouts. With \"Account for inflation\" the amount is raised to the year of retirement with the inflation rate before the tax is calculated; unchecked, it is used as entered. The overall plan always uses the raised amount.",
       exemptionOrder:
         "Investment income up to this amount stays tax-free per year: €1,000 for single persons, €2,000 for couples assessed jointly. Enter what is still available for this investment.",
       considerInflation:
-        "Applies to the pension gap calculator. Checked, it uses the return after deducting the inflation rate; the results are then in today's purchasing power. Unchecked, they are nominal, i.e. in future euros. The overall plan always uses today's purchasing power, the withdrawal plan has a switch of its own, the other calculators are always nominal.",
+        "Checked, the inflation rate is taken into account wherever the global values play a role. Pension gap calculator: it uses the return after deducting the inflation rate, and the results are in today's purchasing power. AV-Depot calculator: the income in retirement (entered in today's purchasing power) is raised to the year of retirement before the tax on the payouts is calculated; final wealth and pensions stay nominal, i.e. in future euros. Unchecked, both are nominal and the income is used as entered. Whatever the box says, the overall plan always uses today's purchasing power; the savings calculator and the withdrawal plan have a switch of their own and then use the inflation rate set here.",
     },
     "av-depot": {
       savingsRateMonthly:
         "What you pay into the Altersvorsorgedepot per month. Up to €150 per month (€1,800 per year) is subsidised, up to €1,140 (€13,680 per year) is possible. You invest the rest of your budget in the savings calculator.",
       avDepotCosts:
-        "Running costs of the Altersvorsorgedepot per year, on top of the fund costs – such as custody or administration fees. They reduce the return. For the standard depot the effective costs are capped by law at 1.0% per year; the cap does not apply to a freely composed depot. There the TER of the chosen ETFs comes on top of these costs, unless it is already in the expected return.",
+        "Running costs of the Altersvorsorgedepot per year: the fund costs (TER) and fees such as a custody or administration fee, together. They reduce the return. For the standard depot the effective costs are capped by law at 1.0% per year; the cap does not apply to a freely composed depot. There you enter the TER of the chosen ETFs in addition to the depot's fee.",
       baseRate:
         "The base rate set yearly by the German Federal Ministry of Finance. It yields the Vorabpauschale, the yearly minimum taxation of accumulating funds in a regular portfolio.",
       oneTimePayout:
@@ -262,7 +264,7 @@ export const en: Dictionary = {
       savingsRateMonthly:
         "What you pay into your savings plan, i.e. the ETF account, per month. The value belongs to the profile of the savings calculator and is used as the rate of the ETF account in the overall plan.",
       costs:
-        "Running costs per year that reduce the return – such as a custody fee. The fund costs (TER) are already in the interest rate or the expected return. In the overall plan these costs reduce the return of the ETF account.",
+        "Running costs per year that reduce the return: the fund costs (TER) and, if any, a custody fee. Enter them here; the interest rate or expected return applies before these costs. In the overall plan these costs reduce the return of the ETF account.",
       durationYears:
         "How many years you save.",
       endValue:
@@ -449,7 +451,7 @@ export const en: Dictionary = {
       expectedReturn: {
         label: "Expected return while saving",
         unit: "% p.a.",
-        hint: "After fund costs (TER), before taxes.",
+        hint: "Before costs and taxes; the fund costs (TER) belong in the “Costs” field.",
       },
       retirementReturn: {
         label: "Return in retirement",
@@ -470,7 +472,7 @@ export const en: Dictionary = {
       taxableIncomeRetirement: {
         label: "Income in retirement",
         unit: "€ / year",
-        hint: "Taxable income, without the payouts.",
+        hint: "Taxable income in today's purchasing power, without the payouts.",
       },
       exemptionOrder: {
         label: "Saver's allowance (Sparerpauschbetrag)",
@@ -483,7 +485,7 @@ export const en: Dictionary = {
       avDepotCosts: {
         label: "Costs of the AV-Depot",
         unit: "% p.a.",
-        hint: "On top of the fund costs, e.g. account fees.",
+        hint: "Fund costs (TER) and fees together.",
       },
       baseRate: {
         label: "Base rate (Basiszins)",
@@ -528,7 +530,7 @@ export const en: Dictionary = {
       costs: {
         label: "Costs per year",
         unit: "% p.a.",
-        hint: "On top of the fund costs, e.g. a custody fee.",
+        hint: "Fund costs (TER) and custody fee together.",
       },
       durationYears: { label: "Duration", unit: "years" },
       endValue: { label: "Final capital", unit: "€" },
@@ -554,7 +556,7 @@ export const en: Dictionary = {
     shared: {
       considerInflation: {
         label: "Account for inflation",
-        hint: "The pension gap calculator then uses returns after deducting the inflation rate.",
+        hint: "Pension gap calculator: returns after deducting the inflation rate. AV-Depot calculator: income in retirement raised to the year of retirement.",
       },
     },
     "av-depot": {},
@@ -986,7 +988,7 @@ export const en: Dictionary = {
     savingsRateHint: (perYear) =>
       `${perYear}. Subsidised up to €150 per month, possible up to €1,140.`,
     costsAboveCap: (cap) =>
-      `Above the cost cap: for the standard depot the effective costs are capped by law at ${cap} per year. These costs alone, without the fund costs, are already above it. The cap does not apply to a freely composed depot; there the TER of the chosen ETFs comes on top of these costs, unless it is already in the expected return.`,
+      `Above the cost cap: for the standard depot the effective costs are capped by law at ${cap} per year. These costs are above it. The cap does not apply to a freely composed depot; there you enter the TER of the chosen ETFs in addition to the depot's fee.`,
     payoutUntilHint: "In the Altersvorsorgedepot at least until 85.",
     name: "Altersvorsorgedepot",
     etfPlan: "ETF savings plan",

@@ -22,6 +22,7 @@ import {
   type SliderSpec,
   ToggleField,
 } from "./fields";
+import { inflationFactorToRetirement } from "@/lib/calculators/registry";
 import { useLocale } from "./locale-provider";
 import { useSettingsEditor } from "./settings-provider";
 
@@ -128,7 +129,12 @@ export function IncomeSetting({
   const { t, f } = useLocale();
   const { settings } = useSettingsEditor();
   const monthly = settings.shared[INCOME_SWITCH[name]] === "monthly";
-  const hint = t.numbers.shared[name].hint;
+  let hint = t.numbers.shared[name].hint;
+  if (name === "taxableIncomeRetirement" && settings.shared.considerInflation) {
+    const inflated =
+      settings.shared.taxableIncomeRetirement * inflationFactorToRetirement(settings.shared);
+    hint = `${hint} ${t.common.inflatedIncome(f.euro(inflated))}`;
+  }
   return (
     <>
       <SelectSetting scope="shared" name={INCOME_SWITCH[name]} />

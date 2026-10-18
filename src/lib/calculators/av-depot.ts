@@ -36,9 +36,9 @@ export interface AvDepotInput {
   taxableIncomeRetirement: number;
   /** Own contribution per year in €. */
   savingsRate: number;
-  /** Expected ETF return after fund costs, in percent. */
+  /** Expected ETF return before costs, in percent. */
   etfReturnRate: number;
-  /** Additional costs of the AV-Depot per year, in percent. */
+  /** Costs of the AV-Depot per year (fund costs and fees together), in percent. */
   avDepotCosts: number;
   /** Tax-free allowance for the comparison calculation, in €. */
   exemptionOrder: number;
