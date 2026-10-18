@@ -121,7 +121,12 @@ export const toggleFields = {
     realTerms: false,
   },
   /** Show the plan's amounts at retirement in future euros. */
-  plan: { nominalView: false },
+  plan: {
+    nominalView: false,
+    /** Whether the plan saves into an AV-Depot / an ETF depot at all. */
+    useAvDepot: true,
+    useDepot: true,
+  },
 } satisfies Record<SettingsScope, Record<string, boolean>>;
 
 /** Choice fields; the first option is the default. */

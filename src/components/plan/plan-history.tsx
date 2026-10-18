@@ -39,10 +39,17 @@ function PotFields({
   onChange: (values: Pots) => void;
 }) {
   const { t } = useLocale();
+  const { settings } = useSettings();
+  // Only the pots the plan uses; the others stay at 0.
+  const pots = POTS.filter(
+    (pot) =>
+      (pot !== "av" || settings.plan.useAvDepot) &&
+      (pot !== "depot" || settings.plan.useDepot),
+  );
   return (
     <Section title={title}>
       <div className="grid gap-4 sm:grid-cols-3">
-        {POTS.map((pot) => (
+        {pots.map((pot) => (
           <NumberField
             key={pot}
             label={t.plan.pots[pot]}

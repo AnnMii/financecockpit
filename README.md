@@ -164,6 +164,10 @@ account (Tagesgeld). All amounts are in today's purchasing power.
   enters the amount that is still free (`src/lib/calculators/budget.ts`).
   Below 10 € in the AV-Depot the plan calculates without it and puts the money
   into the ETF depot.
+- **Optional pots:** the plan page has the switches "Altersvorsorgedepot nutzen"
+  and "ETF-Depot nutzen". An unused pot takes no savings, no budget and no
+  balance. Without an ETF depot, existing capital and any additional savings go
+  to the savings account; the rates in the calculators stay saved.
 - **Payout:** the card "Rente aus allen Quellen" (pension from all sources; plan
   page and cockpit) breaks the middle course down into wealth at retirement and
   pension per month: state pension, AV-Depot, withdrawal from the free assets

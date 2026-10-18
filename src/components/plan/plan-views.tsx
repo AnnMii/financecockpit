@@ -280,7 +280,7 @@ export function PlanBreakdown({
             {text.wealthTitle}
           </h3>
           <dl className="divide-y divide-line text-sm">
-            {row(text.avDepot, euro(typical.avCapital))}
+            {input.avDepot && row(text.avDepot, euro(typical.avCapital))}
             {row(text.free, euro(typical.freeCapital))}
           </dl>
         </div>
@@ -290,7 +290,7 @@ export function PlanBreakdown({
           </h3>
           <dl className="divide-y divide-line text-sm">
             {row(text.statePension, euro(typical.statePension))}
-            {row(text.avPension, euro(typical.avPension))}
+            {input.avDepot && row(text.avPension, euro(typical.avPension))}
             {row(
               text.freePension,
               euro(typical.freePension),

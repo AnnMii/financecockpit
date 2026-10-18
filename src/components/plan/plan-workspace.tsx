@@ -9,6 +9,7 @@ import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import { NumberSetting, ToggleSetting } from "@/components/setting-fields";
+import { useSettingsEditor } from "@/components/settings-provider";
 import type { Percentiles, PlanInput, PlanResult } from "@/lib/plan/plan";
 import type { PlanVersion } from "@/lib/plan/tracking";
 import { usePlan, usePlanRecords } from "./plan-records";
@@ -34,6 +35,7 @@ function Workspace() {
   const { locale, t, f } = useLocale();
   const text = t.plan;
   const { input, errors, result, snapshot } = usePlan();
+  const { settings } = useSettingsEditor();
 
   // The advanced inputs start hidden to keep the plan simple. With an error
   // they are shown anyway: it may be one of them that has to change.
@@ -89,25 +91,31 @@ function Workspace() {
               <NumberSetting
                 scope="shared"
                 name="currentCapital"
-                hint={text.capitalHint}
+                hint={settings.plan.useDepot ? text.capitalHint : text.capitalHintCash}
               />
             )}
           </Section>
 
           <Section title={text.sections.split}>
+            <ToggleSetting scope="plan" name="useAvDepot" />
+            <ToggleSetting scope="plan" name="useDepot" />
             <NumberSetting scope="shared" name="investableMonthly" />
-            <NumberSetting
-              scope="av-depot"
-              name="savingsRateMonthly"
-              label={text.rateLabels.av}
-              action={<RestButton part="av" />}
-            />
-            <NumberSetting
-              scope="savings"
-              name="savingsRateMonthly"
-              label={text.rateLabels.depot}
-              action={<RestButton part="depot" />}
-            />
+            {settings.plan.useAvDepot && (
+              <NumberSetting
+                scope="av-depot"
+                name="savingsRateMonthly"
+                label={text.rateLabels.av}
+                action={<RestButton part="av" />}
+              />
+            )}
+            {settings.plan.useDepot && (
+              <NumberSetting
+                scope="savings"
+                name="savingsRateMonthly"
+                label={text.rateLabels.depot}
+                action={<RestButton part="depot" />}
+              />
+            )}
             {showAdvanced && (
               <NumberSetting
                 scope="plan"

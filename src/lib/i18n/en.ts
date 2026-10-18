@@ -138,6 +138,10 @@ export const en: Dictionary = {
     plan: {
       nominalView:
         "The overall plan works in today's purchasing power. With the box checked, the card “Pension from all sources” shows the amounts in euros of the year of retirement, raised by the inflation rate; they then match the nominal results of the AV-Depot and savings calculators. Unchecked, it stays in today's purchasing power.",
+      useAvDepot:
+        "Unchecked, the overall plan works without an AV-Depot: nothing is paid in, its pension is missing, and the rate in the calculator does not count. It stays saved there.",
+      useDepot:
+        "Unchecked, the overall plan works without an ETF depot: the savings calculator's rate does not count, and existing capital and any additional savings go to the savings account.",
       cashMonthly:
         "What you put into the savings account per month. It hardly fluctuates but returns less.",
       cashReturn:
@@ -503,6 +507,8 @@ export const en: Dictionary = {
   toggles: {
     plan: {
       nominalView: { label: "Show amounts in future euros" },
+      useAvDepot: { label: "Use an AV-Depot" },
+      useDepot: { label: "Use an ETF depot" },
     },
     shared: {
       considerInflation: {
@@ -710,6 +716,8 @@ export const en: Dictionary = {
       "The details of the AV-Depot (costs, taxes, children) come from its calculator.",
     capitalHint:
       "Counts as the balance of the ETF account until you record an actual balance in the history.",
+    capitalHintCash:
+      "Counts as the balance of the savings account until you record an actual balance in the history.",
     balancesFrom: (date, av, depot, cash) =>
       `Actual balance of ${date}: AV-Depot ${av}, ETF account ${depot}, savings account ${cash}.`,
     changeInHistory: "Change in the history",

@@ -95,6 +95,11 @@ export interface PlanInput {
    */
   avDepot: AvDepotInput | null;
   /**
+   * Whether the plan has an ETF depot; without one, what would go into it
+   * goes to the savings account. Plans frozen before this was stored have one.
+   */
+  depotUsed?: boolean;
+  /**
    * Whether the free capital (ETF-Depot and Tagesgeld) is used up by the end
    * of the payout; otherwise only its returns are paid out. Plans frozen
    * before this was stored used it up.
@@ -190,6 +195,7 @@ export function splitSavingsRate(
   total: number,
   shares: Shares,
   withAvDepot = true,
+  withDepot = true,
 ): Pots {
   const wanted = (total * shares.av) / 100;
   const cash = (total * shares.cash) / 100;
@@ -201,7 +207,10 @@ export function splitSavingsRate(
     !withAvDepot || wanted * 12 < MIN_OWN_CONTRIBUTION
       ? 0
       : Math.min(wanted, AV_CONTRIBUTION_CAP / 12);
-  return { av, depot: Math.max(0, rest) + (wanted - av), cash };
+  const toDepot = Math.max(0, rest) + (wanted - av);
+  return withDepot
+    ? { av, depot: toDepot, cash }
+    : { av, depot: 0, cash: cash + toDepot };
 }
 
 /** Whether the plan pays into an AV-Depot. */
@@ -220,7 +229,12 @@ export function withSavingsRate(input: PlanInput, total: number): PlanInput {
           cash: (input.rates.cash / current) * 100,
         }
       : { av: 0, cash: 0 });
-  const rates = splitSavingsRate(total, shares, input.avDepot !== null);
+  const rates = splitSavingsRate(
+    total,
+    shares,
+    input.avDepot !== null,
+    input.depotUsed !== false,
+  );
   return {
     ...input,
     rates,

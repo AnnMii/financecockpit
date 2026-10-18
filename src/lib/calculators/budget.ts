@@ -23,8 +23,9 @@ const cents = (value: number) => Math.round(value * 100) / 100;
 
 export function budgetUse(settings: AllSettings): BudgetUse {
   const available = settings.shared.investableMonthly;
-  const av = settings["av-depot"].savingsRateMonthly;
-  const depot = settings.savings.savingsRateMonthly;
+  // A pot the plan does not use takes no part of the budget.
+  const av = settings.plan.useAvDepot ? settings["av-depot"].savingsRateMonthly : 0;
+  const depot = settings.plan.useDepot ? settings.savings.savingsRateMonthly : 0;
   const cash = settings.plan.cashMonthly;
   const planned = cents(av + depot + cash);
   return { available, av, depot, cash, planned, free: cents(available - planned) };

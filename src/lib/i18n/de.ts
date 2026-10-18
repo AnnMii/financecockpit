@@ -216,6 +216,8 @@ const numbers: NumberTexts = {
 const toggles: ToggleTexts = {
   plan: {
     nominalView: { label: "Beträge in künftigen Euro anzeigen" },
+    useAvDepot: { label: "Altersvorsorgedepot nutzen" },
+    useDepot: { label: "ETF-Depot nutzen" },
   },
   shared: {
     considerInflation: {
@@ -328,6 +330,10 @@ const fieldInfo: FieldInfoTexts = {
   plan: {
     nominalView:
       "Der Gesamtplan rechnet in heutiger Kaufkraft. Mit Haken zeigt die Karte „Rente aus allen Quellen“ die Beträge in Euro des Renteneintrittsjahres, mit der Inflationsrate hochgerechnet; so passen sie zu den nominalen Ergebnissen von AV-Depot-Rechner und Sparrechner. Ohne Haken bleibt sie bei heutiger Kaufkraft.",
+    useAvDepot:
+      "Ohne Haken rechnet der Gesamtplan ohne Altersvorsorgedepot: Es fließt nichts hinein, seine Rente fehlt, und die Rate im Rechner zählt nicht mit. Sie bleibt dort gespeichert.",
+    useDepot:
+      "Ohne Haken rechnet der Gesamtplan ohne ETF-Depot: Die Rate des Sparrechners zählt nicht mit, und vorhandenes Kapital sowie zusätzliche Sparrate gehen aufs Tagesgeld.",
     cashMonthly:
       "Was du pro Monat aufs Tagesgeld legst. Tagesgeld schwankt kaum, bringt aber weniger Rendite.",
     cashReturn:
@@ -753,6 +759,8 @@ export const de = {
       "Die Einzelheiten des AV-Depots (Kosten, Steuern, Kinder) kommen aus dessen Rechner.",
     capitalHint:
       "Gilt als Stand im ETF-Depot, bis du im Verlauf einen Ist-Stand erfasst.",
+    capitalHintCash:
+      "Gilt als Stand auf dem Tagesgeld, bis du im Verlauf einen Ist-Stand erfasst.",
     balancesFrom: (date: string, av: string, depot: string, cash: string) =>
       `Ist-Stand vom ${date}: AV-Depot ${av}, ETF-Depot ${depot}, Tagesgeld ${cash}.`,
     changeInHistory: "Im Verlauf ändern",

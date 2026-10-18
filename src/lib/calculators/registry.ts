@@ -123,14 +123,19 @@ export function toWithdrawalPlanInput(
  */
 export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
   const { shared, plan } = settings;
-  let av = settings["av-depot"].savingsRateMonthly;
-  let depot = settings.savings.savingsRateMonthly;
-  // Below its minimum contribution there is no AV-Depot; the money goes to the depot.
+  const useAv = plan.useAvDepot;
+  const useDepot = plan.useDepot;
+  let av = useAv ? settings["av-depot"].savingsRateMonthly : 0;
+  let depot = useDepot ? settings.savings.savingsRateMonthly : 0;
+  let cash = plan.cashMonthly;
+  // Below its minimum contribution there is no AV-Depot; the money goes to the
+  // depot, or to the savings account when there is no depot either.
   if (av * 12 < MIN_OWN_CONTRIBUTION) {
-    depot += av;
+    if (useDepot) depot += av;
+    else cash += av;
     av = 0;
   }
-  const rates = { av, depot, cash: plan.cashMonthly };
+  const rates = { av, depot, cash };
 
   return {
     age: shared.age,
@@ -147,13 +152,20 @@ export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
     rates,
     budget: shared.investableMonthly,
     depotCosts: settings.savings.costs,
-    values: values ?? { av: 0, depot: shared.currentCapital, cash: 0 },
-    avDepot: {
-      ...toAvDepotInput(settings),
-      savingsRate: rates.av * 12,
-      // Fixed, so a frozen plan does not change with the calendar.
-      currentYear: Math.max(AV_DEPOT_START_YEAR, new Date().getFullYear()),
-    },
+    depotUsed: useDepot,
+    values:
+      values ??
+      (useDepot
+        ? { av: 0, depot: shared.currentCapital, cash: 0 }
+        : { av: 0, depot: 0, cash: shared.currentCapital }),
+    avDepot: useAv
+      ? {
+          ...toAvDepotInput(settings),
+          savingsRate: rates.av * 12,
+          // Fixed, so a frozen plan does not change with the calendar.
+          currentYear: Math.max(AV_DEPOT_START_YEAR, new Date().getFullYear()),
+        }
+      : null,
     capitalConsumption: settings["withdrawal-plan"].capitalConsumption,
     confidenceTarget: plan.confidenceTarget,
     lowerGuardrail: plan.lowerGuardrail,
