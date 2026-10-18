@@ -89,6 +89,16 @@ export function CorridorChart({
     markers?.items.filter((m) => Math.abs(m.x - position) < 0.5) ?? [];
   const tooltipOnLeft = active !== null && x(active) > width / 2;
 
+  const selectAt = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (innerWidth === 0) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const value =
+      xMin + ((event.clientX - bounds.left - MARGIN.left) / innerWidth) * (xMax - xMin);
+    setActive(
+      Math.min(positions.at(-1)!, Math.max(positions[0], Math.round(value))),
+    );
+  };
+
   return (
     <div>
       <ul className="mb-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-2">
@@ -117,7 +127,7 @@ export function CorridorChart({
         role="group"
         aria-label={`${ariaLabel}. ${t.common.chartKeyboardHint}`}
         tabIndex={0}
-        className="relative rounded-md"
+        className="relative touch-pan-y rounded-md"
         style={{ height }}
         onKeyDown={(event) => {
           if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -131,16 +141,12 @@ export function CorridorChart({
           );
         }}
         onBlur={() => setActive(null)}
-        onPointerLeave={() => setActive(null)}
-        onPointerMove={(event) => {
-          if (innerWidth === 0) return;
-          const bounds = event.currentTarget.getBoundingClientRect();
-          const value =
-            xMin + ((event.clientX - bounds.left - MARGIN.left) / innerWidth) * (xMax - xMin);
-          setActive(
-            Math.min(positions.at(-1)!, Math.max(positions[0], Math.round(value))),
-          );
+        onPointerLeave={(event) => {
+          // A finger lifting off must not hide the tooltip again.
+          if (event.pointerType === "mouse") setActive(null);
         }}
+        onPointerMove={selectAt}
+        onPointerDown={selectAt}
       >
         {width > 0 && (
           <svg width={width} height={height} aria-hidden="true">
@@ -158,7 +164,7 @@ export function CorridorChart({
                   y={y(tick)}
                   dy="0.32em"
                   textAnchor="end"
-                  fontSize={11}
+                  fontSize={12}
                   fill="var(--muted)"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
@@ -174,7 +180,7 @@ export function CorridorChart({
                   x={x(p)}
                   y={y(0) + 18}
                   textAnchor="middle"
-                  fontSize={11}
+                  fontSize={12}
                   fill="var(--muted)"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >

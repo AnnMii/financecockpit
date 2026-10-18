@@ -8,12 +8,12 @@ import { useSettings } from "./settings-provider";
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   const pathname = usePathname();
-  const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const active = pathname.startsWith(href);
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`block whitespace-nowrap rounded-md px-3 py-2 text-sm ${
+      className={`block whitespace-nowrap rounded-md px-3 py-3 text-sm lg:py-2 ${
         active
           ? "bg-accent-wash font-semibold text-accent"
           : "text-ink-2 hover:text-ink"
@@ -39,7 +39,7 @@ export function AppNav() {
       aria-label={t.nav.main}
       className="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
     >
-      <NavLink href="/">{t.nav.cockpit}</NavLink>
+      <NavLink href="/cockpit">{t.nav.cockpit}</NavLink>
       <GroupLabel>{t.nav.planning}</GroupLabel>
       <NavLink href="/plan">{t.nav.plan}</NavLink>
       <NavLink href="/history">{t.nav.history}</NavLink>

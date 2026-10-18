@@ -82,7 +82,8 @@ export function InfoPopover({
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setPinned((current) => !current)}
-        className={`inline-flex size-5 items-center justify-center rounded-full border text-xs font-semibold ${
+        data-compact
+        className={`relative inline-flex size-5 items-center justify-center rounded-full border text-xs font-semibold before:absolute before:-inset-2.5 before:content-[''] ${
           pinned
             ? "border-accent bg-accent text-on-accent"
             : "border-axis text-ink-2 hover:text-ink"

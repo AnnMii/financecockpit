@@ -74,3 +74,22 @@ body {
     outline-offset: 2px;
   }
 }
+
+/* Phones: comfortable touch targets, and 16px inputs so iOS does not zoom in on focus. */
+@media (max-width: 639px) {
+  button:not([data-compact]),
+  summary,
+  select {
+    min-height: 2.5rem;
+  }
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}

@@ -10,6 +10,51 @@ export const en: Dictionary = {
   appDescription: "Personal finance cockpit with key figures and calculators.",
   language: "Language",
 
+  landing: {
+    headline: "Your overview for retirement and wealth building",
+    intro:
+      "The Finanzcockpit brings calculators for pension, saving and withdrawal together in one place. You enter age, income, savings rate and return assumptions once – all calculators use the same values, and the cockpit shows their results side by side.",
+    login: "Sign in",
+    register: "Create account",
+    invitationOnly: "Access is currently by invitation only.",
+    featuresHeading: "What the website does",
+    features: {
+      plan: {
+        title: "Overall plan: am I saving enough?",
+        text: "Calculates with 2,000 simulated market paths instead of a single line. You see a corridor, the probability of reaching your goal, and the savings rate needed for your confidence level.",
+      },
+      history: {
+        title: "History: staying on plan",
+        text: "Freeze your plan and enter your balances once a year. You see whether you are inside the corridor – and whether you need to save more or have room to spare.",
+      },
+      profiles: {
+        title: "Profiles to play through",
+        text: "Create several variants, such as “Base” or “Part-time from 55”, and compare them without overwriting your values.",
+      },
+    },
+    calculatorsHeading: "Four calculators",
+    stepsHeading: "How it works",
+    steps: [
+      {
+        title: "Enter the basics",
+        text: "Under “Global values” you enter age, income, money available and return assumptions once.",
+      },
+      {
+        title: "Play through the calculators",
+        text: "The calculators take over your values and show results and charts. Changes only apply once you save them.",
+      },
+      {
+        title: "Check and track the plan",
+        text: "The overall plan tells you whether your savings rate is enough. The history keeps it in view over the years.",
+      },
+    ],
+    noticeHeading: "Good to know",
+    notices: [
+      "These are model calculations based on assumptions. They are not investment, tax or legal advice and no guarantee.",
+      "Your entries are stored in a database on the operator's server. Passwords are stored only as a hash.",
+      "There is no advertising, no tracking and no third-party scripts.",
+    ],
+  },
   nav: {
     main: "Main navigation",
     cockpit: "Cockpit",

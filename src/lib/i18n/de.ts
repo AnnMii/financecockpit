@@ -512,6 +512,51 @@ export const de = {
   appDescription: "Persönliches Finanzcockpit mit Kennzahlen und Rechnern.",
   language: "Sprache",
 
+  landing: {
+    headline: "Dein Überblick für Altersvorsorge und Vermögensaufbau",
+    intro:
+      "Das Finanzcockpit bündelt Rechner für Rente, Sparen und Entnahme an einem Ort. Du gibst Alter, Einkommen, Sparrate und Renditeannahmen einmal ein – alle Rechner nutzen dieselben Werte, und das Cockpit zeigt ihre Ergebnisse zusammen.",
+    login: "Anmelden",
+    register: "Konto anlegen",
+    invitationOnly: "Der Zugang ist derzeit nur für eingeladene Nutzer.",
+    featuresHeading: "Was die Website macht",
+    features: {
+      plan: {
+        title: "Gesamtplan: spare ich genug?",
+        text: "Rechnet mit 2.000 simulierten Börsenverläufen statt einer einzelnen Linie. Du siehst einen Korridor, die Wahrscheinlichkeit, dein Ziel zu erreichen, und die Sparrate, die für dein Sicherheitsniveau nötig ist.",
+      },
+      history: {
+        title: "Verlauf: im Plan bleiben",
+        text: "Friere deinen Plan ein und trage einmal im Jahr deine Kontostände ein. Du siehst, ob du im Korridor liegst – und ob du mehr sparen musst oder Spielraum hast.",
+      },
+      profiles: {
+        title: "Profile zum Durchspielen",
+        text: "Lege mehrere Varianten an, etwa „Basis“ oder „Teilzeit ab 55“, und vergleiche sie, ohne deine Werte zu überschreiben.",
+      },
+    },
+    calculatorsHeading: "Vier Rechner",
+    stepsHeading: "So geht es",
+    steps: [
+      {
+        title: "Grundlagen eintragen",
+        text: "Unter „Globale Werte“ gibst du Alter, Einkommen, verfügbares Geld und Renditeannahmen einmal ein.",
+      },
+      {
+        title: "Rechner durchspielen",
+        text: "Die Rechner übernehmen deine Werte und zeigen Ergebnisse und Diagramme. Änderungen gelten erst, wenn du sie speicherst.",
+      },
+      {
+        title: "Plan prüfen und verfolgen",
+        text: "Der Gesamtplan sagt dir, ob deine Sparrate reicht. Im Verlauf behältst du es über die Jahre im Blick.",
+      },
+    ],
+    noticeHeading: "Gut zu wissen",
+    notices: [
+      "Das sind Modellrechnungen mit Annahmen. Sie sind keine Anlage-, Steuer- oder Rechtsberatung und keine Garantie.",
+      "Deine Eingaben werden in einer Datenbank auf dem Server des Betreibers gespeichert. Passwörter liegen nur als Hash vor.",
+      "Es gibt keine Werbung, kein Tracking und keine Skripte von Drittanbietern.",
+    ],
+  },
   nav: {
     main: "Hauptnavigation",
     cockpit: "Cockpit",

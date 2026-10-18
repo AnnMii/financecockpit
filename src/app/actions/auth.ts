@@ -67,7 +67,7 @@ export async function login(
   await clearAttempts(emailKey);
   await pruneAttempts();
   await createSession(user.id);
-  redirect("/");
+  redirect("/cockpit");
 }
 
 export async function register(
@@ -111,7 +111,7 @@ export async function register(
   }
 
   await createSession(id);
-  redirect("/");
+  redirect("/cockpit");
 }
 
 export async function logout(): Promise<void> {

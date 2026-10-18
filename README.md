@@ -10,7 +10,8 @@ helps.
 
 | Area | Page |
 | --- | --- |
-| Cockpit | `/` |
+| Landing page | `/` |
+| Cockpit | `/cockpit` |
 | Overall plan (Gesamtplan) | `/plan` |
 | History (Verlauf, recorded balances) | `/history` |
 | Pension gap (Rentenlücke) | `/calculators/pension-gap` |

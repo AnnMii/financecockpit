@@ -147,7 +147,7 @@ export function StackedColumns({
         role="group"
         aria-label={`${ariaLabel}. ${t.common.chartKeyboardHint}`}
         tabIndex={0}
-        className="relative rounded-md"
+        className="relative touch-pan-y rounded-md"
         style={{ height }}
         onKeyDown={(event) => {
           if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -158,7 +158,10 @@ export function StackedColumns({
           );
         }}
         onBlur={() => setActive(null)}
-        onPointerLeave={() => setActive(null)}
+        onPointerLeave={(event) => {
+          // A finger lifting off must not hide the tooltip again.
+          if (event.pointerType === "mouse") setActive(null);
+        }}
       >
         {width > 0 && (
           <svg width={width} height={height} aria-hidden="true">
@@ -176,7 +179,7 @@ export function StackedColumns({
                   y={y(tick)}
                   dy="0.32em"
                   textAnchor="end"
-                  fontSize={11}
+                  fontSize={12}
                   fill="var(--muted)"
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
@@ -232,7 +235,7 @@ export function StackedColumns({
                       x={centerX(i)}
                       y={baseline + 18}
                       textAnchor="middle"
-                      fontSize={11}
+                      fontSize={12}
                       fill="var(--muted)"
                       style={{ fontVariantNumeric: "tabular-nums" }}
                     >
@@ -275,6 +278,7 @@ export function StackedColumns({
                 height={innerHeight + MARGIN.bottom}
                 fill="transparent"
                 onPointerMove={() => setActive(i)}
+                onPointerDown={() => setActive(i)}
               />
             ))}
           </svg>
