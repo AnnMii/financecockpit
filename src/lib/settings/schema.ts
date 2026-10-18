@@ -106,7 +106,10 @@ export const numberFields = {
 export const toggleFields = {
   shared: { considerInflation: false },
   "av-depot": {},
-  "pension-gap": {},
+  "pension-gap": {
+    /** Calculate the saving phase like the savings calculator (its tax, costs, interval). */
+    savingsLikeCalculator: false,
+  },
   savings: {
     untilRetirement: true,
     /** Deduct the inflation from the interest rate; all amounts in today's money. */

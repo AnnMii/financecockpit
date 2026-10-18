@@ -9,6 +9,11 @@
  */
 
 import type { CalculationError } from "./errors";
+import {
+  type DistributionType,
+  type InterestInterval,
+  calculateSavings,
+} from "./savings";
 
 export interface PensionGapInput {
   /** Expected pension entitlements, each gross per month. */
@@ -33,6 +38,26 @@ export interface PensionGapInput {
   inflationRate: number;
   /** Capital gains tax in percent; reduces the return until retirement. */
   capitalGainsTax: number;
+  /**
+   * When set, the saving phase is calculated by the savings calculator with
+   * these settings instead of with the capital gains tax above: its tax,
+   * partial exemption, costs and interest interval, deposits at the start of
+   * the month. The inflation still follows `considerInflation`.
+   */
+  savingPhase?: SavingPhaseLikeSavings;
+}
+
+/** The settings of a savings calculator profile that shape the saving phase. */
+export interface SavingPhaseLikeSavings {
+  considerTax: boolean;
+  /** Capital gains tax in percent, applied when `considerTax` is set. */
+  capitalGainsTax: number;
+  distributionType: DistributionType;
+  /** Partial exemption in percent; 0 when it is not taken into account. */
+  partialExemption: number;
+  /** Costs per year in percent. */
+  costs: number;
+  interestInterval: InterestInterval;
 }
 
 export interface GapClosing {
@@ -100,12 +125,9 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
 
   const closing = (capital: number): GapClosing => ({
     capital,
-    savingsRate: requiredSavingsRate(
-      capital,
-      input.currentCapital,
-      savingRate,
-      savingMonths,
-    ),
+    savingsRate:
+      savingsCalculation(input, capital)?.savingRate ??
+      requiredSavingsRate(capital, input.currentCapital, savingRate, savingMonths),
   });
 
   const withConsumption = closing(
@@ -130,6 +152,37 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
       payoutRate,
     ),
   };
+}
+
+/**
+ * The saving phase worked out by the savings calculator, for a profile that
+ * asks for it; null otherwise. `capital` is the target when the savings rate
+ * is searched, and `rate` the given rate when the course is wanted.
+ */
+function savingsCalculation(
+  input: PensionGapInput,
+  capital: number,
+  rate?: number,
+) {
+  const like = input.savingPhase;
+  if (!like || input.retirementAge <= input.age) return null;
+  const { result } = calculateSavings({
+    output: rate === undefined ? "savingRate" : "endValue",
+    startValue: input.currentCapital,
+    savingRate: rate ?? 0,
+    saveInterval: "monthly",
+    yearlyInterest: input.returnUntilRetirement,
+    costs: like.costs,
+    inflation: input.considerInflation ? input.inflationRate : 0,
+    interestInterval: like.interestInterval,
+    durationYears: input.retirementAge - input.age,
+    endValue: capital,
+    considerTax: like.considerTax,
+    capitalGainsTax: like.capitalGainsTax,
+    distributionType: like.distributionType,
+    partialExemption: like.partialExemption,
+  });
+  return result;
 }
 
 /** Monthly interest rates after inflation and taxes: in retirement and until then. */
@@ -179,11 +232,20 @@ function capitalByYear(
   const years: PensionGapYear[] = [];
   let capital = input.currentCapital;
 
-  for (let age = input.age + 1; age <= input.retirementAge; age++) {
-    for (let month = 0; month < 12; month++) {
-      capital = capital * (1 + savingRate) + savingsRate;
+  const like = savingsCalculation(input, 0, savingsRate);
+  if (like) {
+    // The saving phase as the savings calculator sees it (after tax, as if sold).
+    for (const year of like.years) {
+      capital = year.deposits + year.interest;
+      years.push({ age: input.age + year.year, capital, phase: "saving" });
     }
-    years.push({ age, capital, phase: "saving" });
+  } else {
+    for (let age = input.age + 1; age <= input.retirementAge; age++) {
+      for (let month = 0; month < 12; month++) {
+        capital = capital * (1 + savingRate) + savingsRate;
+      }
+      years.push({ age, capital, phase: "saving" });
+    }
   }
   for (let age = input.retirementAge + 1; age <= input.payoutUntilAge; age++) {
     for (let month = 0; month < 12; month++) {

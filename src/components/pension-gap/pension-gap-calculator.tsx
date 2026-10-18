@@ -39,10 +39,16 @@ function Workspace() {
   const { input, errors, result } = usePensionGap();
   const { settings } = useSettingsEditor();
   const text = t.pensionGap;
+  const like = settings["pension-gap"].savingsLikeCalculator;
+  const savings = settings.savings;
+  const likeTax = !savings.considerTax
+    ? text.savingsLikeTax.off
+    : text.savingsLikeTax[savings.distributionType];
 
   return (
     <CalculatorShell
       scope="pension-gap"
+      uses={like ? ["savings"] : undefined}
       errors={errors}
       form={
         <>
@@ -85,7 +91,12 @@ function Workspace() {
               label={text.returnUntilRetirement}
               hint={text.returnUntilRetirementHint}
             />
-            <NumberSetting scope="shared" name="capitalGainsTax" />
+            <ToggleSetting scope="pension-gap" name="savingsLikeCalculator" />
+            {like ? (
+              <p className="text-xs text-ink-2">{text.savingsLikeNote(likeTax)}</p>
+            ) : (
+              <NumberSetting scope="shared" name="capitalGainsTax" />
+            )}
           </Section>
 
           <Section title={text.sections.inflation}>

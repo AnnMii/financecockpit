@@ -347,6 +347,13 @@ adapt the formulas in `pension-gap.ts` or `withdrawal-plan.ts`, then record
 again with `--record`. New test cases go into the fixture file as an entry with
 `name` and `params` and are likewise filled with `--record`.
 
+Option "Sparphase wie im Sparrechner rechnen": with this switch (off by default)
+the pension gap calculator works out the saving phase with the savings calculator
+and the settings of its active profile (tax, partial exemption, costs, interest
+interval; deposits at the start of the month) instead of the Finanzfluss formula.
+The inflation still follows the pension gap switch. The comparison against
+Finanzfluss only applies with the switch off.
+
 Deviation from the original: in the withdrawal plan the chart of the Finanzfluss
 page shows a slightly falling capital without using the capital up (an
 approximation of the interest within the year). Here it stays constant; only

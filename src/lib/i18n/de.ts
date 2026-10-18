@@ -226,7 +226,9 @@ const toggles: ToggleTexts = {
     },
   },
   "av-depot": {},
-  "pension-gap": {},
+  "pension-gap": {
+    savingsLikeCalculator: { label: "Sparphase wie im Sparrechner rechnen" },
+  },
   savings: {
     untilRetirement: { label: "Laufzeit bis Renteneintritt" },
     realTerms: {
@@ -394,6 +396,8 @@ const fieldInfo: FieldInfoTexts = {
       "Was mit der Steuererstattung aus den Einzahlungen passiert: zusätzlich ins AV-Depot einzahlen, in einem normalen Depot anlegen oder ausgeben. Das beeinflusst den Vergleich mit dem ETF-Sparplan.",
   },
   "pension-gap": {
+    savingsLikeCalculator:
+      "Mit Haken wird die Sparphase mit den Einstellungen des aktiven Sparrechner-Profils gerechnet: Steuern (ausschüttend oder thesaurierend, mit Teilfreistellung), Kosten pro Jahr und Zinsintervall; die Einzahlung erfolgt zu Beginn des Monats. Das Feld „Kapitalertragsteuer“ entfällt, es gilt der Satz aus den globalen Werten – aber nur, wenn im Sparrechner „Steuern mitberechnen“ an ist, sonst rechnet die Sparphase ohne Steuern. Die Inflation steuerst du hier mit „Inflation berücksichtigen“. Ohne Haken rechnet der Rechner wie Finanzfluss: Rendite nach Kapitalertragsteuer, Einzahlung am Monatsende.",
     statePension:
       "Deine erwartete gesetzliche Monatsrente, brutto. Sie steht in der jährlichen Renteninformation der Deutschen Rentenversicherung.",
     companyPension:
@@ -1171,6 +1175,9 @@ export const de = {
     notPossible:
       "Nicht möglich: Nach Steuern und Inflation bleibt im Ruhestand keine Rendite, von der sich leben ließe.",
     chartTitle: "Vermögensverlauf mit Kapitalverzehr",
+    savingsLikeNote: (tax: string) =>
+      `Die Sparphase wird wie im aktiven Sparrechner-Profil gerechnet (${tax}), mit dessen Kosten und Zinsintervall. Das Profil kannst du oben wählen.`,
+    savingsLikeTax: { off: "ohne Steuern", distributing: "Steuern ausschüttend", accumulating: "Steuern thesaurierend" },
     chartSubtitle: (retirementAge: number) =>
       `Stand am Ende jedes Lebensjahres: Ansparen bis ${retirementAge}, danach monatliche Entnahme der Rentenlücke.`,
     surplusNote: (atRetirement: string, needed: string, remaining: string) =>

@@ -73,8 +73,20 @@ export function toAvDepotInput(
 
 export function toPensionGapInput(settings: AllSettings): PensionGapInput {
   const { shared } = settings;
+  const { savingsLikeCalculator, ...own } = settings["pension-gap"];
+  const savings = settings.savings;
   return {
-    ...settings["pension-gap"],
+    ...own,
+    savingPhase: savingsLikeCalculator
+      ? {
+          considerTax: savings.considerTax,
+          capitalGainsTax: shared.capitalGainsTax,
+          distributionType: savings.distributionType,
+          partialExemption: savings.considerPartialExemption ? savings.partialExemption : 0,
+          costs: savings.costs,
+          interestInterval: savings.interestInterval,
+        }
+      : undefined,
     age: shared.age,
     retirementAge: shared.retirementAge,
     payoutUntilAge: shared.payoutUntilAge,

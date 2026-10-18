@@ -247,6 +247,8 @@ export const en: Dictionary = {
         "What happens with the tax refund from the deposits: pay it into the AV-Depot as well, invest it in a regular portfolio or spend it. This affects the comparison with the ETF savings plan.",
     },
     "pension-gap": {
+      savingsLikeCalculator:
+        "Checked, the saving phase is calculated with the settings of the active savings calculator profile: taxes (distributing or accumulating, with partial exemption), costs per year and interest interval; deposits are made at the start of the month. The “Capital gains tax” field then goes away; the rate from the global values applies – but only if “Include taxes” is on in the savings calculator, otherwise the saving phase is calculated without taxes. The inflation is controlled here with “Account for inflation”. Unchecked, the calculator works like Finanzfluss: return after capital gains tax, deposits at the end of the month.",
       statePension:
         "Your expected monthly state pension, gross. It is stated in the yearly pension information of the Deutsche Rentenversicherung.",
       companyPension:
@@ -562,7 +564,9 @@ export const en: Dictionary = {
       },
     },
     "av-depot": {},
-    "pension-gap": {},
+    "pension-gap": {
+      savingsLikeCalculator: { label: "Calculate the saving phase like the savings calculator" },
+    },
     savings: {
       untilRetirement: { label: "Duration until retirement" },
       realTerms: {
@@ -1119,6 +1123,9 @@ export const en: Dictionary = {
     notPossible:
       "Not possible: after taxes and inflation no return is left in retirement to live on.",
     chartTitle: "Wealth over time, using up the capital",
+    savingsLikeNote: (tax) =>
+      `The saving phase is calculated like in the active savings calculator profile (${tax}), with its costs and interest interval. You can choose the profile above.`,
+    savingsLikeTax: { off: "without taxes", distributing: "taxes distributing", accumulating: "taxes accumulating" },
     chartSubtitle: (retirementAge) =>
       `At the end of each year of life: saving until ${retirementAge}, then withdrawing the pension gap every month.`,
     surplusNote: (atRetirement, needed, remaining) =>
