@@ -125,6 +125,13 @@ everywhere: in the cockpit, in the calculators and on the page "Globale Werte".
 - Switching a profile discards the local changes of the scope concerned. The
   last profile of a scope cannot be deleted.
 
+### Account preferences
+
+Interface choices that belong to the account rather than to a profile are stored
+in `users.preferences` (see `src/lib/preferences.ts`). They apply at once, need
+no saving and follow you to every device. Today that is the switch "Erweiterte
+Eingaben" (advanced inputs), shared by all forms that have it.
+
 ### Cockpit
 
 For the chosen combination of profiles the start page shows the overall plan

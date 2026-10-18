@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { AdvancedSwitch } from "@/components/advanced-switch";
+import { useAdvancedInputs } from "@/components/preferences-provider";
 import { BudgetHint, RestButton } from "@/components/budget";
 import {
   Assumptions,
@@ -56,7 +56,7 @@ function Workspace() {
 
   // The advanced inputs start hidden to keep the calculator simple. With an
   // error they are shown anyway: it may be one of them that has to change.
-  const [advanced, setAdvanced] = useState(false);
+  const [advanced, setAdvanced] = useAdvancedInputs();
   const forced = errors.length > 0;
   const showAdvanced = advanced || forced;
 

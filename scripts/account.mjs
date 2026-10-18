@@ -18,7 +18,7 @@ const rows = async (sql, args = []) => (await client.execute({ sql, args })).row
 
 async function findUser(email) {
   const [user] = await rows(
-    "select id, email, created_at from users where email = ?",
+    "select id, email, created_at, preferences from users where email = ?",
     [email.trim().toLowerCase()],
   );
   if (!user) {
@@ -57,6 +57,7 @@ if (command === "list") {
       {
         email: user.email,
         createdAt: new Date(Number(user.created_at) * 1000).toISOString(),
+        preferences: parseJson(user.preferences),
         profiles: profiles.map((p) => ({ ...p, data: parseJson(p.data) })),
         planRecords: planRecords.map((r) => ({ ...r, data: parseJson(r.data) })),
       },
