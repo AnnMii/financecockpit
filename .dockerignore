@@ -5,7 +5,7 @@ node_modules
 data
 .env*
 vendor
-test
+test/upstream
 scratchpad
 *.md
 Dockerfile
