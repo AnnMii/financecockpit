@@ -35,19 +35,19 @@ export const en: Dictionary = {
     ],
     screenshotsHeading: "What it looks like",
     screenshotsNote:
-      "Example with rounded values, modelled on an average employee in Germany: 40 years old, €42,000 taxable income, €15,000 starting capital, €300 per month to invest, €1,500 statutory pension and a desired pension of €2,400. These are assumptions for illustration, not a forecast.",
+      "Example with rounded values, modelled on an average employee in Germany: 40 years old, €42,000 taxable income, €15,000 starting capital, €300 per month to invest, €1,500 statutory pension and a desired pension of €1,900. These are assumptions for illustration, not a forecast.",
     screenshots: {
       plan: {
         title: "Overall plan",
         caption:
           "Is the savings rate enough? The plan shows how likely the desired pension is to be reached, the corridor your wealth moves in, and how much more or less you should save.",
-        alt: "Overall plan with the status “Save more”, 29% probability and the chart of wealth until retirement",
+        alt: "Overall plan with the status “On plan”, 86% probability and the chart of wealth until retirement",
       },
       pensionGap: {
         title: "Pension gap",
         caption:
           "What is missing between the expected pension and the desired pension – and which capital and savings rate close the gap.",
-        alt: "Pension gap calculator showing a gap of €886 per month and the capital and savings rate needed",
+        alt: "Pension gap calculator showing a gap of €386 per month and the capital and savings rate needed",
       },
       avDepot: {
         title: "Altersvorsorgedepot",

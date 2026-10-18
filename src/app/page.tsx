@@ -8,7 +8,7 @@ import { getDictionary, getLocale } from "@/lib/i18n/server";
 
 /** Pixel sizes of the screenshots in public/screenshots, per language. */
 const SCREENSHOTS = [
-  { key: "plan", file: "plan", size: { de: [644, 950], en: [644, 950] } },
+  { key: "plan", file: "plan", size: { de: [644, 853], en: [644, 869] } },
   { key: "pensionGap", file: "pension-gap", size: { de: [644, 538], en: [644, 538] } },
   { key: "avDepot", file: "av-depot", size: { de: [644, 896], en: [644, 912] } },
 ] as const;

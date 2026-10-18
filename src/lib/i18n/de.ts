@@ -543,19 +543,19 @@ export const de = {
     ],
     screenshotsHeading: "So sieht es aus",
     screenshotsNote:
-      "Beispiel mit gerundeten Werten, angelehnt an einen durchschnittlichen Arbeitnehmer in Deutschland: 40 Jahre alt, 42.000 € zu versteuerndes Einkommen, 15.000 € Startkapital, 300 € pro Monat zum Investieren, 1.500 € gesetzliche Rente und 2.400 € Wunschrente. Das sind Annahmen zur Veranschaulichung, keine Prognose.",
+      "Beispiel mit gerundeten Werten, angelehnt an einen durchschnittlichen Arbeitnehmer in Deutschland: 40 Jahre alt, 42.000 € zu versteuerndes Einkommen, 15.000 € Startkapital, 300 € pro Monat zum Investieren, 1.500 € gesetzliche Rente und 1.900 € Wunschrente. Das sind Annahmen zur Veranschaulichung, keine Prognose.",
     screenshots: {
       plan: {
         title: "Gesamtplan",
         caption:
           "Reicht die Sparrate? Der Plan zeigt, mit welcher Wahrscheinlichkeit die Wunschrente erreicht wird, welchen Korridor dein Vermögen durchläuft und wie viel mehr oder weniger du sparen solltest.",
-        alt: "Gesamtplan mit Status „Mehr sparen“, 29 % Wahrscheinlichkeit und dem Diagramm des Vermögens bis zum Renteneintritt",
+        alt: "Gesamtplan mit Status „Im Plan“, 86 % Wahrscheinlichkeit und dem Diagramm des Vermögens bis zum Renteneintritt",
       },
       pensionGap: {
         title: "Rentenlücke",
         caption:
           "Was zwischen erwarteter Rente und Wunschrente fehlt – und welches Kapital und welche Sparrate die Lücke schließen.",
-        alt: "Rentenlückenrechner mit 886 € Lücke pro Monat sowie nötigem Kapital und nötiger Sparrate",
+        alt: "Rentenlückenrechner mit 386 € Lücke pro Monat sowie nötigem Kapital und nötiger Sparrate",
       },
       avDepot: {
         title: "Altersvorsorgedepot",
