@@ -618,10 +618,10 @@ export const en: Dictionary = {
         label: "What do you want to calculate?",
         options: {
           endValue: "Final capital",
-          startValue: "Starting capital",
-          yearlyInterest: "Interest rate",
-          duration: "Duration",
-          savingRate: "Savings rate",
+          startValue: "Starting capital [beta]",
+          yearlyInterest: "Interest rate [beta]",
+          duration: "Duration [beta]",
+          savingRate: "Savings rate [beta]",
         },
       },
       saveInterval: {
@@ -642,8 +642,8 @@ export const en: Dictionary = {
         label: "What do you want to calculate?",
         options: {
           amount: "Withdrawal amount",
-          period: "Withdrawal period",
-          capital: "Portfolio",
+          period: "Withdrawal period [beta]",
+          capital: "Portfolio [beta]",
         },
       },
       interval: {

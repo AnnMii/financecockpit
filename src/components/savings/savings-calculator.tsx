@@ -235,7 +235,7 @@ function Results({
     <>
       <StatTile
         hero
-        label={searched.label}
+        label={input.output === "endValue" ? searched.label : `${searched.label} [beta]`}
         value={searched.value}
         note={
           result.alreadyReached && input.output !== "endValue"

@@ -282,10 +282,10 @@ const selects: SelectTexts = {
       label: "Was möchtest du berechnen?",
       options: {
         endValue: "Endkapital",
-        startValue: "Anfangskapital",
-        yearlyInterest: "Zinssatz",
-        duration: "Laufzeit",
-        savingRate: "Sparrate",
+        startValue: "Anfangskapital [beta]",
+        yearlyInterest: "Zinssatz [beta]",
+        duration: "Laufzeit [beta]",
+        savingRate: "Sparrate [beta]",
       },
     },
     saveInterval: {
@@ -310,8 +310,8 @@ const selects: SelectTexts = {
       label: "Was möchtest du berechnen?",
       options: {
         amount: "Entnahmebetrag",
-        period: "Entnahmezeitraum",
-        capital: "Anlagevermögen",
+        period: "Entnahmezeitraum [beta]",
+        capital: "Anlagevermögen [beta]",
       },
     },
     interval: {

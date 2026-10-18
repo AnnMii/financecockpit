@@ -222,7 +222,7 @@ function Results({
     <>
       <StatTile
         hero
-        label={searched.label}
+        label={input.output === "amount" ? searched.label : `${searched.label} [beta]`}
         value={searched.value}
         note={
           endless
