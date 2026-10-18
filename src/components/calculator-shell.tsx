@@ -69,6 +69,7 @@ export function Assumptions({ items }: { items: string[] }) {
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
+        <li>{t.common.noAdvice}</li>
       </ul>
     </Card>
   );

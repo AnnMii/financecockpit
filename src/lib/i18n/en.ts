@@ -152,6 +152,7 @@ export const en: Dictionary = {
     localChangesHint: "Changes apply only here until you save them.",
     assumptions: "Assumptions",
     yearlyTable: "Yearly values as a table",
+    noAdvice: "No tax or investment advice.",
     chartKeyboardHint: "Use the arrow keys to move through the years.",
     perYearEquals: (amount) => `= ${amount} per year`,
     inflatedIncome: (amount) =>
@@ -877,7 +878,7 @@ export const en: Dictionary = {
       "Savings rates rise with inflation; the contributions to the AV-Depot stay nominally the same and follow its calculator.",
       "The required savings rate is your total savings rate with the same split over the pots. At most €1,140 per month go into the AV-Depot; what exceeds that goes into the ETF account.",
       "From retirement on, the fixed return in retirement after the estimated tax deduction applies. The free assets are used up by the end of the payout or, if the withdrawal plan profile says so, only their returns are withdrawn.",
-      "The corridor is a model, not a guarantee. Not tax or investment advice.",
+      "The corridor is a model, not a guarantee.",
     ],
   },
 
@@ -1031,7 +1032,7 @@ export const en: Dictionary = {
       "Contribution years from 2027, income tax according to the 2026 basic tariff including solidarity surcharge, without church tax.",
       "Child allowance until the 18th birthday; allowances only for contributions up to €1,800 per year.",
       "The ETF savings plan runs in a free account with 30% partial exemption and the more favourable of flat tax and personal tax rate.",
-      "Calculation follows the documentation of the Finanzfluss calculator. Not tax or investment advice.",
+      "Calculation follows the documentation of the Finanzfluss calculator.",
     ],
   },
 
@@ -1076,7 +1077,7 @@ export const en: Dictionary = {
       "With inflation, returns are reduced by the inflation rate; pension and desired pension stay in today's purchasing power.",
       "Savings are paid at the end of the month, withdrawals at the beginning; interest monthly.",
       "Health and long-term care insurance on the pension are not included.",
-      "Formulas derived from the results of the Finanzfluss calculator. Not tax or investment advice.",
+      "Formulas derived from the results of the Finanzfluss calculator.",
     ],
   },
 
@@ -1124,11 +1125,19 @@ export const en: Dictionary = {
     totalDeposits: "Total deposits",
     assumptions: [
       "Deposits are made at the beginning of the saving interval; interest is credited in the chosen interest interval and compounds.",
-      "Distributing: the tax reduces the interest continuously. Accumulating: the tax on the whole gain is due at the end; the chart shows the balance after taxes, as if you sold at the end of each year.",
-      "The partial exemption makes the chosen share of the returns tax-free; a saver's allowance is not included.",
       "With “Account for inflation” the inflation rate is deducted from the interest rate; the deposits stay the same in today's purchasing power, the tax is calculated on the real interest.",
-      "Calculation follows the Finanzfluss savings calculator. Not tax or investment advice.",
+      "Calculation follows the Finanzfluss savings calculator.",
     ],
+    /** Which of these show depends on the tax switches. */
+    taxAssumptions: {
+      off: "Without “Include taxes” all amounts are before taxes.",
+      distributing:
+        "Distributing: the tax reduces the interest continuously; all amounts are after taxes.",
+      accumulating:
+        "Accumulating: the tax on the whole gain is due at the end. The chart shows the balance after taxes, as if you sold at the end of each year.",
+      exemption: "The partial exemption makes the chosen share of the returns tax-free.",
+      allowance: "A saver's allowance is not included.",
+    },
   },
 
   withdrawal: {
@@ -1166,7 +1175,7 @@ export const en: Dictionary = {
     assumptions: [
       "Withdrawals are made at the end of each interval; the yearly rate is converted to the interval so that one year yields exactly the interest rate.",
       "By default taxes and inflation are not included, as at Finanzfluss. With the switches “Account for tax on the returns” and “Account for inflation” the calculator works like the overall plan, with small deviations from the calculation conventions (withdrawal at the end of the interval, rate converted to the interval).",
-      "Formulas derived from the results of the Finanzfluss calculator. Not tax or investment advice.",
+      "Formulas derived from the results of the Finanzfluss calculator.",
     ],
   },
 };

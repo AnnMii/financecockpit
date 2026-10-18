@@ -651,6 +651,7 @@ export const de = {
     localChangesHint: "Änderungen gelten nur hier, bis du sie speicherst.",
     assumptions: "Annahmen",
     yearlyTable: "Jahreswerte als Tabelle",
+    noAdvice: "Keine Steuer- oder Anlageberatung.",
     chartKeyboardHint: "Mit den Pfeiltasten durch die Jahre blättern.",
     perYearEquals: (amount: string) => `= ${amount} pro Jahr`,
     inflatedIncome: (amount: string) =>
@@ -925,7 +926,7 @@ export const de = {
       "Sparraten steigen mit der Inflation; die Einzahlungen ins AV-Depot bleiben nominal gleich und folgen dessen Rechner.",
       "Die nötige Sparrate ist deine gesamte Sparrate bei gleicher Aufteilung auf die Töpfe. Ins AV-Depot fließen höchstens 1.140 € pro Monat; was darüber liegt, geht ins ETF-Depot.",
       "Ab Renteneintritt wird mit der festen Rendite im Ruhestand nach dem geschätzten Steuerabzug gerechnet. Das freie Vermögen wird bis zum Ende der Auszahlung aufgebraucht oder, wenn das im Entnahmeplan-Profil so steht, nur auf seine Erträge hin entnommen.",
-      "Der Korridor ist ein Modell, keine Garantie. Keine Steuer- oder Anlageberatung.",
+      "Der Korridor ist ein Modell, keine Garantie.",
     ],
   },
 
@@ -1081,7 +1082,7 @@ export const de = {
       "Beitragsjahre ab 2027, Einkommensteuer nach Grundtarif 2026 inklusive Solidaritätszuschlag, ohne Kirchensteuer.",
       "Kinderzulage bis zum 18. Geburtstag; Zulagen nur für Einzahlungen bis 1.800 € pro Jahr.",
       "Der ETF-Sparplan läuft in einem kostenlosen Depot mit 30 % Teilfreistellung und Günstigerprüfung.",
-      "Rechenweg nach der Dokumentation des Finanzfluss-Rechners. Keine Steuer- oder Anlageberatung.",
+      "Rechenweg nach der Dokumentation des Finanzfluss-Rechners.",
     ],
   },
 
@@ -1129,7 +1130,7 @@ export const de = {
       "Mit Inflation wird mit Renditen nach Abzug der Inflationsrate gerechnet; Rente und Wunschrente bleiben in heutiger Kaufkraft.",
       "Sparraten fließen am Monatsende, Entnahmen am Monatsanfang; Zinsen monatlich.",
       "Kranken- und Pflegeversicherung auf die Rente sind nicht berücksichtigt.",
-      "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet. Keine Steuer- oder Anlageberatung.",
+      "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet.",
     ],
   },
 
@@ -1183,11 +1184,19 @@ export const de = {
     totalDeposits: "Einzahlungen gesamt",
     assumptions: [
       "Einzahlungen erfolgen zu Beginn des Sparintervalls; Zinsen werden im gewählten Zinsintervall gutgeschrieben und mitverzinst.",
-      "Ausschüttend: Die Steuer mindert die Zinsen laufend. Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an; das Diagramm zeigt den Stand nach Steuern, als würdest du am Ende des jeweiligen Jahres verkaufen.",
-      "Die Teilfreistellung stellt den gewählten Anteil der Erträge steuerfrei; ein Sparerpauschbetrag ist nicht berücksichtigt.",
       "Mit „Inflation berücksichtigen“ wird die Inflationsrate vom Zinssatz abgezogen; die Einzahlungen bleiben in heutiger Kaufkraft gleich, die Steuer wird auf den realen Zins gerechnet.",
-      "Rechenweg nach dem Finanzfluss-Sparrechner. Keine Steuer- oder Anlageberatung.",
+      "Rechenweg nach dem Finanzfluss-Sparrechner.",
     ],
+    /** Which of these show depends on the tax switches. */
+    taxAssumptions: {
+      off: "Ohne „Steuern mitberechnen“ sind alle Beträge vor Steuern.",
+      distributing:
+        "Ausschüttend: Die Steuer mindert die Zinsen laufend; alle Beträge sind nach Steuern.",
+      accumulating:
+        "Thesaurierend: Die Steuer auf den gesamten Gewinn fällt am Ende an. Das Diagramm zeigt den Stand nach Steuern, als würdest du am Ende des jeweiligen Jahres verkaufen.",
+      exemption: "Die Teilfreistellung stellt den gewählten Anteil der Erträge steuerfrei.",
+      allowance: "Ein Sparerpauschbetrag ist nicht berücksichtigt.",
+    },
   },
 
   withdrawal: {
@@ -1227,7 +1236,7 @@ export const de = {
     assumptions: [
       "Entnahmen erfolgen am Ende jedes Intervalls; der Jahreszins wird auf das Intervall umgerechnet, sodass sich über ein Jahr genau der Zinssatz ergibt.",
       "Standardmäßig sind Steuern und Inflation nicht berücksichtigt, wie bei Finanzfluss. Mit den Schaltern „Steuern auf die Erträge berücksichtigen“ und „Inflation berücksichtigen“ rechnet der Rechner wie der Gesamtplan, mit kleinen Abweichungen durch die Rechenkonventionen (Entnahme am Ende des Intervalls, Zins auf das Intervall umgerechnet).",
-      "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet. Keine Steuer- oder Anlageberatung.",
+      "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet.",
     ],
   },
 };

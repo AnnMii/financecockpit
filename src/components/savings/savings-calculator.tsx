@@ -278,7 +278,22 @@ function Results({
         />
       </Card>
 
-      <Assumptions items={text.assumptions} />
+      <Assumptions
+        items={[
+          text.assumptions[0],
+          // What the chart shows depends on the tax switches.
+          ...(input.considerTax
+            ? [
+                input.distributionType === "distributing"
+                  ? text.taxAssumptions.distributing
+                  : text.taxAssumptions.accumulating,
+                ...(input.partialExemption > 0 ? [text.taxAssumptions.exemption] : []),
+                text.taxAssumptions.allowance,
+              ]
+            : [text.taxAssumptions.off]),
+          ...text.assumptions.slice(1),
+        ]}
+      />
     </>
   );
 }
