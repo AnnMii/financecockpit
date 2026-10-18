@@ -110,6 +110,23 @@ feature 1 (encryption in the browser) exists. Not recommended before that.
 - [ ] **[You] Check from outside:** HTTPS grade (e.g. SSL Labs, securityheaders.com),
       port scan shows only 80/443 (and 22), the app port is not reachable directly.
 
+## Keeping search engines out
+
+Done in the code and the Docker setup, active by default:
+
+- `robots.txt` disallows everything, every page carries `noindex, nofollow`,
+  and Caddy adds the header `X-Robots-Tag: noindex, nofollow, noarchive`.
+- Use a hard-to-guess subdomain. A generated suggestion:
+  **`fkccmgyu4fxg6t.<your-domain>`** (set it as `DOMAIN` in `.env`).
+- A random name only protects against guessing. The Let's Encrypt certificate
+  is public (Certificate Transparency), so bots can still find the name; the
+  login and the rate limit protect the app itself. For real invisibility use a
+  VPN such as Tailscale or Basic Auth in Caddy.
+
+**To allow indexing again later:** set `ALLOW_INDEXING=true` and
+`ROBOTS_TAG=all` in `.env`, then `docker compose up -d`. No rebuild needed.
+Already indexed pages disappear only after the search engine re-crawls.
+
 ## Phase 3 – Backups and recovery
 
 The database is one file; losing it means losing every account.

@@ -395,7 +395,7 @@ Next.js application with a Node server.
   The code does not change. Not recommended before feature 1 (encryption in the
   browser), because the data is stored in plain text.
 
-Built in for operation: sign-in and registration are rate limited, security
+Built in for operation: search engines are kept out (`ALLOW_INDEXING`), sign-in and registration are rate limited, security
 headers (CSP, HSTS, ...) are set, `/api/health` serves monitoring, and
 `node scripts/account.mjs list | export <email> | delete <email>` handles
 accounts.

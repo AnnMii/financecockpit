@@ -2,5 +2,7 @@
 	encode zstd gzip
 	# Caddy sets X-Forwarded-For to the real client address and drops any
 	# value the client sent; the sign-in rate limit relies on that.
+	# Keeps search engines out; use ROBOTS_TAG=all to allow indexing again.
+	header X-Robots-Tag "{$ROBOTS_TAG:noindex, nofollow, noarchive}"
 	reverse_proxy app:3000
 }

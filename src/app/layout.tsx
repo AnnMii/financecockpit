@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { indexingAllowed } from "@/lib/indexing";
 import { LocaleProvider } from "@/components/locale-provider";
 import { getDictionary, getLocale } from "@/lib/i18n/server";
 import "./globals.css";
@@ -8,6 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: t.appName, template: `%s · ${t.appName}` },
     description: t.appDescription,
+    robots: indexingAllowed()
+      ? { index: true, follow: true }
+      : { index: false, follow: false, noarchive: true, nosnippet: true },
   };
 }
 
