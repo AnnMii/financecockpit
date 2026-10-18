@@ -70,7 +70,11 @@ PermitRootLogin prohibit-password
 MaxAuthTries 3
 X11Forwarding no
 EOF
-sshd -t || die "SSH configuration is invalid; not reloading."
+mkdir -p /run/sshd  # sshd -t needs it; it only exists while the service runs
+if ! sshd -t; then
+  rm -f /etc/ssh/sshd_config.d/00-financecockpit.conf
+  die "SSH configuration is invalid; removed my file, SSH is unchanged."
+fi
 systemctl reload ssh 2>/dev/null || systemctl reload sshd
 
 say "fail2ban for SSH"
