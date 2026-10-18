@@ -1173,6 +1173,8 @@ export const de = {
     chartTitle: "Vermögensverlauf mit Kapitalverzehr",
     chartSubtitle: (retirementAge: number) =>
       `Stand am Ende jedes Lebensjahres: Ansparen bis ${retirementAge}, danach monatliche Entnahme der Rentenlücke.`,
+    surplusNote: (atRetirement: string, needed: string, remaining: string) =>
+      `Dein vorhandenes Kapital wächst bis zum Renteneintritt auf ${atRetirement}, mehr als die nötigen ${needed}. Deshalb brauchst du keine Sparrate, und die Entnahme verbraucht das Kapital nicht: Am Ende bleiben ${remaining} übrig.`,
     chartAria:
       "Säulendiagramm: Vermögen pro Lebensjahr, erst Ansparen, dann Entnahme",
     phase: "Phase",

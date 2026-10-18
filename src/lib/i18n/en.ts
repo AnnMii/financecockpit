@@ -1121,6 +1121,8 @@ export const en: Dictionary = {
     chartTitle: "Wealth over time, using up the capital",
     chartSubtitle: (retirementAge) =>
       `At the end of each year of life: saving until ${retirementAge}, then withdrawing the pension gap every month.`,
+    surplusNote: (atRetirement, needed, remaining) =>
+      `Your existing capital grows to ${atRetirement} by retirement, more than the ${needed} needed. So you need no savings rate, and the withdrawals do not use the capital up: ${remaining} is left at the end.`,
     chartAria: "Column chart: wealth per year of life, first saving, then withdrawal",
     phase: "Phase",
     assumptions: [

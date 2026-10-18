@@ -152,6 +152,18 @@ function Results({
   const { t, f } = useLocale();
   const text = t.pensionGap;
 
+  // Existing capital that already grows beyond what is needed: nothing has to
+  // be saved, and the payout does not use the capital up. The chart then shows
+  // a high, hardly falling course, which this note explains.
+  const atRetirement =
+    [...result.years].reverse().find((year) => year.phase === "saving")?.capital ??
+    input.currentCapital;
+  const atEnd = result.years.at(-1)?.capital ?? 0;
+  const surplus =
+    result.gap > 0 &&
+    result.withConsumption.savingsRate === 0 &&
+    atRetirement > result.withConsumption.capital * 1.01;
+
   return (
     <>
       <StatTile
@@ -211,6 +223,15 @@ function Results({
           {text.chartSubtitle(input.retirementAge)}
         </p>
         <PensionGapChart result={result} />
+        {surplus && (
+          <p className="mt-3 text-sm text-ink-2">
+            {text.surplusNote(
+              f.euro(atRetirement),
+              f.euro(result.withConsumption.capital),
+              f.euro(atEnd),
+            )}
+          </p>
+        )}
         <YearlyTable
           head={[t.common.age, text.phase, t.common.wealth]}
           rows={result.years.map((year) => [
