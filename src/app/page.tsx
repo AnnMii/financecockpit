@@ -1,9 +1,17 @@
+import Image from "next/image";
 import Link from "next/link";
 import { LanguageSwitch } from "@/components/locale-provider";
 import { calculators } from "@/lib/calculators/registry";
 import { registrationAllowed } from "@/lib/auth/config";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getDictionary } from "@/lib/i18n/server";
+import { getDictionary, getLocale } from "@/lib/i18n/server";
+
+/** Pixel sizes of the screenshots in public/screenshots, per language. */
+const SCREENSHOTS = [
+  { key: "plan", file: "plan", size: { de: [644, 950], en: [644, 950] } },
+  { key: "pensionGap", file: "pension-gap", size: { de: [644, 538], en: [644, 538] } },
+  { key: "avDepot", file: "av-depot", size: { de: [644, 896], en: [644, 912] } },
+] as const;
 
 const button =
   "inline-flex min-h-11 items-center justify-center rounded-md px-5 py-2 text-sm font-semibold";
@@ -11,6 +19,7 @@ const button =
 export default async function LandingPage() {
   const signedIn = (await getCurrentUser()) !== null;
   const t = await getDictionary();
+  const locale = await getLocale();
   const l = t.landing;
   const registrationOpen = registrationAllowed();
 
@@ -54,6 +63,62 @@ export default async function LandingPage() {
             ) : (
               <p className="text-sm text-ink-2">{l.invitationOnly}</p>
             )}
+          </div>
+        </section>
+
+        <section aria-labelledby="why" className="py-8">
+          <h2 id="why" className="mb-5 text-xl font-semibold">
+            {l.whyHeading}
+          </h2>
+          <ul className="grid gap-4 sm:grid-cols-3">
+            {l.why.map((reason) => (
+              <li
+                key={reason.title}
+                className="rounded-xl border border-line bg-surface p-5"
+              >
+                <h3 className="font-semibold">{reason.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-2">
+                  {reason.text}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="screenshots" className="py-8">
+          <h2 id="screenshots" className="mb-2 text-xl font-semibold">
+            {l.screenshotsHeading}
+          </h2>
+          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-ink-2">
+            {l.screenshotsNote}
+          </p>
+          <div className="space-y-10">
+            {SCREENSHOTS.map((shot) => {
+              const texts = l.screenshots[shot.key];
+              const [width, height] = shot.size[locale];
+              return (
+                <figure
+                  key={shot.key}
+                  className="grid items-start gap-5 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
+                >
+                  <figcaption className="md:pt-2">
+                    <h3 className="text-lg font-semibold">{texts.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-2">
+                      {texts.caption}
+                    </p>
+                  </figcaption>
+                  <Image
+                    src={`/screenshots/${shot.file}-${locale}.png`}
+                    alt={texts.alt}
+                    width={width}
+                    height={height}
+                    sizes="(min-width: 768px) 480px, 100vw"
+                    unoptimized
+                    className="h-auto w-full rounded-xl border border-line"
+                  />
+                </figure>
+              );
+            })}
           </div>
         </section>
 

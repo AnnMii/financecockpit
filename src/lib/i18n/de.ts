@@ -521,11 +521,49 @@ export const de = {
   landing: {
     headline: "Dein Überblick für Altersvorsorge und Vermögensaufbau",
     intro:
-      "Das Finanzcockpit bündelt Rechner für Rente, Sparen und Entnahme an einem Ort. Du gibst Alter, Einkommen, Sparrate und Renditeannahmen einmal ein – alle Rechner nutzen dieselben Werte, und das Cockpit zeigt ihre Ergebnisse zusammen.",
+      "Reicht meine Rente? Lohnt sich ein Altersvorsorgedepot? Wie viel muss ich monatlich sparen? Das Finanzcockpit beantwortet diese Fragen an einem Ort – mit denselben Annahmen für alles.",
     login: "Anmelden",
     register: "Konto anlegen",
     openCockpit: "Zum Cockpit",
     invitationOnly: "Der Zugang ist derzeit nur für eingeladene Nutzer.",
+    whyHeading: "Warum alles an einem Ort?",
+    why: [
+      {
+        title: "Einmal eingeben, überall nutzen",
+        text: "Alter, Einkommen, Sparrate und Renditeannahmen trägst du einmal ein. Du musst sie nicht in vier verschiedene Rechner abtippen.",
+      },
+      {
+        title: "Zahlen, die zusammenpassen",
+        text: "Einzelne Rechner im Netz arbeiten mit eigenen Annahmen zu Rendite, Inflation und Steuern, deshalb widersprechen sich ihre Ergebnisse leicht. Hier rechnen alle mit denselben Werten.",
+      },
+      {
+        title: "Das Zusammenspiel sehen",
+        text: "Dein monatlich verfügbares Geld ist begrenzt: Was ins Altersvorsorgedepot fließt, fehlt beim ETF-Sparplan. Das Cockpit zeigt, ob alles zusammen reicht – nicht nur jeder Baustein für sich.",
+      },
+    ],
+    screenshotsHeading: "So sieht es aus",
+    screenshotsNote:
+      "Beispiel mit gerundeten Werten, angelehnt an einen durchschnittlichen Arbeitnehmer in Deutschland: 40 Jahre alt, 42.000 € zu versteuerndes Einkommen, 15.000 € Startkapital, 300 € pro Monat zum Investieren, 1.500 € gesetzliche Rente und 2.400 € Wunschrente. Das sind Annahmen zur Veranschaulichung, keine Prognose.",
+    screenshots: {
+      plan: {
+        title: "Gesamtplan",
+        caption:
+          "Reicht die Sparrate? Der Plan zeigt, mit welcher Wahrscheinlichkeit die Wunschrente erreicht wird, welchen Korridor dein Vermögen durchläuft und wie viel mehr oder weniger du sparen solltest.",
+        alt: "Gesamtplan mit Status „Mehr sparen“, 29 % Wahrscheinlichkeit und dem Diagramm des Vermögens bis zum Renteneintritt",
+      },
+      pensionGap: {
+        title: "Rentenlücke",
+        caption:
+          "Was zwischen erwarteter Rente und Wunschrente fehlt – und welches Kapital und welche Sparrate die Lücke schließen.",
+        alt: "Rentenlückenrechner mit 886 € Lücke pro Monat sowie nötigem Kapital und nötiger Sparrate",
+      },
+      avDepot: {
+        title: "Altersvorsorgedepot",
+        caption:
+          "Das geförderte Depot im Vergleich zu einem normalen ETF-Sparplan: Endvermögen, Förderung und Netto-Rente.",
+        alt: "Altersvorsorgedepot-Rechner mit 157.326 € Endvermögen und dem Diagramm der Ansparphase",
+      },
+    },
     featuresHeading: "Was die Website macht",
     features: {
       plan: {

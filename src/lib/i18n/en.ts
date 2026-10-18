@@ -13,11 +13,49 @@ export const en: Dictionary = {
   landing: {
     headline: "Your overview for retirement and wealth building",
     intro:
-      "The Finanzcockpit brings calculators for pension, saving and withdrawal together in one place. You enter age, income, savings rate and return assumptions once – all calculators use the same values, and the cockpit shows their results side by side.",
+      "Will my pension be enough? Is an Altersvorsorgedepot worth it? How much do I need to save each month? The Finanzcockpit answers these questions in one place – with the same assumptions for everything.",
     login: "Sign in",
     register: "Create account",
     openCockpit: "Go to the cockpit",
     invitationOnly: "Access is currently by invitation only.",
+    whyHeading: "Why everything in one place?",
+    why: [
+      {
+        title: "Enter once, use everywhere",
+        text: "You enter age, income, savings rate and return assumptions once. You do not have to retype them into four different calculators.",
+      },
+      {
+        title: "Numbers that fit together",
+        text: "Single calculators on the web use their own assumptions for returns, inflation and taxes, so their results easily contradict each other. Here all of them use the same values.",
+      },
+      {
+        title: "See how it plays together",
+        text: "The money you have available each month is limited: what goes into the Altersvorsorgedepot is missing from the ETF savings plan. The cockpit shows whether everything is enough together – not just each piece on its own.",
+      },
+    ],
+    screenshotsHeading: "What it looks like",
+    screenshotsNote:
+      "Example with rounded values, modelled on an average employee in Germany: 40 years old, €42,000 taxable income, €15,000 starting capital, €300 per month to invest, €1,500 statutory pension and a desired pension of €2,400. These are assumptions for illustration, not a forecast.",
+    screenshots: {
+      plan: {
+        title: "Overall plan",
+        caption:
+          "Is the savings rate enough? The plan shows how likely the desired pension is to be reached, the corridor your wealth moves in, and how much more or less you should save.",
+        alt: "Overall plan with the status “Save more”, 29% probability and the chart of wealth until retirement",
+      },
+      pensionGap: {
+        title: "Pension gap",
+        caption:
+          "What is missing between the expected pension and the desired pension – and which capital and savings rate close the gap.",
+        alt: "Pension gap calculator showing a gap of €886 per month and the capital and savings rate needed",
+      },
+      avDepot: {
+        title: "Altersvorsorgedepot",
+        caption:
+          "The subsidised depot compared with a normal ETF savings plan: final wealth, subsidies and net pension.",
+        alt: "Altersvorsorgedepot calculator showing €157,326 final wealth and the chart of the saving phase",
+      },
+    },
     featuresHeading: "What the website does",
     features: {
       plan: {
