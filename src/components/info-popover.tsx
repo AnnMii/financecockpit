@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 // Time to move the mouse from the button into the panel before it closes.
 const CLOSE_DELAY_MS = 150;
@@ -9,7 +9,8 @@ const CLOSE_DELAY_MS = 150;
  * A small "i" button that shows a panel with background information: while
  * the mouse is over it or it has the keyboard focus, and pinned open after a
  * click, which is also how it works on touch screens. The panel can hold a
- * chart. Place it inside a `relative` container; the panel opens below that.
+ * chart. From tablet width the panel is positioned on the screen below the
+ * button (so a scrolling column cannot clip it); on phones it is a sheet.
  */
 export function InfoPopover({
   label,
@@ -29,6 +30,37 @@ export function InfoPopover({
   const container = useRef<HTMLSpanElement>(null);
   const closing = useRef<ReturnType<typeof setTimeout>>(undefined);
   const open = pinned || hovered || focused;
+  const panel = useRef<HTMLDivElement | null>(null);
+
+  // Puts the panel below the button, kept inside the screen.
+  const place = useCallback(() => {
+    const el = panel.current;
+    const box = container.current;
+    if (!el || !box) return;
+    if (window.innerWidth < 640) {
+      el.style.top = "";
+      el.style.left = "";
+      el.style.maxHeight = "";
+      return;
+    }
+    const rect = box.getBoundingClientRect();
+    const left = Math.min(Math.max(8, rect.left), window.innerWidth - el.offsetWidth - 8);
+    const top = rect.bottom + 4;
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+    el.style.maxHeight = `${Math.max(120, window.innerHeight - top - 8)}px`;
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    // Capture: a column that scrolls moves the button too.
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open, place]);
 
   useEffect(() => {
     if (!open) return;
@@ -94,11 +126,15 @@ export function InfoPopover({
       {open && (
         <div
           id={id}
+          ref={(element) => {
+            panel.current = element;
+            if (element) place();
+          }}
           role="region"
           aria-label={label}
-          // On phones a sheet across the screen, from tablet width a panel
-          // below the label.
-          className={`fixed inset-x-4 top-16 z-30 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-xl border border-line bg-surface p-4 text-sm shadow-lg sm:absolute sm:inset-x-auto sm:left-0 sm:top-full sm:mt-1 sm:max-h-none sm:overflow-visible ${
+          // On phones a sheet across the screen; from tablet width the position
+          // is set by `place`.
+          className={`fixed inset-x-4 top-16 z-30 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-xl border border-line bg-surface p-4 text-sm shadow-lg sm:inset-x-auto sm:top-auto ${
             narrow ? "sm:w-72" : "sm:w-[28rem]"
           }`}
         >

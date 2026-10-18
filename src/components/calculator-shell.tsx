@@ -34,7 +34,7 @@ export function CalculatorShell({
   const { t } = useLocale();
   return (
     <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[20rem_minmax(0,1fr)]">
-      <div className="space-y-4">
+      <div className={`space-y-4 ${PANE}`}>
         <CalculatorProfiles scope={scope} uses={uses} />
         <Card className="space-y-7">{form}</Card>
       </div>
@@ -42,9 +42,9 @@ export function CalculatorShell({
       <DraftBar />
 
       {errors.length === 0 ? (
-        <div className="min-w-0 space-y-5">{children}</div>
+        <div className={`min-w-0 space-y-5 ${PANE}`}>{children}</div>
       ) : (
-        <Card>
+        <Card className={PANE}>
           <h2 className="mb-2 text-base font-semibold">
             {t.common.cannotCalculate}
           </h2>
@@ -59,6 +59,13 @@ export function CalculatorShell({
     </div>
   );
 }
+
+/**
+ * On wide screens the parameters and the results each scroll on their own, so
+ * a long form does not push the charts out of sight and the other way round.
+ */
+const PANE =
+  "xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:pr-2";
 
 export function Assumptions({ items }: { items: string[] }) {
   const { t } = useLocale();
