@@ -188,7 +188,7 @@ const numbers: NumberTexts = {
     desiredPension: {
       label: "Monatliche Wunschrente (netto)",
       unit: "€ / Monat",
-      hint: "Netto, was du im Ruhestand zur Verfügung haben möchtest.",
+      hint: "Netto, in heutiger Kaufkraft, was du im Ruhestand zur Verfügung haben möchtest.",
     },
   },
   savings: {
@@ -222,7 +222,7 @@ const toggles: ToggleTexts = {
   shared: {
     considerInflation: {
       label: "Inflation berücksichtigen",
-      hint: "Rentenlücke-Rechner: Renditen nach Abzug der Inflationsrate. AV-Depot-Rechner: Einkommen im Ruhestand auf den Renteneintritt hochgerechnet.",
+      hint: "Rentenlücke-Rechner: Die Wunschrente zählt in heutiger Kaufkraft, die Renditen sinken um die Inflationsrate. AV-Depot-Rechner: Einkommen im Ruhestand auf den Renteneintritt hochgerechnet.",
     },
   },
   "av-depot": {},
@@ -381,7 +381,7 @@ const fieldInfo: FieldInfoTexts = {
     exemptionOrder:
       "Kapitalerträge bis zu diesem Betrag bleiben pro Jahr steuerfrei: 1.000 € für Einzelpersonen, 2.000 € für zusammen Veranlagte. Trage ein, was davon für diese Geldanlage noch frei ist.",
     considerInflation:
-      "Mit Haken wird die Inflationsrate dort berücksichtigt, wo die globalen Werte eine Rolle spielen. Rentenlücke-Rechner: Er rechnet mit der Rendite nach Abzug der Inflationsrate, die Ergebnisse stehen in heutiger Kaufkraft. AV-Depot-Rechner: Das Einkommen im Ruhestand (in heutiger Kaufkraft eingetragen) wird auf das Jahr des Renteneintritts hochgerechnet, bevor die Steuer auf die Auszahlungen berechnet wird; Endvermögen und Renten bleiben nominal, also in künftigen Euro. Ohne Haken sind beide nominal und das Einkommen gilt unverändert. Unabhängig vom Haken rechnet der Gesamtplan immer in heutiger Kaufkraft, Sparrechner und Entnahmeplan haben einen eigenen Schalter und nutzen dann die hier eingestellte Inflationsrate.",
+      "Mit Haken wird die Inflationsrate dort berücksichtigt, wo die globalen Werte eine Rolle spielen. Rentenlücke-Rechner: Die Wunschrente und die Rentenansprüche sind Beträge von heute. Mit Haken rechnet der Rechner deshalb in heutiger Kaufkraft: mit der Rendite nach Abzug der Inflationsrate, sodass auch nötiges Kapital und Sparrate in heutiger Kaufkraft stehen. Ohne Haken würde die Wunschrente wie ein Betrag im Jahr des Renteneintritts behandelt und der Bedarf unterschätzt. AV-Depot-Rechner: Das Einkommen im Ruhestand (in heutiger Kaufkraft eingetragen) wird auf das Jahr des Renteneintritts hochgerechnet, bevor die Steuer auf die Auszahlungen berechnet wird; Endvermögen und Renten bleiben nominal, also in künftigen Euro. Ohne Haken sind beide nominal und das Einkommen gilt unverändert. Unabhängig vom Haken rechnet der Gesamtplan immer in heutiger Kaufkraft, Sparrechner und Entnahmeplan haben einen eigenen Schalter und nutzen dann die hier eingestellte Inflationsrate.",
   },
   "av-depot": {
     savingsRateMonthly:
@@ -411,7 +411,7 @@ const fieldInfo: FieldInfoTexts = {
     yearlyTaxFreeAmount:
       "Einkommen bis zu diesem Betrag bleibt pro Jahr steuerfrei. Der Grundfreibetrag wird jedes Jahr angepasst.",
     desiredPension:
-      "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
+      "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest, in heutiger Kaufkraft. Mit „Inflation berücksichtigen“ rechnet der Rentenlücke-Rechner damit; ohne den Haken würde der Betrag wie ein Betrag im Jahr des Renteneintritts behandelt. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
   },
   savings: {
     savingsRateMonthly:
@@ -547,19 +547,19 @@ export const de = {
     ],
     screenshotsHeading: "So sieht es aus",
     screenshotsNote:
-      "Beispiel mit gerundeten Werten, angelehnt an einen durchschnittlichen Arbeitnehmer in Deutschland: 40 Jahre alt, 42.000 € zu versteuerndes Einkommen, 15.000 € Startkapital, 300 € pro Monat zum Investieren, 1.500 € gesetzliche Rente und 1.900 € Wunschrente. Das sind Annahmen zur Veranschaulichung, keine Prognose.",
+      "Beispiel mit gerundeten Werten, angelehnt an einen durchschnittlichen Arbeitnehmer in Deutschland: 40 Jahre alt, 42.000 € zu versteuerndes Einkommen, 15.000 € Startkapital, 300 € pro Monat zum Investieren, 1.500 € gesetzliche Rente und 1.850 € Wunschrente. Das sind Annahmen zur Veranschaulichung, keine Prognose.",
     screenshots: {
       plan: {
         title: "Gesamtplan",
         caption:
           "Reicht die Sparrate? Der Plan zeigt, mit welcher Wahrscheinlichkeit die Wunschrente erreicht wird, welchen Korridor dein Vermögen durchläuft und wie viel mehr oder weniger du sparen solltest.",
-        alt: "Gesamtplan mit Status „Im Plan“, 86 % Wahrscheinlichkeit und dem Diagramm des Vermögens bis zum Renteneintritt",
+        alt: "Gesamtplan mit Status „Im Plan“, 91 % Wahrscheinlichkeit und dem Diagramm des Vermögens bis zum Renteneintritt",
       },
       pensionGap: {
         title: "Rentenlücke",
         caption:
           "Was zwischen erwarteter Rente und Wunschrente fehlt – und welches Kapital und welche Sparrate die Lücke schließen.",
-        alt: "Rentenlückenrechner mit 386 € Lücke pro Monat sowie nötigem Kapital und nötiger Sparrate",
+        alt: "Rentenlückenrechner mit 336 € Lücke pro Monat sowie nötigem Kapital und nötiger Sparrate",
       },
       avDepot: {
         title: "Altersvorsorgedepot",
@@ -1205,7 +1205,7 @@ export const de = {
     phase: "Phase",
     assumptions: [
       "Der Steuerabzug gilt für die Rente oberhalb des Grundfreibetrags und für die Erträge im Ruhestand; die Kapitalertragsteuer mindert die Rendite bis zur Rente.",
-      "Mit Inflation wird mit Renditen nach Abzug der Inflationsrate gerechnet; Rente und Wunschrente bleiben in heutiger Kaufkraft.",
+      "Mit „Inflation berücksichtigen“ (Voreinstellung) gilt die Wunschrente als Betrag in heutiger Kaufkraft: Es wird mit Renditen nach Abzug der Inflationsrate gerechnet, und Kapital, Sparrate und Rentenlücke stehen in heutiger Kaufkraft. Ohne den Haken würde die Wunschrente wie ein Betrag im Jahr des Renteneintritts behandelt.",
       "Sparraten fließen am Monatsende, Entnahmen am Monatsanfang; Zinsen monatlich.",
       "Kranken- und Pflegeversicherung auf die Rente sind nicht berücksichtigt.",
       "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet.",

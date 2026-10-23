@@ -35,19 +35,19 @@ export const en: Dictionary = {
     ],
     screenshotsHeading: "What it looks like",
     screenshotsNote:
-      "Example with rounded values, modelled on an average employee in Germany: 40 years old, €42,000 taxable income, €15,000 starting capital, €300 per month to invest, €1,500 statutory pension and a desired pension of €1,900. These are assumptions for illustration, not a forecast.",
+      "Example with rounded values, modelled on an average employee in Germany: 40 years old, €42,000 taxable income, €15,000 starting capital, €300 per month to invest, €1,500 statutory pension and a desired pension of €1,850. These are assumptions for illustration, not a forecast.",
     screenshots: {
       plan: {
         title: "Overall plan",
         caption:
           "Is the savings rate enough? The plan shows how likely the desired pension is to be reached, the corridor your wealth moves in, and how much more or less you should save.",
-        alt: "Overall plan with the status “On plan”, 86% probability and the chart of wealth until retirement",
+        alt: "Overall plan with the status “On plan”, 91% probability and the chart of wealth until retirement",
       },
       pensionGap: {
         title: "Pension gap",
         caption:
           "What is missing between the expected pension and the desired pension – and which capital and savings rate close the gap.",
-        alt: "Pension gap calculator showing a gap of €386 per month and the capital and savings rate needed",
+        alt: "Pension gap calculator showing a gap of €336 per month and the capital and savings rate needed",
       },
       avDepot: {
         title: "Altersvorsorgedepot",
@@ -232,7 +232,7 @@ export const en: Dictionary = {
       exemptionOrder:
         "Investment income up to this amount stays tax-free per year: €1,000 for single persons, €2,000 for couples assessed jointly. Enter what is still available for this investment.",
       considerInflation:
-        "Checked, the inflation rate is taken into account wherever the global values play a role. Pension gap calculator: it uses the return after deducting the inflation rate, and the results are in today's purchasing power. AV-Depot calculator: the income in retirement (entered in today's purchasing power) is raised to the year of retirement before the tax on the payouts is calculated; final wealth and pensions stay nominal, i.e. in future euros. Unchecked, both are nominal and the income is used as entered. Whatever the box says, the overall plan always uses today's purchasing power; the savings calculator and the withdrawal plan have a switch of their own and then use the inflation rate set here.",
+        "Checked, the inflation rate is taken into account wherever the global values play a role. Pension gap calculator: the desired pension and the pension entitlements are amounts of today. Checked, the calculator therefore works in today's purchasing power: with the return after deducting the inflation rate, so the needed capital and savings rate are in today's purchasing power too. Unchecked, the desired pension would be treated like an amount in the year of retirement and the need underestimated. AV-Depot calculator: the income in retirement (entered in today's purchasing power) is raised to the year of retirement before the tax on the payouts is calculated; final wealth and pensions stay nominal, i.e. in future euros. Unchecked, both are nominal and the income is used as entered. Whatever the box says, the overall plan always uses today's purchasing power; the savings calculator and the withdrawal plan have a switch of their own and then use the inflation rate set here.",
     },
     "av-depot": {
       savingsRateMonthly:
@@ -262,7 +262,7 @@ export const en: Dictionary = {
       yearlyTaxFreeAmount:
         "Income up to this amount stays tax-free per year. The basic allowance is adjusted every year.",
       desiredPension:
-        "The amount you want to have available per month in retirement, net. A rule of thumb is about 80% of your last net income.",
+        "The amount you want to have available per month in retirement, net, in today's purchasing power. With “Account for inflation” the pension gap calculator works with it that way; unchecked, the amount would be treated like an amount in the year of retirement. A rule of thumb is about 80% of your last net income.",
     },
     savings: {
       savingsRateMonthly:
@@ -526,7 +526,7 @@ export const en: Dictionary = {
       desiredPension: {
         label: "Desired monthly pension (net)",
         unit: "€ / month",
-        hint: "Net amount you want to have available in retirement.",
+        hint: "Net amount, in today's purchasing power, you want to have available in retirement.",
       },
     },
     savings: {
@@ -560,7 +560,7 @@ export const en: Dictionary = {
     shared: {
       considerInflation: {
         label: "Account for inflation",
-        hint: "Pension gap calculator: returns after deducting the inflation rate. AV-Depot calculator: income in retirement raised to the year of retirement.",
+        hint: "Pension gap calculator: the desired pension counts in today's purchasing power, returns are reduced by the inflation rate. AV-Depot calculator: income in retirement raised to the year of retirement.",
       },
     },
     "av-depot": {},
@@ -1145,7 +1145,7 @@ export const en: Dictionary = {
     phase: "Phase",
     assumptions: [
       "The tax deduction applies to the pension above the basic allowance and to returns in retirement; capital gains tax reduces the return until retirement.",
-      "With inflation, returns are reduced by the inflation rate; pension and desired pension stay in today's purchasing power.",
+      "With “Account for inflation” (the default) the desired pension counts as an amount in today's purchasing power: returns are reduced by the inflation rate, and capital, savings rate and pension gap are in today's purchasing power. Unchecked, the desired pension would be treated like an amount in the year of retirement.",
       "Savings are paid at the end of the month, withdrawals at the beginning; interest monthly.",
       "Health and long-term care insurance on the pension are not included.",
       "Formulas derived from the results of the Finanzfluss calculator.",
