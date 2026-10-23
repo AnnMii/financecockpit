@@ -1171,6 +1171,17 @@ export const de = {
     withoutConsumptionNote:
       "Du lebst nur von den Erträgen, das Vermögen bleibt erhalten.",
     capitalAtRetirement: "Benötigtes Kapital bei Renteneintritt",
+    onPlanTitle: "Du liegst im Plan",
+    onPlanTitleClear: "Du liegst deutlich im Plan",
+    onPlanText: (
+      atRetirement: string,
+      needed: string,
+      buffer: string,
+      percent: string,
+      untilAge: number,
+      remaining: string,
+    ) =>
+      `Mit deinem vorhandenen Kapital brauchst du keine zusätzliche Sparrate. Es wächst bis zum Renteneintritt auf ${atRetirement}; nötig wären nur ${needed}. Das sind ${buffer} (${percent}) Puffer. Selbst wenn du das Kapital über die ganze Entnahme verbrauchst, bleiben mit ${untilAge} Jahren noch ${remaining} übrig.`,
     chartViews: { with: "Mit Kapitalverzehr", without: "Ohne Kapitalverzehr" },
     chartViewLabel: "Verlauf anzeigen",
     chartTitleWithout: "Vermögensverlauf ohne Kapitalverzehr",
@@ -1185,8 +1196,6 @@ export const de = {
     savingsLikeTax: { off: "ohne Steuern", distributing: "Steuern ausschüttend", accumulating: "Steuern thesaurierend" },
     chartSubtitle: (retirementAge: number) =>
       `Stand am Ende jedes Lebensjahres: Ansparen bis ${retirementAge}, danach monatliche Entnahme der Rentenlücke.`,
-    surplusNote: (atRetirement: string, needed: string, remaining: string) =>
-      `Dein vorhandenes Kapital wächst bis zum Renteneintritt auf ${atRetirement}, mehr als die nötigen ${needed}. Deshalb brauchst du keine Sparrate, und die Entnahme verbraucht das Kapital nicht: Am Ende bleiben ${remaining} übrig.`,
     chartAria:
       "Säulendiagramm: Vermögen pro Lebensjahr, erst Ansparen, dann Entnahme",
     phase: "Phase",

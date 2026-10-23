@@ -1119,6 +1119,10 @@ export const en: Dictionary = {
     withoutConsumptionNote:
       "You live on the returns only, the wealth is preserved.",
     capitalAtRetirement: "Capital needed at retirement",
+    onPlanTitle: "You are on plan",
+    onPlanTitleClear: "You are clearly on plan",
+    onPlanText: (atRetirement, needed, buffer, percent, untilAge, remaining) =>
+      `With your existing capital you need no additional savings rate. It grows to ${atRetirement} by retirement; only ${needed} would be needed. That is a buffer of ${buffer} (${percent}). Even if you use the capital up over the whole payout, ${remaining} is still left at age ${untilAge}.`,
     chartViews: { with: "With capital consumption", without: "Without capital consumption" },
     chartViewLabel: "Show course",
     chartTitleWithout: "Wealth course without capital consumption",
@@ -1133,8 +1137,6 @@ export const en: Dictionary = {
     savingsLikeTax: { off: "without taxes", distributing: "taxes distributing", accumulating: "taxes accumulating" },
     chartSubtitle: (retirementAge) =>
       `At the end of each year of life: saving until ${retirementAge}, then withdrawing the pension gap every month.`,
-    surplusNote: (atRetirement, needed, remaining) =>
-      `Your existing capital grows to ${atRetirement} by retirement, more than the ${needed} needed. So you need no savings rate, and the withdrawals do not use the capital up: ${remaining} is left at the end.`,
     chartAria: "Column chart: wealth per year of life, first saving, then withdrawal",
     phase: "Phase",
     assumptions: [

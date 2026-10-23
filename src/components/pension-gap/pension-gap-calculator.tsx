@@ -176,10 +176,13 @@ function Results({
     [...result.years].reverse().find((year) => year.phase === "saving")?.capital ??
     input.currentCapital;
   const atEnd = result.years.at(-1)?.capital ?? 0;
+  const needed = result.withConsumption.capital;
   const surplus =
     result.gap > 0 &&
     result.withConsumption.savingsRate === 0 &&
-    atRetirement > result.withConsumption.capital * 1.01;
+    atRetirement > needed * 1.01;
+  const buffer = atRetirement - needed;
+  const bufferShare = needed > 0 ? buffer / needed : 0;
 
   return (
     <>
@@ -196,6 +199,28 @@ function Results({
               )
         }
       />
+
+      {surplus && (
+        <section
+          role="status"
+          className="rounded-xl border border-l-4 border-line border-l-good bg-surface p-5"
+        >
+          <h2 className="flex items-center gap-2 text-base font-semibold text-good">
+            <span aria-hidden="true">✓</span>
+            {bufferShare >= 0.2 ? text.onPlanTitleClear : text.onPlanTitle}
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-ink">
+            {text.onPlanText(
+              f.euro(atRetirement),
+              f.euro(needed),
+              f.euro(buffer),
+              f.percent(Math.round(bufferShare * 100)),
+              input.payoutUntilAge,
+              f.euro(atEnd),
+            )}
+          </p>
+        </section>
+      )}
 
       <Card>
         <h2 className="mb-4 text-base font-semibold">{text.overviewTitle}</h2>
@@ -271,15 +296,6 @@ function Results({
           )}
         </div>
         <PensionGapChart result={result} years={shownYears} />
-        {showing === "with" && surplus && (
-          <p className="mt-3 text-sm text-ink-2">
-            {text.surplusNote(
-              f.euro(atRetirement),
-              f.euro(result.withConsumption.capital),
-              f.euro(atEnd),
-            )}
-          </p>
-        )}
         <YearlyTable
           head={[t.common.age, text.phase, t.common.wealth]}
           rows={shownYears.map((year) => [
