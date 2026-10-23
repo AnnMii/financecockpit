@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Assumptions,
   CalculatorShell,
@@ -162,6 +163,11 @@ function Results({
 }) {
   const { t, f } = useLocale();
   const text = t.pensionGap;
+  const [view, setView] = useState<"with" | "without">("with");
+  // Falls back to the first course when the second does not exist (the interest is not enough).
+  const showing = view === "without" && result.yearsWithoutConsumption ? "without" : "with";
+  const shownYears =
+    showing === "without" ? result.yearsWithoutConsumption! : result.years;
 
   // Existing capital that already grows beyond what is needed: nothing has to
   // be saved, and the payout does not use the capital up. The chart then shows
@@ -229,12 +235,43 @@ function Results({
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold">{text.chartTitle}</h2>
-        <p className="mb-4 text-sm text-ink-2">
-          {text.chartSubtitle(input.retirementAge)}
-        </p>
-        <PensionGapChart result={result} />
-        {surplus && (
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold">
+              {showing === "without" ? text.chartTitleWithout : text.chartTitle}
+            </h2>
+            <p className="mb-4 text-sm text-ink-2">
+              {showing === "without"
+                ? text.chartSubtitleWithout(input.retirementAge)
+                : text.chartSubtitle(input.retirementAge)}
+            </p>
+          </div>
+          {result.yearsWithoutConsumption && (
+            <div
+              role="group"
+              aria-label={text.chartViewLabel}
+              className="flex text-xs"
+            >
+              {(["with", "without"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={showing === option}
+                  onClick={() => setView(option)}
+                  className={`border border-axis px-3 py-1.5 first:rounded-l-md last:rounded-r-md last:border-l-0 ${
+                    showing === option
+                      ? "bg-accent-wash font-semibold text-accent"
+                      : "text-ink-2 hover:text-ink"
+                  }`}
+                >
+                  {text.chartViews[option]}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <PensionGapChart result={result} years={shownYears} />
+        {showing === "with" && surplus && (
           <p className="mt-3 text-sm text-ink-2">
             {text.surplusNote(
               f.euro(atRetirement),
@@ -245,7 +282,7 @@ function Results({
         )}
         <YearlyTable
           head={[t.common.age, text.phase, t.common.wealth]}
-          rows={result.years.map((year) => [
+          rows={shownYears.map((year) => [
             year.age,
             text.series[year.phase],
             f.euro(year.capital),

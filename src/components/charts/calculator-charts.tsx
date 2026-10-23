@@ -2,7 +2,7 @@
 
 import { useLocale } from "@/components/locale-provider";
 import type { AvDepotResult } from "@/lib/calculators/av-depot";
-import type { PensionGapResult } from "@/lib/calculators/pension-gap";
+import type { PensionGapResult, PensionGapYear } from "@/lib/calculators/pension-gap";
 import type { SavingsResult } from "@/lib/calculators/savings";
 import type { WithdrawalPlanResult } from "@/lib/calculators/withdrawal-plan";
 import { StackedColumns } from "./stacked-columns";
@@ -58,13 +58,17 @@ export function AvDepotChart({
 }
 
 /** Wealth per year of life: saving until retirement, then withdrawing the gap. */
-export function PensionGapChart({ result, height }: ChartProps<PensionGapResult>) {
+export function PensionGapChart({
+  result,
+  height,
+  years = result.years,
+}: ChartProps<PensionGapResult> & { years?: PensionGapYear[] }) {
   const { t, f } = useLocale();
   const text = t.pensionGap;
   return (
     <StackedColumns
       height={height}
-      data={result.years.map((year) => ({
+      data={years.map((year) => ({
         tick: year.age % 5 === 0 ? String(year.age) : "",
         title: t.common.ageN(year.age),
         values: { [year.phase]: year.capital },

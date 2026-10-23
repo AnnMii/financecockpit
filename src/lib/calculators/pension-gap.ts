@@ -86,6 +86,8 @@ export interface PensionGapResult {
   withoutConsumption: GapClosing | null;
   /** Wealth at the end of each year of life in the model that uses the capital up. */
   years: PensionGapYear[];
+  /** The same for the model that only withdraws the interest; null when that is not possible. */
+  yearsWithoutConsumption: PensionGapYear[] | null;
 }
 
 export function validatePensionGapInput(
@@ -151,6 +153,18 @@ export function calculatePensionGap(input: PensionGapInput): PensionGapResult {
       savingRate,
       payoutRate,
     ),
+    // Withdrawn at the end of the month, as the capital (gap / rate) assumes:
+    // it then stays exactly where it is.
+    yearsWithoutConsumption: withoutConsumption
+      ? capitalByYear(
+          input,
+          withoutConsumption.savingsRate,
+          gap,
+          savingRate,
+          payoutRate,
+          false,
+        )
+      : null,
   };
 }
 
@@ -228,6 +242,8 @@ function capitalByYear(
   gap: number,
   savingRate: number,
   payoutRate: number,
+  /** Whether the monthly withdrawal comes before the interest of that month. */
+  withdrawAtStart = true,
 ): PensionGapYear[] {
   const years: PensionGapYear[] = [];
   let capital = input.currentCapital;
@@ -249,7 +265,9 @@ function capitalByYear(
   }
   for (let age = input.retirementAge + 1; age <= input.payoutUntilAge; age++) {
     for (let month = 0; month < 12; month++) {
-      capital = (capital - gap) * (1 + payoutRate);
+      capital = withdrawAtStart
+        ? (capital - gap) * (1 + payoutRate)
+        : capital * (1 + payoutRate) - gap;
     }
     // Rounding leaves a few cents around zero at the end.
     years.push({ age, capital: Math.max(0, capital), phase: "payout" });

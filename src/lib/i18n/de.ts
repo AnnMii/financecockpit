@@ -1170,7 +1170,12 @@ export const de = {
     withoutConsumption: "Ohne Kapitalverzehr",
     withoutConsumptionNote:
       "Du lebst nur von den Erträgen, das Vermögen bleibt erhalten.",
-    capitalAtRetirement: "Kapital bei Renteneintritt",
+    capitalAtRetirement: "Benötigtes Kapital bei Renteneintritt",
+    chartViews: { with: "Mit Kapitalverzehr", without: "Ohne Kapitalverzehr" },
+    chartViewLabel: "Verlauf anzeigen",
+    chartTitleWithout: "Vermögensverlauf ohne Kapitalverzehr",
+    chartSubtitleWithout: (retirementAge: number) =>
+      `Stand am Ende jedes Lebensjahres: Ansparen bis ${retirementAge}, danach lebst du von den Erträgen und das Vermögen bleibt erhalten.`,
     savingsRatePerMonth: "Sparrate pro Monat",
     notPossible:
       "Nicht möglich: Nach Steuern und Inflation bleibt im Ruhestand keine Rendite, von der sich leben ließe.",

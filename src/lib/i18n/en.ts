@@ -1118,7 +1118,12 @@ export const en: Dictionary = {
     withoutConsumption: "Preserving the capital",
     withoutConsumptionNote:
       "You live on the returns only, the wealth is preserved.",
-    capitalAtRetirement: "Capital at retirement",
+    capitalAtRetirement: "Capital needed at retirement",
+    chartViews: { with: "With capital consumption", without: "Without capital consumption" },
+    chartViewLabel: "Show course",
+    chartTitleWithout: "Wealth course without capital consumption",
+    chartSubtitleWithout: (retirementAge) =>
+      `Balance at the end of each year of life: saving until ${retirementAge}, then you live off the returns and the wealth is kept.`,
     savingsRatePerMonth: "Savings rate per month",
     notPossible:
       "Not possible: after taxes and inflation no return is left in retirement to live on.",
