@@ -104,8 +104,7 @@ export const numberFields = {
 } satisfies Record<string, Record<string, NumberFieldSpec>>;
 
 export const toggleFields = {
-  // On by default: the desired pension is entered in today's purchasing power.
-  shared: { considerInflation: true },
+  shared: { considerInflation: false },
   "av-depot": {},
   "pension-gap": {
     /** Calculate the saving phase like the savings calculator (its tax, costs, interval). */

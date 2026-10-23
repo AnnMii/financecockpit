@@ -183,6 +183,7 @@ function Results({
   const { t, f } = useLocale();
   const text = t.pensionGap;
   const [view, setView] = useState<"with" | "without">("with");
+  const { shared } = useSettingsEditor().settings;
   // Falls back to the first course when the second does not exist (the interest is not enough).
   const showing = view === "without" && result.yearsWithoutConsumption ? "without" : "with";
   const shownYears =
@@ -218,6 +219,12 @@ function Results({
               )
         }
       />
+
+      <p className="-mt-2 text-xs text-ink-2">
+        {input.considerInflation
+          ? text.inflationOn(f.percent(shared.inflationRate))
+          : text.inflationOff}
+      </p>
 
       {surplus && (
         <section

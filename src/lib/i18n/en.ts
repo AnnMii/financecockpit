@@ -1105,6 +1105,10 @@ export const en: Dictionary = {
     series: { saving: "Saving", payout: "Withdrawal" },
     heroLabel: "Pension gap per month",
     heroCovered: "Your expected net pension covers the desired pension.",
+    inflationOn: (rate) =>
+      `Calculated with inflation (${rate} per year): the desired pension counts in today's purchasing power, and all amounts are in today's purchasing power.`,
+    inflationOff:
+      "Calculated without inflation: the desired pension is treated like an amount in the year of retirement, all amounts are nominal.",
     heroNote: (net, desired) =>
       `This is missing between ${net} net pension and ${desired} desired pension.`,
     overviewTitle: "Desired pension at a glance",
@@ -1145,7 +1149,7 @@ export const en: Dictionary = {
     phase: "Phase",
     assumptions: [
       "The tax deduction applies to the pension above the basic allowance and to returns in retirement; capital gains tax reduces the return until retirement.",
-      "With “Account for inflation” (the default) the desired pension counts as an amount in today's purchasing power: returns are reduced by the inflation rate, and capital, savings rate and pension gap are in today's purchasing power. Unchecked, the desired pension would be treated like an amount in the year of retirement.",
+      "With “Account for inflation” the desired pension counts as an amount in today's purchasing power: returns are reduced by the inflation rate, and capital, savings rate and pension gap are in today's purchasing power. Unchecked, the desired pension would be treated like an amount in the year of retirement.",
       "Savings are paid at the end of the month, withdrawals at the beginning; interest monthly.",
       "Health and long-term care insurance on the pension are not included.",
       "Formulas derived from the results of the Finanzfluss calculator.",

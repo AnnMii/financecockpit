@@ -33,9 +33,9 @@ different numbers here than there.
 | Default values here | €200,002 | €237.50 | €542,659 | €644.39 |
 | Age 30, payout until 100, return until retirement 5 % | €309,185 | €327.51 | €542,659 | €574.81 |
 
-These numbers are with "Inflation berücksichtigen" switched off. The switch is
-on by default now (the desired pension is in today's purchasing power); with the
-default values the capital is then €231,049 and the savings rate €362.75.
+These numbers are with "Inflation berücksichtigen" switched off (the default).
+With the switch on (the desired pension is in today's purchasing power) the
+capital is €231,049 and the savings rate €362.75.
 
 The second row is the result of the Finanzfluss page. The pension gap itself is
 €1,153 per month in both cases.

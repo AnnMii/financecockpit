@@ -1156,6 +1156,10 @@ export const de = {
     series: { saving: "Ansparen", payout: "Entnahme" },
     heroLabel: "Rentenlücke pro Monat",
     heroCovered: "Deine erwartete Nettorente deckt die Wunschrente.",
+    inflationOn: (rate: string) =>
+      `Mit Inflation gerechnet (${rate} pro Jahr): Die Wunschrente gilt in heutiger Kaufkraft, und alle Beträge stehen in heutiger Kaufkraft.`,
+    inflationOff:
+      "Ohne Inflation gerechnet: Die Wunschrente wird wie ein Betrag im Jahr des Renteneintritts behandelt, alle Beträge sind nominal.",
     heroNote: (net: string, desired: string) =>
       `So viel fehlt zwischen ${net} Nettorente und ${desired} Wunschrente.`,
     overviewTitle: "Wunschrente im Überblick",
@@ -1205,7 +1209,7 @@ export const de = {
     phase: "Phase",
     assumptions: [
       "Der Steuerabzug gilt für die Rente oberhalb des Grundfreibetrags und für die Erträge im Ruhestand; die Kapitalertragsteuer mindert die Rendite bis zur Rente.",
-      "Mit „Inflation berücksichtigen“ (Voreinstellung) gilt die Wunschrente als Betrag in heutiger Kaufkraft: Es wird mit Renditen nach Abzug der Inflationsrate gerechnet, und Kapital, Sparrate und Rentenlücke stehen in heutiger Kaufkraft. Ohne den Haken würde die Wunschrente wie ein Betrag im Jahr des Renteneintritts behandelt.",
+      "Mit „Inflation berücksichtigen“ gilt die Wunschrente als Betrag in heutiger Kaufkraft: Es wird mit Renditen nach Abzug der Inflationsrate gerechnet, und Kapital, Sparrate und Rentenlücke stehen in heutiger Kaufkraft. Ohne den Haken würde die Wunschrente wie ein Betrag im Jahr des Renteneintritts behandelt.",
       "Sparraten fließen am Monatsende, Entnahmen am Monatsanfang; Zinsen monatlich.",
       "Kranken- und Pflegeversicherung auf die Rente sind nicht berücksichtigt.",
       "Formeln aus den Ergebnissen des Finanzfluss-Rechners hergeleitet.",
