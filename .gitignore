@@ -43,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# time of the last daily dependency check, see AGENTS.md
+/.dependency-check
