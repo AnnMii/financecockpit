@@ -186,7 +186,7 @@ const numbers: NumberTexts = {
       unit: "€ / Jahr",
     },
     desiredPension: {
-      label: "Monatliche Wunschrente",
+      label: "Monatliche Wunschrente (netto)",
       unit: "€ / Monat",
       hint: "Netto, was du im Ruhestand zur Verfügung haben möchtest.",
     },

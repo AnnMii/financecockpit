@@ -524,7 +524,7 @@ export const en: Dictionary = {
         unit: "€ / year",
       },
       desiredPension: {
-        label: "Desired monthly pension",
+        label: "Desired monthly pension (net)",
         unit: "€ / month",
         hint: "Net amount you want to have available in retirement.",
       },
