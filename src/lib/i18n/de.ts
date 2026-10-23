@@ -1182,6 +1182,10 @@ export const de = {
       remaining: string,
     ) =>
       `Mit deinem vorhandenen Kapital brauchst du keine zusätzliche Sparrate. Es wächst bis zum Renteneintritt auf ${atRetirement}; nötig wären nur ${needed}. Das sind ${buffer} (${percent}) Puffer. Selbst wenn du das Kapital über die ganze Entnahme verbrauchst, bleiben mit ${untilAge} Jahren noch ${remaining} übrig.`,
+    budgetFits: (budget: string) =>
+      `Im Plan: Die Sparrate passt in dein Budget (${budget} pro Monat zum Investieren).`,
+    budgetExceeded: (budget: string, missing: string) =>
+      `Nicht im Plan: Die nötige Sparrate liegt ${missing} über deinem Budget „Zum Investieren verfügbar pro Monat“ (${budget}).`,
     chartViews: { with: "Mit Kapitalverzehr", without: "Ohne Kapitalverzehr" },
     chartViewLabel: "Verlauf anzeigen",
     chartTitleWithout: "Vermögensverlauf ohne Kapitalverzehr",

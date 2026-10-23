@@ -1123,6 +1123,10 @@ export const en: Dictionary = {
     onPlanTitleClear: "You are clearly on plan",
     onPlanText: (atRetirement, needed, buffer, percent, untilAge, remaining) =>
       `With your existing capital you need no additional savings rate. It grows to ${atRetirement} by retirement; only ${needed} would be needed. That is a buffer of ${buffer} (${percent}). Even if you use the capital up over the whole payout, ${remaining} is still left at age ${untilAge}.`,
+    budgetFits: (budget) =>
+      `On plan: the savings rate fits your budget (${budget} per month to invest).`,
+    budgetExceeded: (budget, missing) =>
+      `Not on plan: the required savings rate is ${missing} above your budget “Available to invest per month” (${budget}).`,
     chartViews: { with: "With capital consumption", without: "Without capital consumption" },
     chartViewLabel: "Show course",
     chartTitleWithout: "Wealth course without capital consumption",

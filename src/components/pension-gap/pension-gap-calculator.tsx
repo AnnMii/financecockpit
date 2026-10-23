@@ -127,6 +127,10 @@ function ClosingCard({
 }) {
   const { t, f } = useLocale();
   const text = t.pensionGap;
+  // The savings rate that is needed against what can be invested per month.
+  const budget = useSettingsEditor().settings.shared.investableMonthly;
+  const missing = closing ? Math.round((closing.savingsRate - budget) * 100) / 100 : 0;
+  const fits = missing <= 0;
   return (
     <Card>
       <h2 className="text-base font-semibold">{title}</h2>
@@ -149,6 +153,21 @@ function ClosingCard({
         </dl>
       ) : (
         <p className="text-sm text-ink">{text.notPossible}</p>
+      )}
+      {closing && (
+        <p
+          role="status"
+          className={`mt-4 flex gap-2 rounded-md border px-3 py-2 text-sm ${
+            fits ? "border-good/40 text-good" : "border-critical/40 text-critical"
+          }`}
+        >
+          <span aria-hidden="true">{fits ? "✓" : "✗"}</span>
+          <span>
+            {fits
+              ? text.budgetFits(f.euro(budget))
+              : text.budgetExceeded(f.euro(budget), f.euroCents(missing))}
+          </span>
+        </p>
       )}
     </Card>
   );
