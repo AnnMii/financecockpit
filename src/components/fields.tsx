@@ -125,8 +125,8 @@ export function NumberField({
   const invalid = !readOnly && !isValid(f.parse(text), spec);
 
   return (
-    <div>
-      <div className="relative mb-1 flex items-center gap-2">
+    <div className="min-w-0">
+      <div className="relative mb-1 flex flex-wrap items-center gap-x-2 gap-y-1">
         <label htmlFor={id} className="text-sm font-medium text-ink">
           {label}
         </label>

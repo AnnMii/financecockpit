@@ -93,7 +93,7 @@ function FromPlanButton({
       disabled={!possible}
       onClick={takeOver}
       title={possible ? text.hint : text.unavailable}
-      className="rounded-md border border-axis px-2 py-0.5 text-xs font-medium text-ink hover:bg-accent-wash disabled:opacity-50"
+      className="whitespace-nowrap rounded-md border border-axis px-2 py-0.5 text-xs font-medium text-ink hover:bg-accent-wash disabled:opacity-50"
     >
       {text.button}
     </button>
