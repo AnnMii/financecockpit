@@ -1200,7 +1200,7 @@ export const de = {
       "Nicht möglich: Nach Steuern und Inflation bleibt im Ruhestand keine Rendite, von der sich leben ließe.",
     chartTitle: "Vermögensverlauf mit Kapitalverzehr",
     savingsLikeNote: (tax: string) =>
-      `Die Sparphase wird wie im aktiven Sparrechner-Profil gerechnet (${tax}), mit dessen Kosten und Zinsintervall. Das Profil kannst du oben wählen.`,
+      `Die Sparphase wird wie im aktiven Sparrechner-Profil gerechnet (${tax}), mit dessen Kosten und Zinsintervall.`,
     savingsLikeTax: { off: "ohne Steuern", distributing: "Steuern ausschüttend", accumulating: "Steuern thesaurierend" },
     chartSubtitle: (retirementAge: number) =>
       `Stand am Ende jedes Lebensjahres: Ansparen bis ${retirementAge}, danach monatliche Entnahme der Rentenlücke.`,

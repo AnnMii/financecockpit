@@ -1141,7 +1141,7 @@ export const en: Dictionary = {
       "Not possible: after taxes and inflation no return is left in retirement to live on.",
     chartTitle: "Wealth over time, using up the capital",
     savingsLikeNote: (tax) =>
-      `The saving phase is calculated like in the active savings calculator profile (${tax}), with its costs and interest interval. You can choose the profile above.`,
+      `The saving phase is calculated like in the active savings calculator profile (${tax}), with its costs and interest interval.`,
     savingsLikeTax: { off: "without taxes", distributing: "taxes distributing", accumulating: "taxes accumulating" },
     chartSubtitle: (retirementAge) =>
       `At the end of each year of life: saving until ${retirementAge}, then withdrawing the pension gap every month.`,

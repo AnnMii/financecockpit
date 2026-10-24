@@ -11,6 +11,7 @@ import { PensionGapChart } from "@/components/charts/calculator-charts";
 import { DraftSettings } from "@/components/draft-settings";
 import { Card, Section } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
+import { ProfilePicker } from "@/components/profile-picker";
 import { NumberSetting, ToggleSetting } from "@/components/setting-fields";
 import { useSettingsEditor } from "@/components/settings-provider";
 import { StatTile } from "@/components/stat-tile";
@@ -49,7 +50,6 @@ function Workspace() {
   return (
     <CalculatorShell
       scope="pension-gap"
-      uses={like ? ["savings"] : undefined}
       errors={errors}
       form={
         <>
@@ -94,7 +94,10 @@ function Workspace() {
             />
             <ToggleSetting scope="pension-gap" name="savingsLikeCalculator" />
             {like ? (
-              <p className="text-xs text-ink-2">{text.savingsLikeNote(likeTax)}</p>
+              <>
+                <ProfilePicker scope="savings" />
+                <p className="text-xs text-ink-2">{text.savingsLikeNote(likeTax)}</p>
+              </>
             ) : (
               <NumberSetting scope="shared" name="capitalGainsTax" />
             )}
