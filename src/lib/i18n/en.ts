@@ -1073,6 +1073,10 @@ export const en: Dictionary = {
     taxSavings: "Tax savings",
     consumedNote: (amount) =>
       `${amount} of tax savings are not invested and are not part of the wealth.`,
+    monthlyBetter: (amount) =>
+      `The Altersvorsorgedepot pays ${amount} more per month than the ETF savings plan.`,
+    monthlyWorse: (amount) =>
+      `The Altersvorsorgedepot pays ${amount} less per month than the ETF savings plan.`,
     monthlyTitle: "Monthly net pension",
     monthlySubtitle: (from, until) =>
       `Payout from age ${from} to ${until}, after taxes, from the second year on.`,

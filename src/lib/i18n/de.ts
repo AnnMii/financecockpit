@@ -1123,6 +1123,10 @@ export const de = {
     taxSavings: "Steuerersparnis",
     consumedNote: (amount: string) =>
       `${amount} Steuerersparnis werden nicht investiert und sind im Vermögen nicht enthalten.`,
+    monthlyBetter: (amount: string) =>
+      `Das Altersvorsorgedepot zahlt ${amount} pro Monat mehr als der ETF-Sparplan.`,
+    monthlyWorse: (amount: string) =>
+      `Das Altersvorsorgedepot zahlt ${amount} pro Monat weniger als der ETF-Sparplan.`,
     monthlyTitle: "Monatliche Netto-Rente",
     monthlySubtitle: (from: number, until: number) =>
       `Auszahlung von ${from} bis ${until}, nach Steuern, ab dem zweiten Jahr.`,

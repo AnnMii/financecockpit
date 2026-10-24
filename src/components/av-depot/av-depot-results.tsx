@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Assumptions, YearlyTable } from "@/components/calculator-shell";
 import { AvDepotChart } from "@/components/charts/calculator-charts";
+import { niceStep } from "@/components/charts/stacked-columns";
 import { Card } from "@/components/fields";
 import { useLocale } from "@/components/locale-provider";
 import { StatTile } from "@/components/stat-tile";
@@ -12,9 +13,18 @@ import type {
   PayoutYear,
 } from "@/lib/calculators/av-depot";
 
+/** Share of the row that the longest possible bar takes; the figure sits behind it. */
+const BAR_SPACE = 75;
+
 function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
   const { t, f } = useLocale();
+  // A fixed scale with ticks, not "the larger bar is always full": otherwise
+  // the bar of the higher pension never moves when an input changes.
   const max = Math.max(av, normal, 1);
+  const step = niceStep(max, 4);
+  const top = Math.ceil(max / step) * step;
+  const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step);
+  const difference = Math.round(av - normal);
   const rows = [
     { label: t.avDepot.name, value: av, color: "var(--series-1)" },
     { label: t.avDepot.etfPlan, value: normal, color: "var(--series-compare)" },
@@ -28,7 +38,7 @@ function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
             <div
               className="h-5 rounded-r-sm"
               style={{
-                width: `${(row.value / max) * 75}%`,
+                width: `${(row.value / top) * BAR_SPACE}%`,
                 minWidth: 2,
                 background: row.color,
               }}
@@ -39,6 +49,24 @@ function MonthlyPayoutBars({ av, normal }: { av: number; normal: number }) {
           </div>
         </div>
       ))}
+      <div className="relative h-5 border-t border-grid text-xs text-muted" aria-hidden="true">
+        {ticks.map((tick) => (
+          <span
+            key={tick}
+            className="absolute top-1 -translate-x-1/2 tabular-nums first:translate-x-0"
+            style={{ left: `${(tick / top) * BAR_SPACE}%` }}
+          >
+            {f.euro(tick)}
+          </span>
+        ))}
+      </div>
+      {difference !== 0 && (
+        <p className="text-sm text-ink-2">
+          {difference > 0
+            ? t.avDepot.monthlyBetter(f.euro(difference))
+            : t.avDepot.monthlyWorse(f.euro(-difference))}
+        </p>
+      )}
     </div>
   );
 }
