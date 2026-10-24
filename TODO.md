@@ -402,3 +402,77 @@ data.
 (Sparrechner)" on the plan page to "Sparrate ETF-Depot"; make the budget "Zum
 Investieren verfügbar pro Monat" editable in the AV-Depot and savings calculator
 as well (there it is only a hint under the savings rate so far).
+
+---
+
+## 17. Claude connector (MCP): ask questions about the calculators in claude.ai
+
+- [ ] **Decide whether and when this gets built** (not implemented yet; planned only)
+
+**Idea:** Users ask questions about the calculators in their own Claude chat. The
+chat knows what the calculators can and cannot do, can run them with given
+values and can propose values for the active calculator. The app offers this as
+a **custom connector** (a remote MCP server), so each user works with their own
+Claude account and nobody pays for anybody else.
+
+**Why a connector and not a chat on the website:** The sign-in of the Claude
+subscriptions (Free, Pro, Max) may only be used in Claude Code and Claude.ai, not
+in other apps. A chat inside the website would need an API key (paid per use,
+separate from the subscription): either the operator's (the operator pays) or
+one per user (a high hurdle). Both were ruled out for now. The price of the
+connector: the chat lives in claude.ai, not on the website.
+
+**What was checked** (Claude Help Center, "custom connectors"): custom connectors
+exist on all plans (Free: one connector); the server must be reachable from the
+internet; sign-in is OAuth or fixed credentials such as a token in a header. Not
+clear yet: whether the interface accepts a token for single users (to be tried).
+
+**Design:**
+
+- **Server:** a route `/mcp` in the app that speaks the MCP protocol over HTTP
+  (official MCP SDK), stateless.
+- **Tools for Claude:**
+  1. `describe_calculators`: what each calculator can and cannot do (Vorabpauschale,
+     Sparerpauschbetrag, no tax or investment advice), generated from the
+     calculator registry and the README so it stays in sync with the code.
+  2. `run_calculator`: runs the pure TypeScript calculators with given values,
+     validated with the existing settings schema; no side effects.
+  3. `get_my_settings`: reads the saved profiles of the signed-in user, read only.
+  4. `propose_values`: stores a proposal (calculator, fields, reason); it is
+     checked against the allowed ranges and **not applied**.
+- **Website side:** a table `proposals` and a banner in the app ("Claude proposes:
+  savings rate €250 instead of €150 – apply / discard"). Applying puts the values
+  into the draft as local changes, like "1 lokale Änderung"; only the user saves.
+  Proposals expire. A page "Claude verbinden" explains the setup and manages the
+  tokens.
+- **Sign-in in two steps:** (A) a personal access token the user creates in the
+  app (stored only as a hash, revocable, read and propose only), sent as a bearer
+  header, or as a secret part of the address if the interface has no header field
+  (addresses end up in logs, so this is the weaker way). (B) A proper OAuth login
+  later, if A is not enough.
+
+**Security and privacy:** all tools are read-only or propose-only; there is no way
+to change source code, profiles or accounts. Each token belongs to one account
+and sees only its data. Requests are rate limited with the existing logic, answer
+sizes are capped, no conversation content is logged. The data goes from the user
+to their own Claude account, the operator sends nothing to Anthropic. The
+connector can first be limited to beta users (admin portal).
+
+**Effort:** medium, about three to four rounds.
+
+**Steps:**
+
+1. MCP server with `describe_calculators` and `run_calculator`, token sign-in;
+   try it in claude.ai (also: does the interface accept a token?).
+2. `get_my_settings` and the page "Claude verbinden".
+3. Proposals and the banner.
+4. OAuth, if step 1 shows the token is not enough.
+
+**To decide beforehand:**
+
+- Is step 1 (knowledge and calculating, no access to the user's data) enough as a
+  start to see whether the connection works?
+- Beta users only at first, or everybody?
+- Should the chat also be able to switch profiles, or only propose values for the
+  current calculator? (The plan is the second.)
+- Needs the server to be online first (see HOSTING.md); local tests need a tunnel.
