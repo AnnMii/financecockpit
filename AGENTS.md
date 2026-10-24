@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-## Daily dependency and security check
+## Daily check: dependencies, security and the Finanzfluss originals
 
 Whenever a prompt is worked on, first look at the file `.dependency-check` in the
 repository root (it holds the time of the last check as an ISO date, and is
@@ -21,11 +21,22 @@ the actual task, then write the new time into the file:
 3. If something looks serious (a high or critical advisory, or a security
    release of a package above), search the web for the advisory and check
    whether the app is actually affected.
-4. Report the result in two or three lines at the start of the answer: nothing
-   new, or what was found and which version fixes it.
+4. `npm run upstream:diff`: did the Finanzfluss calculators we follow (AV-Depot,
+   savings calculator, income tax) change upstream since the commit the
+   submodule is pinned to? (It fetches the submodule's remote; it changes none of
+   our files.)
+5. `npm run upstream:check-api`: does the Finanzfluss server still give the
+   answers stored in `test/fixtures/` for the pension gap calculator and the
+   withdrawal plan? Never run it with `--record` as part of the check.
+6. Report the result in two or three lines at the start of the answer: nothing
+   new, or what was found (a package and the version that fixes it; which
+   Finanzfluss calculator changed and in what way).
 
 The check is not automatic: it only happens when a prompt is worked on, so at
 least once a day when the project is in use. Never upgrade, install or change
 `package.json` as part of the check without asking; propose the update instead.
+The same goes for Finanzfluss changes: never move the submodule, edit a
+calculator or record new fixtures without asking; report the difference and, if
+the user agrees, follow "Syncing with the Finanzfluss original" in the README.
 Skip the check only if the user asks for it. Use the user's language for the
 report.
