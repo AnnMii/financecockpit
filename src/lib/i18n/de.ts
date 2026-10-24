@@ -235,7 +235,10 @@ const toggles: ToggleTexts = {
       label: "Inflation berücksichtigen (heutige Kaufkraft)",
       hint: "Zieht die Inflationsrate vom Zinssatz ab; Einzahlungen und Ergebnis in heutigen Euro.",
     },
-    considerTax: { label: "Steuern mitberechnen" },
+    considerTax: {
+      label: "Steuern mitberechnen",
+      hint: "Ergebnis nach Steuern: ausschüttend fällt sie jedes Jahr an, thesaurierend beim Verkauf am Ende.",
+    },
     considerPartialExemption: {
       label: "Teilfreistellung bei Fonds berücksichtigen",
     },
@@ -429,7 +432,7 @@ const fieldInfo: FieldInfoTexts = {
     untilRetirement:
       "Mit Haken ist die Laufzeit Renteneintritt minus Alter und folgt den globalen Werten. Ohne Haken gibst du die Laufzeit frei ein, etwa für ein Sparziel vor der Rente.",
     considerTax:
-      "Zieht die Kapitalertragsteuer von den Zinsen ab. Ohne diese Option sind alle Ergebnisse vor Steuern.",
+      "Zieht die Kapitalertragsteuer ab; das Ergebnis ist dann nach Steuern. Ausschüttend fällt die Steuer jedes Jahr auf die Zinsen an. Thesaurierend fällt sie erst beim Verkauf am Ende an, einmal auf den gesamten Gewinn: Das Endkapital ist dann das, was nach dem Verkauf übrig bliebe. Während der Sparzeit zahlst du keine Steuer; die Vorabpauschale und der Sparerpauschbetrag sind nicht berücksichtigt. Ohne diese Option sind alle Ergebnisse vor Steuern.",
     considerPartialExemption:
       "Bei Fonds bleibt ein Teil der Erträge steuerfrei. Schalte das an, wenn du in Fonds oder ETFs sparst.",
     output:
@@ -1263,6 +1266,11 @@ export const de = {
     chartSubtitle:
       "Einzahlungen inklusive Anfangskapital und die darauf aufgelaufenen Zinsen",
     afterTax: " nach Steuern",
+    afterTaxSale: " nach Steuern bei Verkauf",
+    endValueBeforeTax: "Endkapital vor Steuern",
+    taxTotal: "Steuern gesamt",
+    chartViewLabel: "Ansicht",
+    chartViews: { before: "Vor Steuern", after: "Nach Steuern", afterSale: "Nach Steuern bei Verkauf" },
     chartAria:
       "Säulendiagramm: Kapital pro Jahr, aufgeteilt in Einzahlungen und Zinsen",
     totalDeposits: "Einzahlungen gesamt",

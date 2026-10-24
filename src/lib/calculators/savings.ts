@@ -286,3 +286,22 @@ export function calculateSavings(input: SavingsInput): {
     errors: [],
   };
 }
+
+/**
+ * The same plan without taxes: what it reaches and the course before taxes.
+ * Whatever was searched, the figures of the result lead to its end value.
+ */
+export function withoutTax(
+  input: SavingsInput,
+  result: SavingsResult,
+): SavingsResult | null {
+  return calculateSavings({
+    ...input,
+    output: "endValue",
+    startValue: result.startValue,
+    savingRate: result.savingRate,
+    yearlyInterest: result.yearlyInterest,
+    durationYears: result.durationYears,
+    considerTax: false,
+  }).result;
+}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { AdvancedSwitch } from "@/components/advanced-switch";
 import { useAccess } from "@/components/access-provider";
 import { useAdvancedInputs } from "@/components/preferences-provider";
@@ -25,6 +26,7 @@ import {
   type SavingsInput,
   type SavingsResult,
   minimumEndValue,
+  withoutTax,
 } from "@/lib/calculators/savings";
 
 export function SavingsCalculator() {
@@ -205,10 +207,22 @@ function Results({
   const text = t.savings;
   const perInterval =
     input.saveInterval === "monthly" ? t.common.perMonth : t.common.perYear;
-  const afterTax = input.considerTax ? text.afterTax : "";
+  const afterTax = !input.considerTax
+    ? ""
+    : input.distributionType === "accumulating"
+      ? text.afterTaxSale
+      : text.afterTax;
+  // The same plan before taxes, to show what the taxes cost and to compare.
+  const untaxed = input.considerTax ? withoutTax(input, result) : null;
+  const [taxView, setTaxView] = useState<"after" | "before">("after");
+  const showing = taxView === "before" && untaxed ? "before" : "after";
+  const shownYears = showing === "before" ? untaxed!.years : result.years;
 
   const figures = {
-    endValue: { label: t.common.endValue, value: f.euro(result.endValue) },
+    endValue: {
+      label: `${t.common.endValue}${afterTax}`,
+      value: f.euro(result.endValue),
+    },
     startValue: { label: text.startValue, value: f.euro(result.startValue) },
     yearlyInterest: {
       label: text.interestRate,
@@ -228,7 +242,13 @@ function Results({
   const totals: [string, number][] = [
     [text.totalDeposits, result.deposits],
     [`${t.common.interest}${afterTax}`, result.interest],
-    [t.common.endValue, result.endValue],
+    [`${t.common.endValue}${afterTax}`, result.endValue],
+    ...(untaxed
+      ? ([
+          [text.endValueBeforeTax, untaxed.endValue],
+          [text.taxTotal, untaxed.endValue - result.endValue],
+        ] as [string, number][])
+      : []),
   ];
 
   return (
@@ -257,12 +277,39 @@ function Results({
       </div>
 
       <Card>
-        <h2 className="text-base font-semibold">{text.chartTitle}</h2>
-        <p className="mb-4 text-sm text-ink-2">
-          {text.chartSubtitle}
-          {afterTax}.
-        </p>
-        <SavingsChart result={result} />
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold">{text.chartTitle}</h2>
+            <p className="mb-4 text-sm text-ink-2">
+              {text.chartSubtitle}
+              {showing === "before" ? "" : afterTax}.
+            </p>
+          </div>
+          {untaxed && (
+            <div role="group" aria-label={text.chartViewLabel} className="flex text-xs">
+              {(["before", "after"] as const).map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  aria-pressed={showing === option}
+                  onClick={() => setTaxView(option)}
+                  className={`border border-axis px-3 py-1.5 first:rounded-l-md last:rounded-r-md last:border-l-0 ${
+                    showing === option
+                      ? "bg-accent-wash font-semibold text-accent"
+                      : "text-ink-2 hover:text-ink"
+                  }`}
+                >
+                  {option === "before"
+                    ? text.chartViews.before
+                    : input.distributionType === "accumulating"
+                      ? text.chartViews.afterSale
+                      : text.chartViews.after}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <SavingsChart result={result} years={shownYears} />
         <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-line pt-4 text-sm sm:grid-cols-3">
           {totals.map(([label, value]) => (
             <div key={label}>
@@ -278,7 +325,7 @@ function Results({
             t.common.interest,
             t.common.capital,
           ]}
-          rows={result.years.map((year) => [
+          rows={shownYears.map((year) => [
             year.year,
             f.euro(year.deposits),
             f.euro(year.interest),

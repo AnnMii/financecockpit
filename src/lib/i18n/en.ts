@@ -280,7 +280,7 @@ export const en: Dictionary = {
       untilRetirement:
         "Checked, the duration is retirement age minus age and follows the shared values. Unchecked, you enter the duration freely, e.g. for a savings goal before retirement.",
       considerTax:
-        "Deducts capital gains tax from the interest. Without this option all results are before taxes.",
+        "Deducts the capital gains tax; the result is then after taxes. Distributing, the tax is due on the interest every year. Accumulating, it is due only when you sell at the end, once on the whole gain: the final capital is then what would be left after the sale. During the saving period you pay no tax; the advance lump sum (Vorabpauschale) and the saver's allowance are not included. Without this option all results are before taxes.",
       considerPartialExemption:
         "For funds, part of the income stays tax-free. Switch this on if you save in funds or ETFs.",
       output:
@@ -573,7 +573,10 @@ export const en: Dictionary = {
         label: "Account for inflation (today's purchasing power)",
         hint: "Deducts the inflation rate from the interest rate; deposits and result in today's euros.",
       },
-      considerTax: { label: "Include taxes" },
+      considerTax: {
+        label: "Include taxes",
+        hint: "Result after taxes: distributing, the tax is due every year; accumulating, when you sell at the end.",
+      },
       considerPartialExemption: {
         label: "Apply the partial exemption for funds",
       },
@@ -1198,6 +1201,11 @@ export const en: Dictionary = {
     chartTitle: "Capital per year",
     chartSubtitle: "Deposits including starting capital and the interest earned on them",
     afterTax: " after taxes",
+    afterTaxSale: " after taxes on sale",
+    endValueBeforeTax: "Final capital before taxes",
+    taxTotal: "Taxes in total",
+    chartViewLabel: "View",
+    chartViews: { before: "Before taxes", after: "After taxes", afterSale: "After taxes on sale" },
     chartAria: "Column chart: capital per year, split into deposits and interest",
     totalDeposits: "Total deposits",
     assumptions: [

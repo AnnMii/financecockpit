@@ -86,13 +86,17 @@ export function PensionGapChart({
 }
 
 /** Capital per year, split into deposits and interest. */
-export function SavingsChart({ result, height }: ChartProps<SavingsResult>) {
+export function SavingsChart({
+  result,
+  height,
+  years = result.years,
+}: ChartProps<SavingsResult> & { years?: SavingsResult["years"] }) {
   const { t, f } = useLocale();
   return (
     <StackedColumns
       height={height}
-      data={result.years.map((year) => ({
-        tick: yearTick(year.year, result.years.length),
+      data={years.map((year) => ({
+        tick: yearTick(year.year, years.length),
         title: t.common.afterYears(
           f.years(Math.min(year.year, result.durationYears)),
         ),
