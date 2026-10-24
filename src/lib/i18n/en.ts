@@ -254,7 +254,7 @@ export const en: Dictionary = {
       avDepotCosts:
         "Running costs of the Altersvorsorgedepot per year: the fund costs (TER) and fees such as a custody or administration fee, together. They reduce the return. For the standard depot the effective costs are capped by law at 1.0% per year; the cap does not apply to a freely composed depot. There you enter the TER of the chosen ETFs in addition to the depot's fee.",
       baseRate:
-        "The base rate set yearly by the German Federal Ministry of Finance. It yields the Vorabpauschale, the yearly minimum taxation of accumulating funds in a regular portfolio.",
+        "The base rate set yearly by the German Federal Ministry of Finance. It yields the Vorabpauschale, the yearly minimum taxation of accumulating funds in a regular portfolio. It follows the yield of 15-year federal bonds at the start of the year: 3.20% in 2026, close to 0% a few years ago. There is no official forecast; the calculator uses one fixed value for all years, preset to 2%.",
       oneTimePayout:
         "Share of the capital you have paid out at once at retirement, before taxes. Up to 30% is allowed; the rest is paid as a monthly pension.",
       taxSavingsMode:
@@ -519,7 +519,7 @@ export const en: Dictionary = {
       baseRate: {
         label: "Base rate (Basiszins)",
         unit: "%",
-        hint: "For the advance tax (Vorabpauschale) in the regular account.",
+        hint: "For the advance tax (Vorabpauschale) in the regular account; 2026: 3.20%, an assumption for all years.",
       },
       oneTimePayout: {
         label: "Lump sum at retirement",

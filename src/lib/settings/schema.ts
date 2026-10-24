@@ -69,7 +69,8 @@ export const numberFields = {
     /** Per month into the AV-Depot: 150 € is the subsidy limit, 1.140 € the maximum. */
     savingsRateMonthly: euro(150, 1_140),
     avDepotCosts: percent(0.2, 5),
-    baseRate: percent(0, 10),
+    // An assumption for all years: 2026 is 3.20 %, but it was around 0 % only a few years ago.
+    baseRate: percent(2, 10),
     oneTimePayout: percent(0, 30),
   },
   "pension-gap": {},

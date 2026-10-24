@@ -181,7 +181,7 @@ const numbers: NumberTexts = {
     baseRate: {
       label: "Basiszins",
       unit: "%",
-      hint: "Für die Vorabpauschale im normalen Depot.",
+      hint: "Für die Vorabpauschale im normalen Depot; 2026: 3,20 %, Annahme für alle Jahre.",
     },
     oneTimePayout: {
       label: "Einmalauszahlung bei Renteneintritt",
@@ -405,7 +405,7 @@ const fieldInfo: FieldInfoTexts = {
     avDepotCosts:
       "Laufende Kosten des Altersvorsorgedepots pro Jahr: die Fondskosten (TER) und Gebühren wie eine Depot- oder Verwaltungsgebühr zusammen. Sie mindern die Rendite. Für das Standarddepot sind die Effektivkosten gesetzlich auf 1,0 % pro Jahr begrenzt; im frei zusammengestellten Depot gilt der Deckel nicht. Dort trägst du die TER der gewählten ETFs zusätzlich zur Gebühr des Depots hier ein.",
     baseRate:
-      "Der Basiszins, den das Bundesfinanzministerium jährlich festlegt. Aus ihm ergibt sich die Vorabpauschale, also die jährliche Mindestbesteuerung thesaurierender Fonds im normalen Depot.",
+      "Der Basiszins, den das Bundesfinanzministerium jährlich festlegt. Aus ihm ergibt sich die Vorabpauschale, also die jährliche Mindestbesteuerung thesaurierender Fonds im normalen Depot. Er folgt der Rendite 15-jähriger Bundesanleihen zum Jahresbeginn: 2026 sind es 3,20 %, vor wenigen Jahren lag er nahe 0 %. Eine amtliche Prognose gibt es nicht; der Rechner nutzt einen festen Wert für alle Jahre, vorbelegt mit 2 %.",
     oneTimePayout:
       "Anteil des Kapitals, den du dir zum Renteneintritt auf einmal auszahlen lässt, vor Steuern. Erlaubt sind bis zu 30 %; der Rest wird als monatliche Rente ausgezahlt.",
     taxSavingsMode:
