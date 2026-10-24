@@ -55,23 +55,23 @@ function Workspace() {
         <>
           <Section title={text.sections.entitlements}>
             <NumberSetting
-              scope="pension-gap"
+              scope="shared"
               name="statePension"
               slider={sliders.pension}
             />
-            <NumberSetting scope="pension-gap" name="companyPension" />
-            <NumberSetting scope="pension-gap" name="privatePension" />
-            <NumberSetting scope="pension-gap" name="riesterPension" />
+            <NumberSetting scope="shared" name="companyPension" />
+            <NumberSetting scope="shared" name="privatePension" />
+            <NumberSetting scope="shared" name="riesterPension" />
           </Section>
 
           <Section title={text.sections.tax}>
-            <NumberSetting scope="pension-gap" name="taxPrediction" />
-            <NumberSetting scope="pension-gap" name="yearlyTaxFreeAmount" />
+            <NumberSetting scope="shared" name="taxPrediction" />
+            <NumberSetting scope="shared" name="yearlyTaxFreeAmount" />
           </Section>
 
           <Section title={text.sections.desired}>
             <NumberSetting
-              scope="pension-gap"
+              scope="shared"
               name="desiredPension"
               slider={sliders.desiredPension}
             />

@@ -22,7 +22,7 @@ describe("toWithdrawalPlanInput", () => {
   it("takes the estimated tax deduction of the pension gap profile off the return", () => {
     const taxed = {
       ...withWithdrawal(settings, { considerTax: true }),
-      "pension-gap": { ...settings["pension-gap"], taxPrediction: 20 },
+      shared: { ...settings.shared, taxPrediction: 20 },
     };
     expect(toWithdrawalPlanInput(taxed).interestRate).toBeCloseTo(2.4, 10);
     // A lower return pays less per month from the same capital.
@@ -36,7 +36,7 @@ describe("toWithdrawalPlanInput", () => {
     expect(toWithdrawalPlanInput(real).interestRate).toBeCloseTo(1, 10);
     const both = {
       ...withWithdrawal(settings, { realTerms: true, considerTax: true }),
-      "pension-gap": { ...settings["pension-gap"], taxPrediction: 20 },
+      shared: { ...settings.shared, taxPrediction: 20 },
     };
     // (3 % − 2 %) × (1 − 20 %), not 3 % × 0,8 − 2 %
     expect(toWithdrawalPlanInput(both).interestRate).toBeCloseTo(0.8, 10);

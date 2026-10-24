@@ -47,7 +47,7 @@ function Workspace() {
   return (
     <CalculatorShell
       scope="plan"
-      uses={["pension-gap", "av-depot", "savings", "withdrawal-plan"]}
+      uses={["av-depot", "savings", "withdrawal-plan"]}
       errors={errors}
       errorHint={
         errors.some((error) => error.startsWith("av")) ? text.avErrorHint : null
@@ -61,15 +61,15 @@ function Workspace() {
           />
 
           <Section title={text.sections.pension}>
-            <NumberSetting scope="pension-gap" name="desiredPension" />
-            <NumberSetting scope="pension-gap" name="statePension" />
+            <NumberSetting scope="shared" name="desiredPension" />
+            <NumberSetting scope="shared" name="statePension" />
             {showAdvanced && (
               <>
-                <NumberSetting scope="pension-gap" name="companyPension" />
-                <NumberSetting scope="pension-gap" name="privatePension" />
-                <NumberSetting scope="pension-gap" name="riesterPension" />
-                <NumberSetting scope="pension-gap" name="taxPrediction" />
-                <NumberSetting scope="pension-gap" name="yearlyTaxFreeAmount" />
+                <NumberSetting scope="shared" name="companyPension" />
+                <NumberSetting scope="shared" name="privatePension" />
+                <NumberSetting scope="shared" name="riesterPension" />
+                <NumberSetting scope="shared" name="taxPrediction" />
+                <NumberSetting scope="shared" name="yearlyTaxFreeAmount" />
               </>
             )}
             <p className="text-xs text-ink-2">{text.pensionNote}</p>

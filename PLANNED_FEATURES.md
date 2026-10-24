@@ -224,8 +224,9 @@ under this.
   not freely nameable. The savings rates come from the profiles of the
   Altersvorsorgedepot and the savings calculator and from the plan; the global
   budget is checked against them.
-- **Pension entitlements and desired pension** stay in the profile of the pension
-  gap calculator; the plan page shows and changes them there.
+- **Pension entitlements and desired pension** were first kept in the profile of
+  the pension gap calculator; they are global values now (migration 0008), shared
+  by the pension gap calculator and the plan.
 - **Return** stays entered nominally; the plan always deducts the inflation rate
   and only calculates in today's purchasing power. There is no nominal view.
 - **Volatility:** default 15 % (depot) and 1 % (savings account), adjustable.

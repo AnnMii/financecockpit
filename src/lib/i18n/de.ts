@@ -145,26 +145,6 @@ const numbers: NumberTexts = {
       unit: "€ / Jahr",
       hint: "Der Teil, der für diese Geldanlage noch frei ist.",
     },
-  },
-  "av-depot": {
-    savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
-    avDepotCosts: {
-      label: "Kosten des AV-Depots",
-      unit: "% p. a.",
-      hint: "Fondskosten (TER) und Gebühren zusammen.",
-    },
-    baseRate: {
-      label: "Basiszins",
-      unit: "%",
-      hint: "Für die Vorabpauschale im normalen Depot.",
-    },
-    oneTimePayout: {
-      label: "Einmalauszahlung bei Renteneintritt",
-      unit: "%",
-      hint: "Bis zu 30 % des Kapitals, brutto.",
-    },
-  },
-  "pension-gap": {
     statePension: {
       label: "Gesetzliche Rente",
       unit: "€ / Monat",
@@ -191,6 +171,25 @@ const numbers: NumberTexts = {
       hint: "Netto, in heutiger Kaufkraft, was du im Ruhestand zur Verfügung haben möchtest.",
     },
   },
+  "av-depot": {
+    savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
+    avDepotCosts: {
+      label: "Kosten des AV-Depots",
+      unit: "% p. a.",
+      hint: "Fondskosten (TER) und Gebühren zusammen.",
+    },
+    baseRate: {
+      label: "Basiszins",
+      unit: "%",
+      hint: "Für die Vorabpauschale im normalen Depot.",
+    },
+    oneTimePayout: {
+      label: "Einmalauszahlung bei Renteneintritt",
+      unit: "%",
+      hint: "Bis zu 30 % des Kapitals, brutto.",
+    },
+  },
+  "pension-gap": {},
   savings: {
     savingsRateMonthly: { label: "Sparrate pro Monat", unit: "€" },
     costs: {
@@ -250,7 +249,7 @@ const toggles: ToggleTexts = {
     },
     considerTax: {
       label: "Steuern auf die Erträge berücksichtigen",
-      hint: "Zieht den geschätzten Steuerabzug aus dem Rentenlücke-Profil von der Rendite ab.",
+      hint: "Zieht den geschätzten Steuerabzug aus den globalen Werten von der Rendite ab.",
     },
     realTerms: {
       label: "Inflation berücksichtigen (heutige Kaufkraft)",
@@ -385,6 +384,20 @@ const fieldInfo: FieldInfoTexts = {
       "Kapitalerträge bis zu diesem Betrag bleiben pro Jahr steuerfrei: 1.000 € für Einzelpersonen, 2.000 € für zusammen Veranlagte. Trage ein, was davon für diese Geldanlage noch frei ist.",
     considerInflation:
       "Mit Haken wird die Inflationsrate dort berücksichtigt, wo die globalen Werte eine Rolle spielen. Rentenlücke-Rechner: Die Wunschrente und die Rentenansprüche sind Beträge von heute. Mit Haken rechnet der Rechner deshalb in heutiger Kaufkraft: mit der Rendite nach Abzug der Inflationsrate, sodass auch nötiges Kapital und Sparrate in heutiger Kaufkraft stehen. Ohne Haken würde die Wunschrente wie ein Betrag im Jahr des Renteneintritts behandelt und der Bedarf unterschätzt. AV-Depot-Rechner: Das Einkommen im Ruhestand (in heutiger Kaufkraft eingetragen) wird auf das Jahr des Renteneintritts hochgerechnet, bevor die Steuer auf die Auszahlungen berechnet wird; Endvermögen und Renten bleiben nominal, also in künftigen Euro. Ohne Haken sind beide nominal und das Einkommen gilt unverändert. Unabhängig vom Haken rechnet der Gesamtplan immer in heutiger Kaufkraft, Sparrechner und Entnahmeplan haben einen eigenen Schalter und nutzen dann die hier eingestellte Inflationsrate.",
+    statePension:
+      "Deine erwartete gesetzliche Monatsrente, brutto. Sie steht in der jährlichen Renteninformation der Deutschen Rentenversicherung.",
+    companyPension:
+      "Erwartete Monatsrente aus betrieblicher Altersvorsorge, brutto – etwa Direktversicherung oder Pensionskasse.",
+    privatePension:
+      "Erwartete Monatsrente aus privaten Renten- oder Lebensversicherungen, brutto.",
+    riesterPension:
+      "Erwartete Monatsrente aus Riester- oder Rürup-Verträgen, brutto.",
+    taxPrediction:
+      "Pauschaler Steuersatz auf deine Renten oberhalb des Grundfreibetrags und auf die Zinsen im Ruhestand. Eine Schätzung; der tatsächliche Satz hängt von deinem gesamten Einkommen ab.",
+    yearlyTaxFreeAmount:
+      "Einkommen bis zu diesem Betrag bleibt pro Jahr steuerfrei. Der Grundfreibetrag wird jedes Jahr angepasst.",
+    desiredPension:
+      "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest, in heutiger Kaufkraft. Mit „Inflation berücksichtigen“ rechnet der Rentenlücke-Rechner damit; ohne den Haken würde der Betrag wie ein Betrag im Jahr des Renteneintritts behandelt. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
   },
   "av-depot": {
     savingsRateMonthly:
@@ -401,20 +414,6 @@ const fieldInfo: FieldInfoTexts = {
   "pension-gap": {
     savingsLikeCalculator:
       "Mit Haken wird die Sparphase mit den Einstellungen des aktiven Sparrechner-Profils gerechnet: Steuern (ausschüttend oder thesaurierend, mit Teilfreistellung), Kosten pro Jahr und Zinsintervall; die Einzahlung erfolgt zu Beginn des Monats. Das Feld „Kapitalertragsteuer“ entfällt, es gilt der Satz aus den globalen Werten – aber nur, wenn im Sparrechner „Steuern mitberechnen“ an ist, sonst rechnet die Sparphase ohne Steuern. Die Inflation steuerst du hier mit „Inflation berücksichtigen“. Ohne Haken rechnet der Rechner wie Finanzfluss: Rendite nach Kapitalertragsteuer, Einzahlung am Monatsende.",
-    statePension:
-      "Deine erwartete gesetzliche Monatsrente, brutto. Sie steht in der jährlichen Renteninformation der Deutschen Rentenversicherung.",
-    companyPension:
-      "Erwartete Monatsrente aus betrieblicher Altersvorsorge, brutto – etwa Direktversicherung oder Pensionskasse.",
-    privatePension:
-      "Erwartete Monatsrente aus privaten Renten- oder Lebensversicherungen, brutto.",
-    riesterPension:
-      "Erwartete Monatsrente aus Riester- oder Rürup-Verträgen, brutto.",
-    taxPrediction:
-      "Pauschaler Steuersatz auf deine Renten oberhalb des Grundfreibetrags und auf die Zinsen im Ruhestand. Eine Schätzung; der tatsächliche Satz hängt von deinem gesamten Einkommen ab.",
-    yearlyTaxFreeAmount:
-      "Einkommen bis zu diesem Betrag bleibt pro Jahr steuerfrei. Der Grundfreibetrag wird jedes Jahr angepasst.",
-    desiredPension:
-      "Der Betrag, den du im Ruhestand monatlich netto zur Verfügung haben möchtest, in heutiger Kaufkraft. Mit „Inflation berücksichtigen“ rechnet der Rentenlücke-Rechner damit; ohne den Haken würde der Betrag wie ein Betrag im Jahr des Renteneintritts behandelt. Als Faustregel gelten etwa 80 % des letzten Nettoeinkommens.",
   },
   savings: {
     savingsRateMonthly:
@@ -454,7 +453,7 @@ const fieldInfo: FieldInfoTexts = {
     capitalConsumption:
       "Mit Haken wird das Vermögen über den Zeitraum vollständig aufgebraucht. Ohne Haken werden nur die Zinsen entnommen, das Kapital bleibt erhalten.",
     considerTax:
-      "Mit Haken wird vom Zinssatz der geschätzte Steuerabzug des Rentenlücke-Profils abgezogen, wie im Gesamtplan. Ohne Haken wird ohne Steuern gerechnet, wie bei Finanzfluss.",
+      "Mit Haken wird vom Zinssatz der geschätzte Steuerabzug aus den globalen Werten abgezogen, wie im Gesamtplan. Ohne Haken wird ohne Steuern gerechnet, wie bei Finanzfluss.",
     realTerms:
       "Mit Haken wird die Inflationsrate (Feld darunter) von der Rendite im Ruhestand abgezogen, vor dem Steuerabzug, wie im Gesamtplan; Kapital und Entnahmen stehen dann in heutiger Kaufkraft. Ohne Haken sind alle Beträge nominal, also in künftigen Euro, wie bei Finanzfluss.",
     output:
@@ -799,7 +798,7 @@ export const de = {
         `Das freie Vermögen wird bis Alter ${age} aufgebraucht.`,
       keeps: "Vom freien Vermögen werden nur die Erträge entnommen; es bleibt erhalten.",
       taxNote: (rate: string) =>
-        `Steuern auf die Erträge in der Auszahlphase: geschätzter Steuerabzug von ${rate} (aus dem Rentenlücke-Profil). Das Altersvorsorgedepot versteuert nach seinen eigenen Regeln.`,
+        `Steuern auf die Erträge in der Auszahlphase: geschätzter Steuerabzug von ${rate} (aus den globalen Werten). Das Altersvorsorgedepot versteuert nach seinen eigenen Regeln.`,
     },
     rateLabels: {
       av: "Sparrate Altersvorsorgedepot",
@@ -820,7 +819,7 @@ export const de = {
       "Oder setze die Sparrate des Altersvorsorgedepots auf 0; dann rechnet der Plan ohne es.",
     alsoUses: "Der Plan nutzt außerdem",
     pensionNote:
-      "Diese Werte gehören zum Profil des Rentenlücke-Rechners und gelten auch dort.",
+      "Diese Werte sind globale Werte: Sie gelten auch im Rentenlücke-Rechner und unter „Globale Werte“.",
     status: {
       increase: "Mehr sparen",
       onTrack: "Im Plan – nichts ändern",
@@ -984,6 +983,7 @@ export const de = {
     saving: "Sparen und Anlegen",
     inflation: "Inflation",
     incomeAndTax: "Einkommen und Steuern",
+    pension: "Rente",
   },
 
   admin: {

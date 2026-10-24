@@ -233,6 +233,20 @@ export const en: Dictionary = {
         "Investment income up to this amount stays tax-free per year: €1,000 for single persons, €2,000 for couples assessed jointly. Enter what is still available for this investment.",
       considerInflation:
         "Checked, the inflation rate is taken into account wherever the global values play a role. Pension gap calculator: the desired pension and the pension entitlements are amounts of today. Checked, the calculator therefore works in today's purchasing power: with the return after deducting the inflation rate, so the needed capital and savings rate are in today's purchasing power too. Unchecked, the desired pension would be treated like an amount in the year of retirement and the need underestimated. AV-Depot calculator: the income in retirement (entered in today's purchasing power) is raised to the year of retirement before the tax on the payouts is calculated; final wealth and pensions stay nominal, i.e. in future euros. Unchecked, both are nominal and the income is used as entered. Whatever the box says, the overall plan always uses today's purchasing power; the savings calculator and the withdrawal plan have a switch of their own and then use the inflation rate set here.",
+      statePension:
+        "Your expected monthly state pension, gross. It is stated in the yearly pension information of the Deutsche Rentenversicherung.",
+      companyPension:
+        "Expected monthly pension from a company pension scheme, gross.",
+      privatePension:
+        "Expected monthly pension from private pension or life insurance, gross.",
+      riesterPension:
+        "Expected monthly pension from Riester or Rürup contracts, gross.",
+      taxPrediction:
+        "Flat tax rate on your pensions above the basic allowance and on interest in retirement. An estimate; the actual rate depends on your total income.",
+      yearlyTaxFreeAmount:
+        "Income up to this amount stays tax-free per year. The basic allowance is adjusted every year.",
+      desiredPension:
+        "The amount you want to have available per month in retirement, net, in today's purchasing power. With “Account for inflation” the pension gap calculator works with it that way; unchecked, the amount would be treated like an amount in the year of retirement. A rule of thumb is about 80% of your last net income.",
     },
     "av-depot": {
       savingsRateMonthly:
@@ -249,20 +263,6 @@ export const en: Dictionary = {
     "pension-gap": {
       savingsLikeCalculator:
         "Checked, the saving phase is calculated with the settings of the active savings calculator profile: taxes (distributing or accumulating, with partial exemption), costs per year and interest interval; deposits are made at the start of the month. The “Capital gains tax” field then goes away; the rate from the global values applies – but only if “Include taxes” is on in the savings calculator, otherwise the saving phase is calculated without taxes. The inflation is controlled here with “Account for inflation”. Unchecked, the calculator works like Finanzfluss: return after capital gains tax, deposits at the end of the month.",
-      statePension:
-        "Your expected monthly state pension, gross. It is stated in the yearly pension information of the Deutsche Rentenversicherung.",
-      companyPension:
-        "Expected monthly pension from a company pension scheme, gross.",
-      privatePension:
-        "Expected monthly pension from private pension or life insurance, gross.",
-      riesterPension:
-        "Expected monthly pension from Riester or Rürup contracts, gross.",
-      taxPrediction:
-        "Flat tax rate on your pensions above the basic allowance and on interest in retirement. An estimate; the actual rate depends on your total income.",
-      yearlyTaxFreeAmount:
-        "Income up to this amount stays tax-free per year. The basic allowance is adjusted every year.",
-      desiredPension:
-        "The amount you want to have available per month in retirement, net, in today's purchasing power. With “Account for inflation” the pension gap calculator works with it that way; unchecked, the amount would be treated like an amount in the year of retirement. A rule of thumb is about 80% of your last net income.",
     },
     savings: {
       savingsRateMonthly:
@@ -302,7 +302,7 @@ export const en: Dictionary = {
       capitalConsumption:
         "Checked, the assets are used up completely over the period. Unchecked, only the interest is withdrawn, the capital is preserved.",
       considerTax:
-        "Checked, the estimated tax deduction of the pension gap profile is deducted from the interest rate, as in the overall plan. Unchecked, it is calculated without taxes, as at Finanzfluss.",
+        "Checked, the estimated tax deduction from the global values is deducted from the interest rate, as in the overall plan. Unchecked, it is calculated without taxes, as at Finanzfluss.",
       realTerms:
         "Checked, the inflation rate (field below) is deducted from the return in retirement, before the tax deduction, as in the overall plan; capital and withdrawals are then in today's purchasing power. Unchecked, all amounts are nominal, i.e. in future euros, as at Finanzfluss.",
       output:
@@ -483,26 +483,6 @@ export const en: Dictionary = {
         unit: "€ / year",
         hint: "The part still unused for this investment.",
       },
-    },
-    "av-depot": {
-      savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
-      avDepotCosts: {
-        label: "Costs of the AV-Depot",
-        unit: "% p.a.",
-        hint: "Fund costs (TER) and fees together.",
-      },
-      baseRate: {
-        label: "Base rate (Basiszins)",
-        unit: "%",
-        hint: "For the advance tax (Vorabpauschale) in the regular account.",
-      },
-      oneTimePayout: {
-        label: "Lump sum at retirement",
-        unit: "%",
-        hint: "Up to 30% of the capital, before tax.",
-      },
-    },
-    "pension-gap": {
       statePension: {
         label: "State pension",
         unit: "€ / month",
@@ -529,6 +509,25 @@ export const en: Dictionary = {
         hint: "Net amount, in today's purchasing power, you want to have available in retirement.",
       },
     },
+    "av-depot": {
+      savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
+      avDepotCosts: {
+        label: "Costs of the AV-Depot",
+        unit: "% p.a.",
+        hint: "Fund costs (TER) and fees together.",
+      },
+      baseRate: {
+        label: "Base rate (Basiszins)",
+        unit: "%",
+        hint: "For the advance tax (Vorabpauschale) in the regular account.",
+      },
+      oneTimePayout: {
+        label: "Lump sum at retirement",
+        unit: "%",
+        hint: "Up to 30% of the capital, before tax.",
+      },
+    },
+    "pension-gap": {},
     savings: {
       savingsRateMonthly: { label: "Savings rate per month", unit: "€" },
       costs: {
@@ -588,7 +587,7 @@ export const en: Dictionary = {
       },
       considerTax: {
         label: "Account for tax on the returns",
-        hint: "Deducts the estimated tax deduction of the pension gap profile from the return.",
+        hint: "Deducts the estimated tax deduction from the global values from the return.",
       },
       realTerms: {
         label: "Account for inflation (today's purchasing power)",
@@ -756,7 +755,7 @@ export const en: Dictionary = {
       consumes: (age) => `The free assets are used up by age ${age}.`,
       keeps: "Only the returns of the free assets are withdrawn; they are kept.",
       taxNote: (rate) =>
-        `Tax on the returns in the payout phase: estimated tax deduction of ${rate} (from the pension gap profile). The Altersvorsorgedepot is taxed by its own rules.`,
+        `Tax on the returns in the payout phase: estimated tax deduction of ${rate} (from the global values). The Altersvorsorgedepot is taxed by its own rules.`,
     },
     rateLabels: {
       av: "Savings rate Altersvorsorgedepot",
@@ -777,7 +776,7 @@ export const en: Dictionary = {
       "Or set the savings rate of the Altersvorsorgedepot to 0; the plan then calculates without it.",
     alsoUses: "The plan also uses",
     pensionNote:
-      "These values belong to the profile of the pension gap calculator and apply there too.",
+      "These are global values: they also apply in the pension gap calculator and under “Global values”.",
     status: {
       increase: "Save more",
       onTrack: "On plan – change nothing",
@@ -935,6 +934,7 @@ export const en: Dictionary = {
     saving: "Saving and investing",
     inflation: "Inflation",
     incomeAndTax: "Income and taxes",
+    pension: "Pension",
   },
 
   admin: {

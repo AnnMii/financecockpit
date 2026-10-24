@@ -61,6 +61,17 @@ export default async function SettingsPage() {
                 <NumberSetting scope="shared" name="capitalGainsTax" />
               </div>
             </Section>
+            <Section title={text.pension}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <NumberSetting scope="shared" name="desiredPension" />
+                <NumberSetting scope="shared" name="statePension" />
+                <NumberSetting scope="shared" name="companyPension" />
+                <NumberSetting scope="shared" name="privatePension" />
+                <NumberSetting scope="shared" name="riesterPension" />
+                <NumberSetting scope="shared" name="taxPrediction" />
+                <NumberSetting scope="shared" name="yearlyTaxFreeAmount" />
+              </div>
+            </Section>
           </Card>
         </WithoutSharedBadges>
         <DraftBar />

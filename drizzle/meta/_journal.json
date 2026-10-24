@@ -57,6 +57,13 @@
       "when": 1792341464397,
       "tag": "0007_admin_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1792840929682,
+      "tag": "0008_pension_to_shared",
+      "breakpoints": true
     }
   ]
 }

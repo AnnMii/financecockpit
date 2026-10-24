@@ -54,6 +54,16 @@ export const numberFields = {
     taxableIncomeRetirement: euro(20_000, 10_000_000),
     /** Sparerpauschbetrag still available for these savings. */
     exemptionOrder: euro(1_000, 2_000),
+    /** Pension entitlements, each gross per month, as in the annual pension information. */
+    statePension: euro(950, 100_000),
+    companyPension: euro(100, 100_000),
+    privatePension: euro(0, 100_000),
+    riesterPension: euro(0, 100_000),
+    /** Estimated tax deduction on the pension, and the yearly tax-free amount. */
+    taxPrediction: percent(15, 99),
+    yearlyTaxFreeAmount: euro(12_348, 1_000_000),
+    /** Net pension per month the user wants in retirement, in today's purchasing power. */
+    desiredPension: euro(2_200, 1_000_000),
   },
   "av-depot": {
     /** Per month into the AV-Depot: 150 € is the subsidy limit, 1.140 € the maximum. */
@@ -62,15 +72,7 @@ export const numberFields = {
     baseRate: percent(0, 10),
     oneTimePayout: percent(0, 30),
   },
-  "pension-gap": {
-    statePension: euro(950, 100_000),
-    companyPension: euro(100, 100_000),
-    privatePension: euro(0, 100_000),
-    riesterPension: euro(0, 100_000),
-    taxPrediction: percent(15, 99),
-    yearlyTaxFreeAmount: euro(12_348, 1_000_000),
-    desiredPension: euro(2_200, 1_000_000),
-  },
+  "pension-gap": {},
   savings: {
     /** Per month into the savings plan, which is the ETF depot. */
     savingsRateMonthly: euro(150, 100_000),

@@ -73,10 +73,16 @@ export function toAvDepotInput(
 
 export function toPensionGapInput(settings: AllSettings): PensionGapInput {
   const { shared } = settings;
-  const { savingsLikeCalculator, ...own } = settings["pension-gap"];
+  const { savingsLikeCalculator } = settings["pension-gap"];
   const savings = settings.savings;
   return {
-    ...own,
+    statePension: shared.statePension,
+    companyPension: shared.companyPension,
+    privatePension: shared.privatePension,
+    riesterPension: shared.riesterPension,
+    taxPrediction: shared.taxPrediction,
+    yearlyTaxFreeAmount: shared.yearlyTaxFreeAmount,
+    desiredPension: shared.desiredPension,
     savingPhase: savingsLikeCalculator
       ? {
           considerTax: savings.considerTax,
@@ -132,7 +138,7 @@ export function toWithdrawalPlanInput(
   // Inflation first, then the estimated tax deduction of the pension gap
   // profile: the same order as in the overall plan.
   const taxShare = plan.considerTax
-    ? settings["pension-gap"].taxPrediction / 100
+    ? settings.shared.taxPrediction / 100
     : 0;
   const inflation = plan.realTerms ? settings.shared.inflationRate : 0;
   return {
@@ -180,7 +186,15 @@ export function toPlanInput(settings: AllSettings, values?: Pots): PlanInput {
     capitalGainsTax: shared.capitalGainsTax,
     depotVolatility: plan.depotVolatility,
     cashVolatility: plan.cashVolatility,
-    pension: settings["pension-gap"],
+    pension: {
+      statePension: shared.statePension,
+      companyPension: shared.companyPension,
+      privatePension: shared.privatePension,
+      riesterPension: shared.riesterPension,
+      taxPrediction: shared.taxPrediction,
+      yearlyTaxFreeAmount: shared.yearlyTaxFreeAmount,
+      desiredPension: shared.desiredPension,
+    },
     rates,
     budget: shared.investableMonthly,
     depotCosts: settings.savings.costs,

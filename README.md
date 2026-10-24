@@ -88,6 +88,7 @@ migration.
 | Inflation | | ✓ | ✓ (optional) | ✓ (optional) |
 | Capital gains tax | | ✓ | ✓ | |
 | Income, tax-free allowance, children | ✓ | | | |
+| Pension entitlements, tax deduction, desired pension | | ✓ | | (tax deduction, optional) |
 
 The overall plan uses all global values except the switch "Inflation
 berücksichtigen" (account for inflation): it always works in today's purchasing
@@ -212,11 +213,11 @@ account (Tagesgeld). All amounts are in today's purchasing power.
   (ETF depot and savings account) after taxes. Whether the free assets are used
   up or only their returns are withdrawn is set in the profile of the
   withdrawal plan (`capitalConsumption`), which the plan reads along. Taxes on
-  the returns are the estimated tax deduction of the pension gap profile.
-- **Where the values come from:** pension entitlements and the desired pension
-  are on the plan page but belong to the active profile of the pension gap
-  calculator and apply there too. The details of the AV-Depot come from its
-  profile.
+  the returns are the estimated tax deduction from the global values.
+- **Where the values come from:** pension entitlements, the estimated tax
+  deduction and the desired pension are global values (shown on the plan page,
+  the pension gap calculator and under "Globale Werte"). The details of the
+  AV-Depot come from its profile.
 - **Today's balance:** the latest recorded balance from the history. As long as
   none is recorded, the "Vorhandenes Kapital" (existing capital) of the global
   values counts as the balance of the ETF depot.
