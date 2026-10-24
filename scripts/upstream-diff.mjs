@@ -11,6 +11,8 @@ const SUBMODULE = "vendor/finanzfluss-calculators";
 // The files our AV-Depot calculator and Sparrechner are derived from.
 const PATHS = [
   "src/calculators/av-depot.ts",
+  "src/calculators/av-depot-simulator.ts",
+  "src/calculators/av-depot-utils.ts",
   "src/calculators/savings.ts",
   "src/calculators/savings-end-value.ts",
   "src/calculators/savings-utils.ts",
@@ -19,6 +21,7 @@ const PATHS = [
   "src/utils/Lohnsteuer",
   "src/utils/financial.ts",
   "test/calculators/av-depot.test.ts",
+  "test/calculators/av-depot-simulator.test.ts",
 ];
 
 if (!existsSync(`${SUBMODULE}/package.json`)) {
