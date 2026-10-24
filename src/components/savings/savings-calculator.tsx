@@ -218,10 +218,23 @@ function Results({
   const showing = taxView === "before" && untaxed ? "before" : "after";
   const shownYears = showing === "before" ? untaxed!.years : result.years;
 
-  const figures = {
+  const figures: Record<
+    "endValue" | "startValue" | "yearlyInterest" | "duration" | "savingRate",
+    { label: string; value: string; secondary?: { label: string; value: string }; note?: string }
+  > = {
     endValue: {
       label: `${t.common.endValue}${afterTax}`,
       value: f.euro(result.endValue),
+      // With taxes both figures, and what the taxes cost.
+      ...(untaxed
+        ? {
+            secondary: {
+              label: text.endValueBeforeTax,
+              value: f.euro(untaxed.endValue),
+            },
+            note: `${text.taxTotal}: ${f.euro(untaxed.endValue - result.endValue)}`,
+          }
+        : {}),
     },
     startValue: { label: text.startValue, value: f.euro(result.startValue) },
     yearlyInterest: {
@@ -257,8 +270,10 @@ function Results({
         hero
         label={input.output === "endValue" ? searched.label : `${searched.label} [beta]`}
         value={searched.value}
+        secondary={searched.secondary}
         note={
-          result.alreadyReached && input.output !== "endValue"
+          searched.note ??
+          (result.alreadyReached && input.output !== "endValue"
             ? text.alreadyReached[input.output](
                 f.euro(input.endValue),
                 // What the plan reaches without the searched figure.
@@ -266,13 +281,19 @@ function Results({
               )
             : input.output === "duration"
               ? text.durationMonths(Math.ceil(result.durationYears * 12))
-              : undefined
+              : undefined)
         }
       />
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {others.map((key) => (
-          <StatTile key={key} label={figures[key].label} value={figures[key].value} />
+          <StatTile
+            key={key}
+            label={figures[key].label}
+            value={figures[key].value}
+            secondary={figures[key].secondary}
+            note={figures[key].note}
+          />
         ))}
       </div>
 
